@@ -1,0 +1,166 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Kaynak Dosyalar">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Üst Bilgi Dosyaları">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{87780bdf-f596-42fa-a1a7-462281d8b8a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{231c45e7-5bef-4880-a698-013ff21c5985}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{7b24af7e-8157-4778-b3d3-515a5982081a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives">
+      <UniqueIdentifier>{05c985e8-6309-4bf8-a988-65ea6ad6782d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls">
+      <UniqueIdentifier>{4be5fa6d-2855-4324-aea0-f15e97e2bbaa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utils">
+      <UniqueIdentifier>{03a03e3a-e7fa-462e-9293-bdbd2208980d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Lights">
+      <UniqueIdentifier>{a3352234-db07-49c0-a250-268a0ebe45dd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Kaynak Dosyalar</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Geometry.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Drawable.cpp">
+      <Filter>Kaynak Dosyalar</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="BoxGeometry.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>Kaynak Dosyalar</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="OrbitCamera.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Controls.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="grTexture.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="grLight.cpp">
+      <Filter>Core\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="grDirectionalLight.cpp">
+      <Filter>Core\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="grPointLight.cpp">
+      <Filter>Core\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Object.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Geometry.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawable.h">
+      <Filter>Üst Bilgi Dosyaları</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="ElementManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="BoxGeometry.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="OrbitCamera.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="Controls.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="grTexture.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="grLight.h">
+      <Filter>Core\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="grDirectionalLight.h">
+      <Filter>Core\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="grPointLight.h">
+      <Filter>Core\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Shaders\simple_vertex.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Shaders\simple_fragment.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+  </ItemGroup>
+</Project>
