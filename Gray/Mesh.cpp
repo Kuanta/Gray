@@ -24,20 +24,21 @@ void Mesh::update(float deltaTime)
 
 void Mesh::draw()
 {
-	this->updateModel();
-
 	if (this->gm != nullptr)
 	{
+		//cout << this->name << " - " << this->material->getTexture(DIFFUSE_TEXTURE)->getTextureID()<<endl;
 		Shader* shader = this->gm->shaders.defaultShader;
 		shader->use();
 		//Set Model-View_Projection
 		shader->setMat4("model", this->model);
 		shader->setMat4("view", this->gm->currentScene->camera.getViewMatrix());
 		shader->setMat4("projection", this->gm->currentScene->camera.projection);
-		this->geometry->draw();
-		this->material->draw();
+		//BUG FIX: MATERIAL SHOULD BE DRAWN FIRST
+		this->material->draw(shader);
+		this->geometry->draw(shader);
+		
 	}
-	Object::draw();
+	//Object::draw();
 	
 }
 

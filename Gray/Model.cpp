@@ -24,12 +24,30 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	
 	Object* root = this->loadNode(gm, scene->mRootNode, scene);
 
+	//Root transform
+	glm::vec3 position;
+	glm::quat orientation;
+	glm::vec3 scale;
+	aiMatrix4x4 rootTransform = scene->mRootNode->mTransformation;
+	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, glm::vec3(), glm::vec4());
+	root->position = position;
+	root->scale = scale;
+	root->rotation = glm::eulerAngles(orientation);
 	return root;
 }
 
 Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, Object* parent)
 {
 	Object* object = new Object();
+	//Decompose transformation of the mesh
+	glm::vec3 position;
+	glm::quat orientation;
+	glm::vec3 scale;
+	aiMatrix4x4 nodeTransform = node->mTransformation;
+	glm::decompose(AiToGLMMat4(nodeTransform), scale, orientation,position, glm::vec3(), glm::vec4());
+	object->position = position;
+	object->scale = scale;
+	object->rotation = glm::eulerAngles(orientation);
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
 		Mesh* mesh = this->loadMesh(gm, scene->mMeshes[node->mMeshes[i]], scene);
@@ -46,15 +64,15 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, O
 
 Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 {
+	//cout << "Loading Mesh : " << mesh->mName.data << endl;
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
-	for (size_t i = 0; i < mesh->mNumVertices; i++)
+	for (int i = 0; i < mesh->mNumVertices; i++)
 	{
 		Vertex vertex;
 		vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 		//Normals
 		vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-		cout << "Normals: X:" << mesh->mNormals[i].x << " Y:" << mesh->mNormals[i].y << " Z:" << mesh->mNormals[i].z << endl;
 		//UVs
 		if (mesh->mTextureCoords[0])
 		{
@@ -63,10 +81,10 @@ Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 		vertices.push_back(vertex);
 	}
 
-	for (size_t i = 0; i <mesh->mNumFaces; i++)
+	for (int i = 0; i <mesh->mNumFaces; i++)
 	{
 		aiFace face = mesh->mFaces[i];
-		for (size_t j = 0; j < face.mNumIndices; j++)
+		for (int j = 0; j < face.mNumIndices; j++)
 		{
 			indices.push_back(face.mIndices[j]);
 		}
@@ -74,6 +92,7 @@ Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 	Geometry* geometry = new Geometry(vertices, indices);
 	Mesh* grMesh;
 	if (mesh->mMaterialIndex >= 0) {
+		//cout << "Material Index:" << mesh->mMaterialIndex << endl;
 		grMesh = new Mesh(geometry, this->loadMaterial(gm, scene, mesh->mMaterialIndex));
 	}
 	else
@@ -81,8 +100,11 @@ Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 		Material* mat = new Material();
 		grMesh = new Mesh(geometry, mat);
 	}
+	grMesh->name = mesh->mName.data;
 	grMesh->gm = gm;
+	//cout << "Mesh Name:" << grMesh->name << " - Texture Name:" << grMesh->material->getTexture(DIFFUSE_TEXTURE)->getFilename() << endl;
 	grMesh->material->gm = gm;
+
 	return grMesh;
 }
 
@@ -97,6 +119,7 @@ void Model::loadMaterials(const aiScene * scene)
 
 Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned int materialIndex)
 {
+
 	Material* gMaterial = new Material();
 	aiMaterial* material = scene->mMaterials[materialIndex];
 	aiColor3D diffuseColor, specularColor, ambientColor;
@@ -105,11 +128,15 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
 	material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor);
 	material->Get(AI_MATKEY_SHININESS, shininess);
-
+	
 	gMaterial->diffuse = this->aiColorToGlm(diffuseColor);
 	gMaterial->specular = this->aiColorToGlm(specularColor);
 	gMaterial->ambient = this->aiColorToGlm(ambientColor);
 	gMaterial->shininess = shininess;
+	if (gMaterial->shininess < 2)
+	{
+		gMaterial->shininess = 2;
+	}
 	//Check Textures
 	//TODO: Check for other texture types
 	if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
@@ -120,11 +147,13 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 			int idx = std::string(path.data).rfind("\\");
 			std::string filename = std::string(path.data).substr(idx + 1);
 			filename = this->directory + "/" + filename;
-			grTexture texture;
-			texture.loadTexture(filename.c_str());
+			gMaterial->setTexture(filename.c_str(), DIFFUSE_TEXTURE);
+			//cout << "Loading " << filename << endl;
 
+			
 		}
 	}
+	
 	gMaterial->gm = gm;
 	return gMaterial;
 }

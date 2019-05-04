@@ -24,12 +24,13 @@ GLuint grTexture::getTextureID()
 void grTexture::useTexture(int textureOrder)
 {
 	glActiveTexture(GL_TEXTURE0 + textureOrder);
-	glBindTexture(GL_TEXTURE_2D, textureID);
+	glBindTexture(GL_TEXTURE_2D, this->textureID);
 }
 
 void grTexture::loadTexture(const char* filename)
 {
-	this->filename = filename;
+	this->filename = string(filename);
+	cout << "Filename:" << this->filename.c_str() << endl;
 	unsigned char *texData = stbi_load(filename, &this->width, &this->height, &this->bitDepth,0);
 	if (!texData)
 	{
@@ -37,9 +38,9 @@ void grTexture::loadTexture(const char* filename)
 		return;
 	}
 
-	glGenTextures(1, &textureID);
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
+	glGenTextures(1, &this->textureID);
+	glBindTexture(GL_TEXTURE_2D, this->textureID);
+	cout << "Generated at :" << this->textureID << endl;
 	//Texture Params
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

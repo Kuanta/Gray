@@ -49,7 +49,7 @@ public:
 	unsigned int VAO, VBO, EBO;
 	void setIndices(unsigned int indices[], int indicesSize);
 	void initBuffers();
-	void draw();
+	void draw(Shader* shader);
 	void cleanup();
 	
 protected:

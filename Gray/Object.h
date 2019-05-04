@@ -1,7 +1,9 @@
 #pragma once
 
 #include <math.h>
-#include <glm\glm.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include "ElementManager.h"
 
 class GameManager;
@@ -13,6 +15,7 @@ public:
 	Object* parent;
 	GameManager* gm;
 	ElementManager<Object*> children;
+	string name;
 	int id;
 	//Transformation Variables
 	glm::vec3 position;

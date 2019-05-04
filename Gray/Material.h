@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Shader.h"
 #include "grTexture.h"
 #include "GameManager.h"
 
@@ -25,8 +26,11 @@ public:
 	Material(glm::vec3 diffuse, glm::vec3 ambient, glm::vec3 specular, float shininess);
 	~Material();
 	GameManager* gm = nullptr;
-	void draw();
-	void setDiffuseTexture(char* filename);
+
+	//Getters and Setters
+	void setTexture(const char* filename, TextureTypes textureType);
+	grTexture* getTexture(TextureTypes textureType);
+	void draw(Shader* shader);
 	void cleanup();
 
 	//Uniforms

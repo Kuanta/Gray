@@ -1,6 +1,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <iostream>
 #include <GLFW\glfw3.h>
+#include <math.h>
 #include "GameScene.h"
 #include "GameManager.h"
 #include "BoxGeometry.h"
@@ -17,30 +18,70 @@ int main()
 	GameManager* gm = new GameManager(800, 600);
 	GameScene* scene = new GameScene(gm);
 	gm->currentScene = scene;
-	BoxGeometry* bg = new BoxGeometry(5.0f, 5.0f, 5.0f);
-	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
-	mat->setDiffuseTexture("assets/brick.png");
+
+	//Brick
+	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
+	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
+	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
 	Mesh* mesh = new Mesh(bg, mat);
+	mesh->name = string("Brick");
 	mesh->gm = gm;
 	mesh->material->gm = gm;
-	Model* model = new Model();
-	Object* scene2 = model->loadModel(gm, "assets/pyramid.fbx");
-	scene2->scale = glm::vec3(1,1,1);
+	mesh->position.x = -25;
+
+	//Wooden Box
+	BoxGeometry* woodBoxGeo = new BoxGeometry(5, 5, 5);
+	Material* woodBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
+	woodBoxMat->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
+	Mesh* woodBox = new Mesh(woodBoxGeo, woodBoxMat);
+	woodBox->name = "Wood";
+	woodBox->gm = gm;
+	woodBox->material->gm = gm;
+	woodBox->position.x = 5;
+
+	//Sci-fi
+	BoxGeometry* sfBoxGeo = new BoxGeometry(5, 5, 5);
+	Material* sfBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
+	sfBoxMat->setTexture("assets/metal.png", DIFFUSE_TEXTURE);
+	Mesh* sfBox = new Mesh(sfBoxGeo, sfBoxMat);
+	sfBox->name = "SciFi";
+	sfBox->gm = gm;
+	sfBox->material->gm = gm;
+	sfBox->position.x =-5;
+	sfBox->position.z = 5;
+	
+	
+	//Model* model = new Model();
+	//Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
+	//if (scene2 != nullptr)
+	//{
+	//	scene2->scale = glm::vec3(2,2,2);
+	//	scene2->position.y = -1;
+	//	//scene->em.addElement(scene2);
+
+	//}
+	scene->em.addElement(mesh);
+	scene->em.addElement(woodBox);
+	scene->em.addElement(sfBox);
+	
+	
 	OrbitCamera* oc = new OrbitCamera(&scene->camera);
-	Object* parentMesh = new Object();
+	scene->camera.controls = oc;
+	/*Object* parentMesh = new Object();
 	Object* parentMesh2 = new Object();
 	parentMesh->add(parentMesh2);
 	parentMesh2->add(mesh);
-	scene->camera.controls = oc;
+	
 	parentMesh->position.z = -15;
 	parentMesh->position.x = 0;
 	parentMesh->position.y = 0;
-	parentMesh->scale.x = 2;
+	parentMesh->scale.x = 2;*/
+	
 	scene->camera.setTarget(glm::vec3(0, 0, -10));
-	scene->em.addElement(parentMesh);
 
 	while (!glfwWindowShouldClose(gm->window))
 	{
+		mesh->position.x = cos(glfwGetTime()) * 5;
 		gm->update();
 	}
 }

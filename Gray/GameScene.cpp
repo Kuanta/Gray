@@ -5,9 +5,9 @@
 GameScene::GameScene(GameManager* gm) : Scene(gm)
 {
 	this->camera = Camera(75, 800/600, 0.001f, 10000.0f);
-	this->ambientLight = grLight(glm::vec3(0.8, 0.7, 0.8), 0.3);
-	this->dirLight = grDirectionalLight(glm::vec3(0.8, 0.7, 0.8), 0.4,glm::vec3(0.0f,-1.0f, 0.0f));
-	this->pointLight = grPointLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.8, 1.0f, 0.014f, 0.07f);
+	this->ambientLight = grLight(glm::vec3(0.8, 0.8, 0.8), 0.4);
+	this->dirLight = grDirectionalLight(glm::vec3(0.8, 0.7, 0.8), 0.3,glm::vec3(0.0f,-1.0f, 0.0f));
+	this->pointLight = grPointLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.8f, 1.0f, 0.014f*0.01, 0.07f*0.01);
 	this->pointLight.setPosition(5, 15, -10);
 	this->camera.position.z = 8;
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));

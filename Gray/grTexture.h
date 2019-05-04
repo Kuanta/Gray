@@ -1,6 +1,9 @@
 #pragma once
 #include "stb_image.h"
 #include <glad\glad.h>
+#include <iostream>
+
+using namespace std;
 
 class grTexture
 {
@@ -9,6 +12,13 @@ public:
 	~grTexture();
 
 	//Getters & Setters
+	void setFilename(const char* filename) {
+		this->filename = filename;
+	}
+	string getFilename()
+	{
+		return string(this->filename);
+	}
 	GLuint getTextureID();
 	bool textureExists() {
 		if (width > 0 && height > 0) {
@@ -24,6 +34,6 @@ public:
 private:
 	int width, height, bitDepth;
 	GLuint textureID;
-	const char* filename;
+	string filename;
 };
 

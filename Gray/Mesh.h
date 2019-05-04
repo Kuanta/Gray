@@ -18,11 +18,8 @@ public:
 	void draw() override;
 	void cleanup();
 
-	//Transformation Matrices
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
 private :
+	Shader* shader;
 	unsigned int VAO, VBO, EBO; //These buffers will be created in Geometry
 	
 };

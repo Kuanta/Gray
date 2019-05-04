@@ -96,8 +96,9 @@ void Geometry::initBuffers()
 	glBindVertexArray(0);
 }
 
-void Geometry::draw()
+void Geometry::draw(Shader* shader)
 {
+	shader->use();
 	glBindVertexArray(this->VAO);
 	if (this->indexed)
 	{

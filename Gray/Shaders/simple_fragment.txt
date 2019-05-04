@@ -65,7 +65,7 @@ void main()
 	}
 	else
 	{
-		FragColor = vec4(0.5, 0.5, 0.5,1) * (dirColor+pointColor);
+		FragColor = vec4(material.diffuse,1)* (dirColor+pointColor);
 	}
 	
     

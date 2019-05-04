@@ -39,6 +39,7 @@ void Object::remove(Object * object)
 
 void Object::update(float deltaTime)
 {
+	this->updateModel();
 	//Update children
 	for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
 	{
@@ -52,7 +53,6 @@ void Object::update(float deltaTime)
 
 void Object::draw()
 {
-	//Draw children
 	for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
 	{
 		if ((*it) != nullptr)
