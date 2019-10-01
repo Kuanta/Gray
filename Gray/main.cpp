@@ -20,49 +20,54 @@ int main()
 	gm->currentScene = scene;
 
 	//Brick
+	Object* box = new Object();
 	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
 	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
 	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
 	Mesh* mesh = new Mesh(bg, mat);
-	mesh->name = string("Brick");
-	mesh->gm = gm;
+	box->name = string("Brick");
+	box->gm = gm;
 	mesh->material->gm = gm;
-	mesh->position.x = -25;
+	box->position.x = -25;
+	mesh->addToObject(box);
 
 	//Wooden Box
+	Object* woodBox = new Object();
 	BoxGeometry* woodBoxGeo = new BoxGeometry(5, 5, 5);
 	Material* woodBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
 	woodBoxMat->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
-	Mesh* woodBox = new Mesh(woodBoxGeo, woodBoxMat);
+	Mesh* woodBoxMesh = new Mesh(woodBoxGeo, woodBoxMat);
 	woodBox->name = "Wood";
 	woodBox->gm = gm;
-	woodBox->material->gm = gm;
+	woodBoxMesh->material->gm = gm;
 	woodBox->position.x = 5;
+	woodBoxMesh->addToObject(woodBox);
 
 	//Sci-fi
 	BoxGeometry* sfBoxGeo = new BoxGeometry(5, 5, 5);
 	Material* sfBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
 	sfBoxMat->setTexture("assets/metal.png", DIFFUSE_TEXTURE);
-	Mesh* sfBox = new Mesh(sfBoxGeo, sfBoxMat);
+	Mesh* sfBoxMesh = new Mesh(sfBoxGeo, sfBoxMat);
+	Object* sfBox = new Object();
+	sfBoxMesh->addToObject(sfBox);
 	sfBox->name = "SciFi";
 	sfBox->gm = gm;
-	sfBox->material->gm = gm;
 	sfBox->position.x =-5;
 	sfBox->position.z = 5;
 	
 	
-	//Model* model = new Model();
-	//Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
-	//if (scene2 != nullptr)
-	//{
-	//	scene2->scale = glm::vec3(2,2,2);
-	//	scene2->position.y = -1;
-	//	//scene->em.addElement(scene2);
-
-	//}
-	scene->em.addElement(mesh);
-	scene->em.addElement(woodBox);
-	scene->em.addElement(sfBox);
+	Model* model = new Model();
+	Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
+	if (scene2 != nullptr)
+	{
+		scene2->scale = glm::vec3(0.5,0.5,0.5);
+		scene2->position.y = -90;
+		scene->em.addElement(scene2);
+		scene2->gm = gm;
+	}
+	//scene->em.addElement(box);
+	//scene->em.addElement(woodBox);
+	//scene->em.addElement(sfBox);
 	
 	
 	OrbitCamera* oc = new OrbitCamera(&scene->camera);
@@ -81,7 +86,7 @@ int main()
 
 	while (!glfwWindowShouldClose(gm->window))
 	{
-		mesh->position.x = cos(glfwGetTime()) * 5;
+		box->position.x = cos(glfwGetTime()) * 5;
 		gm->update();
 	}
 }

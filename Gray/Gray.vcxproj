@@ -118,8 +118,10 @@
   <ItemGroup>
     <ClCompile Include="BoxGeometry.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Component.cpp" />
     <ClCompile Include="Controls.cpp" />
     <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="FlyCamera.cpp" />
     <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="GameScene.cpp" />
     <ClCompile Include="Geometry.cpp" />
@@ -140,9 +142,11 @@
   <ItemGroup>
     <ClInclude Include="BoxGeometry.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="Controls.h" />
     <ClInclude Include="Drawable.h" />
     <ClInclude Include="ElementManager.h" />
+    <ClInclude Include="FlyCamera.h" />
     <ClInclude Include="GameManager.h" />
     <ClInclude Include="GameScene.h" />
     <ClInclude Include="Geometry.h" />

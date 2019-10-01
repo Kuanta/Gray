@@ -30,6 +30,9 @@
     <Filter Include="Core\Lights">
       <UniqueIdentifier>{a3352234-db07-49c0-a250-268a0ebe45dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Components">
+      <UniqueIdentifier>{882216e1-fa41-43fc-8fa3-8ce02fffb3d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -92,6 +95,12 @@
     <ClCompile Include="Model.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="FlyCamera.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
@@ -153,6 +162,12 @@
     </ClInclude>
     <ClInclude Include="Model.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="FlyCamera.h">
+      <Filter>Üst Bilgi Dosyaları</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>Core\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

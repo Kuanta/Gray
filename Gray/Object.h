@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "ElementManager.h"
+#include "Component.h"
 
 class GameManager;
 class Object
@@ -15,6 +16,7 @@ public:
 	Object* parent;
 	GameManager* gm;
 	ElementManager<Object*> children;
+	vector<Component*> components;
 	string name;
 	int id;
 	//Transformation Variables
@@ -24,6 +26,8 @@ public:
 	glm::vec3 target;
 	glm::mat4 model;
 	//Methods
+	Object* getRootObject(); //Returns the greatest grandparent
+	void addComponent(Component* component);
 	void setTarget(glm::vec3 newTarget); // Updates rotations from target
 	void add(Object* object);
 	void remove(Object* object);
@@ -36,6 +40,7 @@ protected:
 	void setParent(Object* parent)
 	{
 		this->parent = parent;
+		this->gm = parent->gm;
 	}
 	void updateModel();
 };

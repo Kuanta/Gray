@@ -57,7 +57,7 @@ private:
 	string directory;
 
 	//Methods
-	Object* loadNode(GameManager* gm, aiNode *node, const aiScene* scene, Object* parent = nullptr);
+	Object* loadNode(GameManager* gm, aiNode *node, const aiScene* scene);
 	Mesh* loadMesh(GameManager* gm, aiMesh *mesh, const aiScene* scene);
 	void loadMaterials(const aiScene* scene);
 	Material* loadMaterial(GameManager* gm, const aiScene* scene, unsigned int materialIndex);

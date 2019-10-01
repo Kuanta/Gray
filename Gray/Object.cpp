@@ -16,6 +16,34 @@ Object::~Object()
 {
 }
 
+Object * Object::getRootObject()
+{
+	Object* rootObject = this;
+	while (rootObject->parent != nullptr)
+	{
+		rootObject = rootObject->parent;
+	}
+	return rootObject;
+}
+
+void Object::addComponent(Component * component)
+{
+	bool componentExists = false;
+	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		if ((*iter) == component)
+		{
+			componentExists = true;
+			break;
+		}
+	}
+
+	if (!componentExists)
+	{
+		component->addToObject(this);
+	}
+}
+
 void Object::setTarget(glm::vec3 newTarget)
 {
 	this->target = newTarget;
@@ -40,6 +68,12 @@ void Object::remove(Object * object)
 void Object::update(float deltaTime)
 {
 	this->updateModel();
+
+	//Update components
+	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		(*iter)->update(deltaTime);
+	}
 	//Update children
 	for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
 	{
@@ -53,6 +87,16 @@ void Object::update(float deltaTime)
 
 void Object::draw()
 {
+	//Draw components
+	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		if ((*iter) != nullptr)
+		{
+			(*iter)->draw();
+		}
+	}
+
+	//Draw Child objects
 	for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
 	{
 		if ((*it) != nullptr)
@@ -60,10 +104,16 @@ void Object::draw()
 			(*it)->draw();
 		}
 	}
+
 }
 
 void Object::cleanup()
 {
+	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		(*iter)->cleanup();
+		delete (*iter);
+	}
 }
 void Object::setPosition(glm::vec3 pos)
 {

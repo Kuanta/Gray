@@ -50,7 +50,9 @@ private:
 	//Buttons pressed?
 	bool leftMousePressed = false;
 	bool rightMousePressed = false;
+	bool middleMousePressed = false;
 	glm::vec2 leftPressedPos;
 	glm::vec2 rightPressedPos;
+	glm::vec2 middleMousePressedPos;
 };
 

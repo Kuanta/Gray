@@ -36,7 +36,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	return root;
 }
 
-Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, Object* parent)
+Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
 {
 	Object* object = new Object();
 	//Decompose transformation of the mesh
@@ -51,7 +51,7 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, O
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
 		Mesh* mesh = this->loadMesh(gm, scene->mMeshes[node->mMeshes[i]], scene);
-		object->add(mesh);
+		object->addComponent(mesh);
 	}
 
 	for (size_t i = 0; i < node->mNumChildren; i++)
@@ -59,6 +59,7 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, O
 		Object* child = this->loadNode(gm, node->mChildren[i], scene);
 		object->add(child);
 	}
+	
 	return object;
 }
 
@@ -100,8 +101,7 @@ Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 		Material* mat = new Material();
 		grMesh = new Mesh(geometry, mat);
 	}
-	grMesh->name = mesh->mName.data;
-	grMesh->gm = gm;
+
 	//cout << "Mesh Name:" << grMesh->name << " - Texture Name:" << grMesh->material->getTexture(DIFFUSE_TEXTURE)->getFilename() << endl;
 	grMesh->material->gm = gm;
 

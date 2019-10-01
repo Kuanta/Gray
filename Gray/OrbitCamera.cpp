@@ -104,6 +104,11 @@ void OrbitCamera::mouse_button_callback(GLFWwindow * window, int button, int act
 		this->rightPressedPos = glm::vec2(xpos, ypos);
 		
 	}
+	if (action == GLFW_PRESS && button == GLFW_MOUSE_BUTTON_MIDDLE)
+	{
+		this->middleMousePressed = true;
+		this->middleMousePressedPos = glm::vec2(xpos, ypos);
+	}
 
 	//Release
 	if (action == GLFW_RELEASE && button == GLFW_MOUSE_BUTTON_LEFT)
@@ -115,6 +120,11 @@ void OrbitCamera::mouse_button_callback(GLFWwindow * window, int button, int act
 		this->rightMousePressed = false;
 	}
 
+	if (action == GLFW_RELEASE && button == GLFW_MOUSE_BUTTON_MIDDLE)
+	{
+		this->middleMousePressed = false;
+	}
+	
 }
 
 void OrbitCamera::cursor_position_callback(GLFWwindow * window, double xpos, double ypos)
