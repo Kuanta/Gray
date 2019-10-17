@@ -85,8 +85,8 @@
       <AdditionalIncludeDirectories>D:\Documents\Codes\Cpp\Libraries\Includes;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\Documents\Codes\Cpp\Libraries\Libs\GLFW;D:\Documents\Codes\Cpp\Libraries\Libs\assimp\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>assimp-vc140-mt.lib;glfw3dll.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Documents\Codes\Cpp\Libraries\Libs\assimp\Debug;D:\Documents\Codes\Cpp\Libraries\Libs\GLFW;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>assimp-vc141-mt.lib;glfw3dll.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

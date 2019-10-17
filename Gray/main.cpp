@@ -57,17 +57,18 @@ int main()
 	
 	
 	Model* model = new Model();
-	Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
+	Object* scene2 = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
 	if (scene2 != nullptr)
 	{
 		scene2->scale = glm::vec3(0.5,0.5,0.5);
-		scene2->position.y = -90;
+		scene2->position.y = -60;
+		scene2->position.z = -30;
 		scene->em.addElement(scene2);
 		scene2->gm = gm;
 	}
-	//scene->em.addElement(box);
-	//scene->em.addElement(woodBox);
-	//scene->em.addElement(sfBox);
+	scene->em.addElement(box);
+	scene->em.addElement(woodBox);
+	scene->em.addElement(sfBox);
 	
 	
 	OrbitCamera* oc = new OrbitCamera(&scene->camera);

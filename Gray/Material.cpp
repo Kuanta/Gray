@@ -45,6 +45,22 @@ void Material::setTexture(const char * filename, TextureTypes textureType)
 	
 }
 
+void Material::setTexture(grTexture * texture, TextureTypes textureType)
+{
+	switch (textureType) {
+		case DIFFUSE_TEXTURE:
+			//Clear diffusemap first
+			if (this->diffuseMap != nullptr) {
+				this->diffuseMap->clearTexture();
+				delete this->diffuseMap;
+			}
+			this->diffuseMap = texture;
+			break;
+		default:
+			break;
+	}
+}
+
 grTexture * Material::getTexture(TextureTypes textureType)
 {
 	switch (textureType) {
@@ -72,8 +88,6 @@ void Material::draw(Shader* shader)
 	shader->setVec3("material.ambient", this->ambient);
 	shader->setVec3("material.specular", this->specular);
 	shader->setFloat("material.shininess", this->shininess);
-	
-	
 }
 
 void Material::cleanup()

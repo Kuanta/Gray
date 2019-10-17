@@ -51,13 +51,14 @@ vec3 calcPointLight(PointLight light, Material material, vec3 normal,vec3 fragPo
 
 void main()
 {  
+	vec3 normal = normalize(Normal);
 	vec4 ambientColor = vec4(ambientLight.color, 1.0f) * ambientLight.intensity;
 	
 	//Directional Light
-	vec4 dirColor = vec4(calcDirectionalLight(directionalLight, material, Normal, FragPos, eyePosition),1.0f);
+	vec4 dirColor = vec4(calcDirectionalLight(directionalLight, material, normal, FragPos, eyePosition),1.0f);
 
 	//PointLight 
-	vec4 pointColor = vec4(calcPointLight(pointLight, material, Normal, FragPos, eyePosition), 1.0f);
+	vec4 pointColor = vec4(calcPointLight(pointLight, material, normal, FragPos, eyePosition), 1.0f);
 
 	if(containsTexture == 1)
 	{
@@ -74,13 +75,13 @@ void main()
 vec3 calcDirectionalLight(DirectionalLight light, Material material, vec3 normal,vec3 fragPos,vec3 eyePos)
 {
 	vec3 viewDir = normalize(eyePos - fragPos);
-	vec3 reflectDir = normalize(reflect(-normalize(light.direction), normalize(Normal)));
+	vec3 reflectDir = normalize(reflect(-normalize(light.direction), normal));
 
 	//Ambient
 	vec3 ambientColor = light.color*light.intensity;
 
 	//Diffuse
-	float diffuseFactor = max(dot(normalize(Normal), -normalize(light.direction)),0.0f);
+	float diffuseFactor = max(dot(normal, -normalize(light.direction)),0.0f);
 	vec3 diffuseColor = light.color*light.intensity*diffuseFactor;
 
 	//Specular

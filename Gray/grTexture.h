@@ -1,7 +1,7 @@
 #pragma once
-#include "stb_image.h"
 #include <glad\glad.h>
 #include <iostream>
+#include "stb_image.h"
 
 using namespace std;
 
@@ -30,6 +30,7 @@ public:
 	}
 	void useTexture(int textureOrder);
 	void loadTexture(const char* filename);
+	void loadTexture(unsigned char* data, int width, int height);
 	void clearTexture();
 private:
 	int width, height, bitDepth;

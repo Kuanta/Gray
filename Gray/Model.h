@@ -4,7 +4,6 @@
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
 #include <glm\gtx\matrix_decompose.hpp>
-
 #include "Mesh.h"
 #include "grTexture.h"
 #include "Object.h"
@@ -61,7 +60,8 @@ private:
 	Mesh* loadMesh(GameManager* gm, aiMesh *mesh, const aiScene* scene);
 	void loadMaterials(const aiScene* scene);
 	Material* loadMaterial(GameManager* gm, const aiScene* scene, unsigned int materialIndex);
-
+	void loadTexture(aiMaterial* aiMat, Material* gMat, aiTextureType textType, const aiScene* scene);
+	unsigned char* loadEmbeddedTexture(const aiTexture * textureData, int *width, int *height, int *nrComponents);
 	//Assimp To Glm conversions
 	glm::vec3 aiColorToGlm(aiColor3D aiColor) {
 		return glm::vec3(aiColor.r, aiColor.g, aiColor.b);

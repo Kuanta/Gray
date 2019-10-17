@@ -54,6 +54,24 @@ void grTexture::loadTexture(const char* filename)
 	stbi_image_free(texData);
 }
 
+void grTexture::loadTexture(unsigned char * data, int width, int height)
+{
+	cout << "w:" << width << " h:" << height << endl;
+	this->width = width;
+	this->height = height;
+	glGenTextures(1, &this->textureID);
+	glBindTexture(GL_TEXTURE_2D, this->textureID);
+	cout << "Generated at :" << this->textureID << endl;
+	//Texture Params
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->width, this->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void grTexture::clearTexture()
 {
 	glDeleteTextures(1, &textureID);

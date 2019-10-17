@@ -28,7 +28,6 @@ void Mesh::draw()
 {
 	if (this->object->getRootObject()->gm != nullptr)
 	{
-		//cout << this->object->name << " - " << this->material->getTexture(DIFFUSE_TEXTURE)->getTextureID()<<endl;
 		Shader* shader = this->object->getRootObject()->gm->shaders.defaultShader;
 		shader->use();
 		//Set Model-View_Projection
@@ -37,11 +36,8 @@ void Mesh::draw()
 		shader->setMat4("projection", this->object->getRootObject()->gm->currentScene->camera.projection);
 		//BUG FIX: MATERIAL SHOULD BE DRAWN FIRST
 		this->material->draw(shader);
-		this->geometry->draw(shader);
-		
+		this->geometry->draw(shader);	
 	}
-	//Object::draw();
-	
 }
 
 void Mesh::cleanup()

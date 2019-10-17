@@ -29,6 +29,7 @@ public:
 
 	//Getters and Setters
 	void setTexture(const char* filename, TextureTypes textureType);
+	void setTexture(grTexture* texture, TextureTypes textureType);
 	grTexture* getTexture(TextureTypes textureType);
 	void draw(Shader* shader);
 	void cleanup();

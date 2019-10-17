@@ -133,27 +133,87 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	gMaterial->specular = this->aiColorToGlm(specularColor);
 	gMaterial->ambient = this->aiColorToGlm(ambientColor);
 	gMaterial->shininess = shininess;
-	if (gMaterial->shininess < 2)
-	{
-		gMaterial->shininess = 2;
-	}
+
 	//Check Textures
 	//TODO: Check for other texture types
-	if (material->GetTextureCount(aiTextureType_DIFFUSE)) {
-		aiString path;
-		if (material->GetTexture(aiTextureType_DIFFUSE, 0, &path) == AI_SUCCESS) {
+	//TODO: Check for embedded textures
 
+	//Diffuse Textures
+	loadTexture(material, gMaterial, aiTextureType_DIFFUSE, scene);
+	
+	gMaterial->gm = gm;
+	return gMaterial;
+}
+
+void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textType, const aiScene* scene)
+{
+	aiString path;
+	TextureTypes gTextType;
+	switch (textType) {
+	case aiTextureType_DIFFUSE:
+		gTextType = DIFFUSE_TEXTURE;
+		break;
+	default:
+		gTextType = DIFFUSE_TEXTURE;
+	}
+	if (aiMat->GetTexture(textType, 0, &path) == AI_SUCCESS) {
+		grTexture* texture = new grTexture();
+		cout << "Path:" << path.C_Str() << endl;
+		if (const aiTexture* textureData = scene->GetEmbeddedTexture(path.C_Str()))
+		{
+			cout << "Embedded Texture:" << textureData << endl;
+			////Load embedded texture
+			int width, height, nrComponents;
+			unsigned char* data = this->loadEmbeddedTexture(textureData, &width, &height, &nrComponents);
+			texture->loadTexture(data, width, height);
+		}
+		else
+		{
 			//Handle absolute texture paths
 			int idx = std::string(path.data).rfind("\\");
 			std::string filename = std::string(path.data).substr(idx + 1);
 			filename = this->directory + "/" + filename;
-			gMaterial->setTexture(filename.c_str(), DIFFUSE_TEXTURE);
-			//cout << "Loading " << filename << endl;
-
-			
+			texture->loadTexture(filename.c_str());
 		}
+		gMat->setTexture(texture, gTextType);
 	}
-	
-	gMaterial->gm = gm;
-	return gMaterial;
+}
+
+unsigned char * Model::loadEmbeddedTexture(const aiTexture *textureData, int *width, int *height, int *nrComponents)
+{
+	unsigned char* data = nullptr;
+	int desiredChannels;
+	if (textureData->mHeight == 0)
+	{
+		if (textureData->achFormatHint[0] == 'j')
+		{
+			cout << "JPEG" << endl;
+			desiredChannels = 3;
+		}
+		else if (textureData->achFormatHint[0] == 'p')
+		{
+			cout << "PNG" << endl;
+			desiredChannels = 4;
+		}
+		uint8_t* t_data = reinterpret_cast<unsigned char*>(textureData->pcData);
+		data = stbi_load_from_memory(t_data, textureData->mWidth, width, height, nrComponents, 4);
+	}
+	else {
+		data = new unsigned char(textureData->mWidth*textureData->mHeight * 4);
+		aiTexel* texels = textureData->pcData;
+		for (int i = 0; i < textureData->mWidth*textureData->mHeight; i++)
+		{
+			unsigned char r = texels->r;
+			unsigned char g = texels->g;
+			unsigned char b = texels->b;
+			unsigned char a = texels->a;
+			data[4 * i] = r;
+			data[4 * i + 1] = g;
+			data[4 * i + 2] = b;
+			data[4 * i + 3] = a;
+		}
+		*width = textureData->mWidth;
+		*height = textureData->mHeight;
+	}
+	return data;
 }
