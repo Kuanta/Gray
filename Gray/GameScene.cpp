@@ -4,10 +4,10 @@
 
 GameScene::GameScene(GameManager* gm) : Scene(gm)
 {
-	this->camera = Camera(75, 800/600, 0.001f, 10000.0f);
-	this->ambientLight = grLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.6f);
-	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.2f,glm::vec3(0.0f,-1.0f, 0.0f));
-	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.7f, 1.0f, 0.014f*0.01, 0.07f*0.01);
+	this->camera = Camera(75, 1280/800, 0.1f, 100000000.0f);
+	this->ambientLight = grLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.8f);
+	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.1f,glm::vec3(0.0f,-1.0f, 0.0f));
+	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.7f, 1.0f, 0.014f*0.001, 0.07f*0.001);
 	this->pointLight.setPosition(5, 15, -10);
 	this->camera.position.z = 8;
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));

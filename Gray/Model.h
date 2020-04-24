@@ -4,8 +4,10 @@
 #include <assimp\scene.h>
 #include <assimp\postprocess.h>
 #include <glm\gtx\matrix_decompose.hpp>
-#include "Mesh.h"
+#include "grMesh.h"
 #include "grTexture.h"
+#include "GrAnimation.h"
+#include "GrSkeleton.h"
 #include "Object.h"
 #include "Geometry.h"
 #include "Material.h"
@@ -54,13 +56,17 @@ public:
 	void cleanup();
 private:
 	string directory;
+	Object* root;
+	GrSkeleton* skeleton;
 
 	//Methods
 	Object* loadNode(GameManager* gm, aiNode *node, const aiScene* scene);
-	Mesh* loadMesh(GameManager* gm, aiMesh *mesh, const aiScene* scene);
+	GrMesh* loadMesh(GameManager* gm, aiNode* node, aiMesh *mesh, const aiScene* scene);
 	void loadMaterials(const aiScene* scene);
 	Material* loadMaterial(GameManager* gm, const aiScene* scene, unsigned int materialIndex);
 	void loadTexture(aiMaterial* aiMat, Material* gMat, aiTextureType textType, const aiScene* scene);
+	void loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry);
+	void loadAnimations(const aiScene* scene, Object* root);
 	unsigned char* loadEmbeddedTexture(const aiTexture * textureData, int *width, int *height, int *nrComponents);
 	//Assimp To Glm conversions
 	glm::vec3 aiColorToGlm(aiColor3D aiColor) {

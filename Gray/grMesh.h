@@ -7,11 +7,14 @@
 #include "Material.h"
 #include "Scene.h"
 
-class Mesh : public Component
+
+class GrMesh : public Component
 {
 public:
-	Mesh(Geometry* geometry,Material* material);
-	~Mesh();
+	GrMesh(Geometry* geometry,Material* material);
+	GrMesh(Geometry* geometry, Material* material, string name);
+	~GrMesh();
+	string name;
 	Geometry* geometry;
 	Material* material;
 	void start() override;

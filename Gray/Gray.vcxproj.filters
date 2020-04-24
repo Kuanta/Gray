@@ -44,9 +44,6 @@
     <ClCompile Include="Material.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="Geometry.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -101,15 +98,24 @@
     <ClCompile Include="Component.cpp">
       <Filter>Core\Components</Filter>
     </ClCompile>
+    <ClCompile Include="grBone.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="grMesh.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="GrAnimation.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="GrSkeleton.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Material.h">
@@ -163,11 +169,23 @@
     <ClInclude Include="Model.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="FlyCamera.h">
-      <Filter>Üst Bilgi Dosyaları</Filter>
-    </ClInclude>
     <ClInclude Include="Component.h">
       <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="grBone.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="grMesh.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="GrAnimation.h">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="GrSkeleton.h">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="FlyCamera.h">
+      <Filter>Controls</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

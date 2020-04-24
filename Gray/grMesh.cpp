@@ -1,6 +1,6 @@
-#include "Mesh.h"
+#include "grMesh.h"
 
-Mesh::Mesh(Geometry * geometry, Material * material)
+GrMesh::GrMesh(Geometry * geometry, Material * material)
 {
 	this->geometry = geometry;
 	this->material = material;
@@ -10,21 +10,31 @@ Mesh::Mesh(Geometry * geometry, Material * material)
 	
 }
 
-Mesh::~Mesh()
+GrMesh::GrMesh(Geometry * geometry, Material * material, string name)
+{
+	this->geometry = geometry;
+	this->material = material;
+	this->VAO = geometry->VAO;
+	this->VBO = geometry->VBO;
+	this->EBO = geometry->EBO;
+	this->name = name;
+}
+
+GrMesh::~GrMesh()
 {
 }
 
-void Mesh::start()
+void GrMesh::start()
 {
 	this->material->gm = this->object->gm;
 }
 
-void Mesh::update(float deltaTime)
+void GrMesh::update(float deltaTime)
 {
 	
 }
 
-void Mesh::draw()
+void GrMesh::draw()
 {
 	if (this->object->getRootObject()->gm != nullptr)
 	{
@@ -40,7 +50,7 @@ void Mesh::draw()
 	}
 }
 
-void Mesh::cleanup()
+void GrMesh::cleanup()
 {
 	this->material->cleanup();
 	this->geometry->cleanup();

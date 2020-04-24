@@ -1,5 +1,5 @@
 #include "Component.h"
-#include "Object.h"
+
 
 Component::Component()
 {
@@ -16,6 +16,10 @@ void Component::addToObject(Object * object)
 	this->object = object;
 	object->components.push_back(this); //Add this component to the object's component list
 	this->start();
+}
+
+void Component::removeFromObject()
+{
 }
 
 void Component::fixedUpdate()

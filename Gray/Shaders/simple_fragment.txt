@@ -6,6 +6,7 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec3 debugColor;
 in vec3 Color;
+flat in int faulty;
 
 struct Material
 {
@@ -62,11 +63,16 @@ void main()
 
 	if(containsTexture == 1)
 	{
-		FragColor = texture(diffuseMap, TexCoords) * (dirColor+pointColor);
+		FragColor = texture(diffuseMap, TexCoords) * (ambientColor+dirColor+pointColor);
 	}
 	else
 	{
-		FragColor = vec4(material.diffuse,1)* (dirColor+pointColor);
+		FragColor = vec4(material.diffuse,1)* (ambientColor+dirColor+pointColor);
+	}
+
+	if(faulty == 1)
+	{
+		FragColor = vec4(1.0f, 0.0f, 0.0f, 0.0f);
 	}
 	
     

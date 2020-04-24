@@ -1,13 +1,16 @@
 #pragma once
 
 #include <math.h>
+#include <typeinfo>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "ElementManager.h"
-#include "Component.h"
+
 
 class GameManager;
+class Component;
+enum ComponentType;
 class Object
 {
 public:
@@ -36,6 +39,9 @@ public:
 	virtual void cleanup();
 	void setPosition(glm::vec3 pos);
 	void setPosition(float x, float y, float z);
+	Component* getComponentByType(ComponentType type);
+	Object* getChildWithByName(string name);
+	void loopThroughChildren(Component* comp, void (*callback)(const void*, const void*)); //First Argument should be
 protected:
 	void setParent(Object* parent)
 	{

@@ -38,7 +38,7 @@ public:
 	glm::vec3 diffuse;
 	glm::vec3 ambient;
 	glm::vec3 specular;
-	float shininess;
+	float shininess = 32;
 	float diffuseIntensity = 1;
 	float ambientIntensity = 1;
 	float specularIntensity = 1;

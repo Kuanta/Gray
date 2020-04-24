@@ -1,4 +1,5 @@
 #include "Geometry.h"
+#include <glm/gtx/string_cast.hpp>
 
 
 
@@ -6,28 +7,25 @@ Geometry::Geometry()
 {
 }
 
-Geometry::Geometry(vector<Vertex> vertices, vector<unsigned int> indices)
+Geometry::Geometry(vector<Vertex> vertices, vector<unsigned int> indices, bool initBuffers)
 {
 	this->indexed = true;
-	this->vertices = vertices;
 	this->indices = indices;
-	this->initBuffers();
+	this->initGeometry(vertices, initBuffers);
 }
 
-Geometry::Geometry(vector<Vertex> vertices, unsigned int indices[])
+Geometry::Geometry(vector<Vertex> vertices, unsigned int indices[], bool initBuffers)
 {
 	int indicesSize = sizeof(indices) / sizeof(indices[0]);
 	this->setIndices(indices, indicesSize);
 	this->indexed = true;
-	this->vertices = vertices;
-	this->initBuffers();
+	this->initGeometry(vertices, initBuffers);
 }
 
-Geometry::Geometry(vector<Vertex> vertices)
+Geometry::Geometry(vector<Vertex> vertices, bool initBuffers)
 {
 	this->indexed = false;
-	this->vertices = vertices;
-	this->initBuffers();
+	this->initGeometry(vertices, initBuffers);
 }
 
 Geometry::~Geometry()
@@ -77,28 +75,53 @@ void Geometry::initBuffers()
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, UV2s));
 	//Bone IDs
 	glEnableVertexAttribArray(4);
-	glVertexAttribIPointer(4, NUM_BONES_PER_VERTEX, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, IDs));
-	//Weights
+	glVertexAttribIPointer(4, Geometry::NUM_BONES_PER_VERTEX, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, IDs));
+	//Bone ID2s
 	glEnableVertexAttribArray(5);
-	glVertexAttribPointer(5, NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
-	// vertex tangent
+	glVertexAttribIPointer(5, Geometry::NUM_BONES_PER_VERTEX, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, ID2s));
+	//Weights
 	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
-	// vertex bitangent
+	glVertexAttribPointer(6, Geometry::NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
+	//Weights2
 	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
-	// colors
+	glVertexAttribPointer(7, Geometry::NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights2));
+	// vertex tangent
 	glEnableVertexAttribArray(8);
-	glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
+	glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+	// vertex bitangent
+	glEnableVertexAttribArray(9);
+	glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+	// colors
+	glEnableVertexAttribArray(10);
+	glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
 	
-	
-
 	glBindVertexArray(0);
 }
 
 void Geometry::draw(Shader* shader)
 {
 	shader->use();
+	//Set Bone uniforms
+	vector<glm::mat4> boneMatrices;
+	if (this->bones.size() > 0)
+	{
+		glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 1);
+		for (int i = 0; i < this->bones.size(); i++)
+		{
+			this->bones[i]->updateTransformMatrix(); //An animation node may not change all the bones, update transform matrix every iteration
+			glm::mat4 boneMatrix = this->bones[i]->getTransformMatrix();
+			boneMatrices.push_back(this->skeleton->globalInverseTransform*boneMatrix*this->bones[i]->offsetMatrix);
+
+		}
+		glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,
+			glm::value_ptr(boneMatrices[0]));
+
+	}
+	else
+	{
+		glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 0);
+	}
+	
 	glBindVertexArray(this->VAO);
 	if (this->indexed)
 	{
@@ -114,4 +137,23 @@ void Geometry::draw(Shader* shader)
 
 void Geometry::cleanup()
 {
+}
+
+void Geometry::initGeometry(vector<Vertex> vertices, bool initBuffers)
+{
+	this->vertices = vertices;
+	//Set weights and boneIDs to default values
+	for (int i = 0; i < this->vertices.size(); i++)
+	{
+		for (int j = 0; j < Geometry::NUM_BONES_PER_VERTEX; j++)
+		{
+			this->vertices.at(i).IDs[j] = -1;
+			this->vertices.at(i).Weights[j] = 0;
+		}
+	}
+	if (initBuffers)
+	{
+		this->initBuffers();
+	}
+
 }

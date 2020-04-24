@@ -2,24 +2,67 @@
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aUvs;
-layout (location = 8) in vec3 aColor;
+layout (location = 4) in ivec4 boneIDs;
+layout (location = 5) in ivec4 boneID2s;
+layout (location = 6) in vec4 boneWeights;
+layout (location = 7) in vec4 boneWeights2;
+layout (location = 10) in vec3 aColor;
 
 out vec3 Normal;
 out vec3 FragPos;
 out vec2 TexCoords;
 out vec3 Color;
+flat out int faulty;
 
 
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-
+uniform int hasBones;
+const int MAX_BONES=100;
+const int NUM_BONES_PER_VERTEX=4;
+uniform mat4 gBones[MAX_BONES];
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(aPos, 1.0);
-	Normal=mat3(transpose(inverse(model)))*aNormal;
+	mat4 boneMatrix=mat4(0);
+	int weighted = 0;
+	if(hasBones != 0)
+	{
+		
+		for(int i=0;i<NUM_BONES_PER_VERTEX;i++)
+		{
+			if(boneIDs[i] != -1)
+			{
+				boneMatrix += gBones[boneIDs[i]]*boneWeights[i];
+			}
+		
+		}
+		for(int i=0;i<NUM_BONES_PER_VERTEX;i++)
+		{
+			if(boneID2s[i] != -1)
+			{
+				boneMatrix += gBones[boneID2s[i]]*boneWeights2[i];
+			}
+		
+		}
+	}
+	else{
+		boneMatrix = mat4(1);
+	}
+	
+
+	gl_Position = projection * view * model * boneMatrix * vec4(aPos, 1.0);
+	Normal=mat3(transpose(inverse(model * boneMatrix)))*aNormal;
 	FragPos=vec3(model*vec4(aPos,1.0));
 	TexCoords = aUvs;
 	Color = aColor;
+	if(weighted > 4)
+	{
+		faulty = 1;
+	}
+	else
+	{
+		faulty = 0;
+	}
 }

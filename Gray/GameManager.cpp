@@ -11,11 +11,11 @@ bool GameManager::init(int width, int height)
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	glfwWindowHint(GLFW_SAMPLES, 0);
-	glfwWindowHint(GLFW_RED_BITS, 8);
-	glfwWindowHint(GLFW_GREEN_BITS, 8);
-	glfwWindowHint(GLFW_BLUE_BITS, 8);
-	glfwWindowHint(GLFW_ALPHA_BITS, 8);
-	glfwWindowHint(GLFW_STENCIL_BITS, 8);
+	glfwWindowHint(GLFW_RED_BITS, 16);
+	glfwWindowHint(GLFW_GREEN_BITS, 16);
+	glfwWindowHint(GLFW_BLUE_BITS, 16);
+	glfwWindowHint(GLFW_ALPHA_BITS, 16);
+	glfwWindowHint(GLFW_STENCIL_BITS, 16);
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
@@ -60,7 +60,7 @@ void GameManager::update()
 	currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
-	glClearColor(0.3f, 0.8f, 0.6f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	this->currentScene->update(this->window, deltaTime);
 	glfwPollEvents();

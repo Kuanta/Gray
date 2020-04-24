@@ -13,6 +13,9 @@ Model::~Model()
 
 Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 {
+	// Initialize skeleton
+	this->skeleton = new GrSkeleton();
+
 	this->directory = fileName.substr(0, fileName.find_last_of('/'));
 	Assimp::Importer importer;
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
@@ -21,24 +24,55 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 		cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
 		return nullptr;
 	}
-	
-	Object* root = this->loadNode(gm, scene->mRootNode, scene);
+	root = this->loadNode(gm, scene->mRootNode, scene);
+	root->addComponent(this->skeleton);
+	this->loadAnimations(scene, root);
 
 	//Root transform
 	glm::vec3 position;
 	glm::quat orientation;
 	glm::vec3 scale;
 	aiMatrix4x4 rootTransform = scene->mRootNode->mTransformation;
+	glm::mat4 globalInverseTransform = AiToGLMMat4(rootTransform);
+	this->skeleton->globalInverseTransform = glm::transpose(globalInverseTransform);
 	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, glm::vec3(), glm::vec4());
 	root->position = position;
 	root->scale = scale;
 	root->rotation = glm::eulerAngles(orientation);
+
+	//Set Bone Parents
+	/*
+		Some models have a bone hierarchy that is outside of the mesh hierarchy. For example:
+		-Spine
+			-Head
+			-Legs
+		-Node
+			-Mesh
+				-Spine
+				-Head
+				-Legs
+		In the above example, Head and Legs are children of Spine but thats not implied on the Node>Mesh hierarchy.
+		To solve this, loop through each bone and find the node, object that has the same name for it. Than check the parent of the found node 
+		and search for the bone that has the same name with that parent node. This bone will be the parent node.
+
+	*/
+	map<string, GrBone*>::iterator iter;
+	for (iter = this->skeleton->bones.begin(); iter != this->skeleton->bones.end(); iter++)
+	{
+		GrBone* bone = iter->second;
+		Object* node = this->root->getChildWithByName(bone->name);
+		if (node != nullptr && node->parent != nullptr)
+		{
+			bone->parentBone = this->skeleton->getBoneByName(node->parent->name);
+		}
+	}
 	return root;
 }
 
 Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
 {
 	Object* object = new Object();
+	object->name = node->mName.data;
 	//Decompose transformation of the mesh
 	glm::vec3 position;
 	glm::quat orientation;
@@ -50,7 +84,7 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
 	object->rotation = glm::eulerAngles(orientation);
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
-		Mesh* mesh = this->loadMesh(gm, scene->mMeshes[node->mMeshes[i]], scene);
+		GrMesh* mesh = this->loadMesh(gm, node, scene->mMeshes[node->mMeshes[i]], scene);
 		object->addComponent(mesh);
 	}
 
@@ -63,9 +97,8 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
 	return object;
 }
 
-Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
+GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiScene * scene)
 {
-	//cout << "Loading Mesh : " << mesh->mName.data << endl;
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	for (int i = 0; i < mesh->mNumVertices; i++)
@@ -79,7 +112,17 @@ Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 		{
 			vertex.UVs = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 		}
+		
+		//Initialize boneIDs (Will set correct values while loading bones)
+		for (int j = 0; j < Geometry::NUM_BONES_PER_VERTEX; j++)
+		{
+			vertex.IDs[j] = -1;
+			vertex.Weights[j] = 0;
+			vertex.ID2s[j] = -1;
+			vertex.Weights2[j] = 0;
+		}
 		vertices.push_back(vertex);
+		
 	}
 
 	for (int i = 0; i <mesh->mNumFaces; i++)
@@ -90,21 +133,27 @@ Mesh* Model::loadMesh(GameManager* gm, aiMesh * mesh, const aiScene * scene)
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-	Geometry* geometry = new Geometry(vertices, indices);
-	Mesh* grMesh;
+
+	
+	Geometry* geometry = new Geometry(vertices, indices, false);
+
+	//Load Bones
+	loadBones(scene, node, mesh, geometry);
+	geometry->initBuffers(); //Init buffers after loading bones
+
+	GrMesh* grMesh;
 	if (mesh->mMaterialIndex >= 0) {
-		//cout << "Material Index:" << mesh->mMaterialIndex << endl;
-		grMesh = new Mesh(geometry, this->loadMaterial(gm, scene, mesh->mMaterialIndex));
+		grMesh = new GrMesh(geometry, this->loadMaterial(gm, scene, mesh->mMaterialIndex), mesh->mName.data);
 	}
 	else
 	{
 		Material* mat = new Material();
-		grMesh = new Mesh(geometry, mat);
+		grMesh = new GrMesh(geometry, mat, mesh->mName.data);
 	}
 
-	//cout << "Mesh Name:" << grMesh->name << " - Texture Name:" << grMesh->material->getTexture(DIFFUSE_TEXTURE)->getFilename() << endl;
 	grMesh->material->gm = gm;
 
+	
 	return grMesh;
 }
 
@@ -132,6 +181,10 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	gMaterial->diffuse = this->aiColorToGlm(diffuseColor);
 	gMaterial->specular = this->aiColorToGlm(specularColor);
 	gMaterial->ambient = this->aiColorToGlm(ambientColor);
+	if (shininess == 0)
+	{
+		shininess = 16; //TODO: Setting a default value for shininess for now
+	}
 	gMaterial->shininess = shininess;
 
 	//Check Textures
@@ -158,11 +211,9 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 	}
 	if (aiMat->GetTexture(textType, 0, &path) == AI_SUCCESS) {
 		grTexture* texture = new grTexture();
-		cout << "Path:" << path.C_Str() << endl;
 		if (const aiTexture* textureData = scene->GetEmbeddedTexture(path.C_Str()))
 		{
-			cout << "Embedded Texture:" << textureData << endl;
-			////Load embedded texture
+			//Load embedded texture
 			int width, height, nrComponents;
 			unsigned char* data = this->loadEmbeddedTexture(textureData, &width, &height, &nrComponents);
 			texture->loadTexture(data, width, height);
@@ -179,20 +230,84 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 	}
 }
 
+void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry)
+{
+	for (int i = 0; i < aiMesh->mNumBones; i++)
+	{
+		aiBone* bone = aiMesh->mBones[i];
+		string boneName = bone->mName.data;
+		GrBone* grBone = this->skeleton->getBoneByName(boneName);
+		glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(bone->mOffsetMatrix));
+		glm::mat4 nodeTransformation = Model::AiToGLMMat4(node->mTransformation);
+		if (grBone == nullptr)  //This solved the issue where mesh was deformed, why?
+		{
+			grBone = new GrBone(boneMatrix, nodeTransformation, boneName);
+			this->skeleton->addBone(boneName, grBone);
+			glm::vec3 position;
+			glm::quat orientation;
+			glm::vec3 scale;
+		}
+		
+		geometry->skeleton = this->skeleton;
+		geometry->bones.push_back(grBone);
+
+		for (int j = 0; j < bone->mNumWeights; j++)
+		{
+			aiVertexWeight weight = bone->mWeights[j];
+			for (int b = 0; b < 8; b++)
+			{
+				if (b < 4)
+				{
+					if (geometry->vertices.at(weight.mVertexId).IDs[b] == -1)
+					{
+						geometry->vertices.at(weight.mVertexId).IDs[b] = i;
+						geometry->vertices.at(weight.mVertexId).Weights[b] = weight.mWeight;
+						break;
+					}
+				}
+				else {  //Support for an additional 4 bones
+					if (geometry->vertices.at(weight.mVertexId).ID2s[b - 4] == -1)
+					{
+						geometry->vertices.at(weight.mVertexId).ID2s[b - 4] = i;
+						geometry->vertices.at(weight.mVertexId).Weights2[b - 4] = weight.mWeight;
+						break;
+					}
+				}
+
+			}
+		}
+	}
+}
+
+void Model::loadAnimations(const aiScene * scene, Object* root)
+{
+	for (int i = 0; i < scene->mNumAnimations; i++)
+	{
+		aiAnimation* anim = scene->mAnimations[i];
+		GrAnimation* grAnim = new GrAnimation(anim->mName.data, anim->mDuration, anim->mTicksPerSecond);
+		for (int j = 0; j < anim->mNumChannels; j++)
+		{
+			aiNodeAnim* animNode = anim->mChannels[j];
+			GrAnimationNode* node = new GrAnimationNode(animNode);
+			grAnim->animNodes.insert(std::pair<string, GrAnimationNode*>(node->name, node));
+		}
+		root->addComponent(grAnim);
+		break; // Add single animation for now
+	}
+}
+
 unsigned char * Model::loadEmbeddedTexture(const aiTexture *textureData, int *width, int *height, int *nrComponents)
 {
 	unsigned char* data = nullptr;
 	int desiredChannels;
 	if (textureData->mHeight == 0)
 	{
-		if (textureData->achFormatHint[0] == 'j')
+		if (textureData->achFormatHint[0] == 'j') //jpeg
 		{
-			cout << "JPEG" << endl;
 			desiredChannels = 3;
 		}
-		else if (textureData->achFormatHint[0] == 'p')
+		else if (textureData->achFormatHint[0] == 'p') //png
 		{
-			cout << "PNG" << endl;
 			desiredChannels = 4;
 		}
 		uint8_t* t_data = reinterpret_cast<unsigned char*>(textureData->pcData);

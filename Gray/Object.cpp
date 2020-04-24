@@ -1,6 +1,6 @@
 #include "Object.h"
 #include "GameManager.h"
-
+#include "Component.h"
 
 
 Object::Object()
@@ -125,6 +125,56 @@ void Object::setPosition(float x, float y, float z)
 	this->position.x = x;
 	this->position.y = y;
 	this->position.z = z;
+}
+
+Component* Object::getComponentByType(ComponentType type)
+{
+	for (int i = 0; i < this->components.size(); i++)
+	{
+		if (this->components[i]->type == type)
+		{
+			return this->components[i];
+		}
+	}
+	return nullptr;  //If cant find return null
+}
+
+Object * Object::getChildWithByName(string name)
+{
+	if (this->children.elements.size() > 0)
+	{
+		Object* result = nullptr;
+		for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+		{
+			if ((*it)->name == name)
+			{
+				return (*it);
+			}
+			else {
+				result = (*it)->getChildWithByName(name);
+				if (result != nullptr)
+				{
+					return result;
+				}
+			}
+		}
+		return result;
+	}
+	else
+	{
+		return nullptr;
+	}
+	
+	
+}
+
+void Object::loopThroughChildren(Component* comp, void(*callback)(const void*, const void*))
+{
+	for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+	{
+		callback((*it), comp);
+		(*it)->loopThroughChildren(comp, callback);
+	}
 }
 
 void Object::updateModel()

@@ -6,7 +6,7 @@
 #include "GameManager.h"
 #include "BoxGeometry.h"
 #include "Material.h"
-#include "Mesh.h"
+#include "grMesh.h"
 #include "OrbitCamera.h"
 #include "grLight.h"
 #include "Model.h"
@@ -15,49 +15,53 @@ using namespace std;
 
 int main()
 {
-	GameManager* gm = new GameManager(800, 600);
+	GameManager* gm = new GameManager(1024, 800);
 	GameScene* scene = new GameScene(gm);
 	gm->currentScene = scene;
 
-	//Brick
-	Object* box = new Object();
-	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
-	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
-	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
-	Mesh* mesh = new Mesh(bg, mat);
-	box->name = string("Brick");
-	box->gm = gm;
-	mesh->material->gm = gm;
-	box->position.x = -25;
-	mesh->addToObject(box);
+	////Brick
+	//Object* box = new Object();
+	//BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
+	//Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
+	//mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
+	//GrMesh* mesh = new GrMesh(bg, mat);
+	//box->name = string("Brick");
+	//box->gm = gm;
+	//mesh->material->gm = gm;
+	//box->position.x = -25;
+	//mesh->addToObject(box);
 
-	//Wooden Box
-	Object* woodBox = new Object();
-	BoxGeometry* woodBoxGeo = new BoxGeometry(5, 5, 5);
-	Material* woodBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
-	woodBoxMat->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
-	Mesh* woodBoxMesh = new Mesh(woodBoxGeo, woodBoxMat);
-	woodBox->name = "Wood";
-	woodBox->gm = gm;
-	woodBoxMesh->material->gm = gm;
-	woodBox->position.x = 5;
-	woodBoxMesh->addToObject(woodBox);
+	////Wooden Box
+	//Object* woodBox = new Object();
+	//BoxGeometry* woodBoxGeo = new BoxGeometry(5, 5, 5);
+	//Material* woodBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
+	//woodBoxMat->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
+	//GrMesh* woodBoxMesh = new GrMesh(woodBoxGeo, woodBoxMat);
+	//woodBox->name = "Wood";
+	//woodBox->gm = gm;
+	//woodBoxMesh->material->gm = gm;
+	//woodBox->position.x = 5;
+	//woodBoxMesh->addToObject(woodBox);
 
-	//Sci-fi
-	BoxGeometry* sfBoxGeo = new BoxGeometry(5, 5, 5);
-	Material* sfBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
-	sfBoxMat->setTexture("assets/metal.png", DIFFUSE_TEXTURE);
-	Mesh* sfBoxMesh = new Mesh(sfBoxGeo, sfBoxMat);
-	Object* sfBox = new Object();
-	sfBoxMesh->addToObject(sfBox);
-	sfBox->name = "SciFi";
-	sfBox->gm = gm;
-	sfBox->position.x =-5;
-	sfBox->position.z = 5;
+	////Sci-fi
+	//BoxGeometry* sfBoxGeo = new BoxGeometry(5, 5, 5);
+	//Material* sfBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
+	//sfBoxMat->setTexture("assets/metal.png", DIFFUSE_TEXTURE);
+	//GrMesh* sfBoxMesh = new GrMesh(sfBoxGeo, sfBoxMat);
+	//Object* sfBox = new Object();
+	//sfBoxMesh->addToObject(sfBox);
+	//sfBox->name = "SciFi";
+	//sfBox->gm = gm;
+	//sfBox->position.x =-5;
+	//sfBox->position.z = 5;
 	
 	
 	Model* model = new Model();
-	Object* scene2 = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
+	//Object* scene2 = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
+	Object* scene2 = model->loadModel(gm, "assets/paladin_j_nordstrom.fbx");
+	//Object* scene2 = model->loadModel(gm, "assets/walking.fbx");
+	//Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
+	
 	if (scene2 != nullptr)
 	{
 		scene2->scale = glm::vec3(0.5,0.5,0.5);
@@ -66,9 +70,9 @@ int main()
 		scene->em.addElement(scene2);
 		scene2->gm = gm;
 	}
-	scene->em.addElement(box);
-	scene->em.addElement(woodBox);
-	scene->em.addElement(sfBox);
+	//scene->em.addElement(box);
+	//scene->em.addElement(woodBox);
+	//scene->em.addElement(sfBox);
 	
 	
 	OrbitCamera* oc = new OrbitCamera(&scene->camera);
@@ -87,7 +91,7 @@ int main()
 
 	while (!glfwWindowShouldClose(gm->window))
 	{
-		box->position.x = cos(glfwGetTime()) * 5;
+		//box->position.x = cos(glfwGetTime()) * 5;
 		gm->update();
 	}
 }
