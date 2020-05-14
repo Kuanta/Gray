@@ -116,6 +116,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GrAnimManager.cpp" />
     <ClCompile Include="BoxGeometry.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Component.cpp" />
@@ -143,6 +144,7 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GrAnimManager.h" />
     <ClInclude Include="BoxGeometry.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Component.h" />

@@ -110,6 +110,9 @@
     <ClCompile Include="GrSkeleton.cpp">
       <Filter>Core\Components</Filter>
     </ClCompile>
+    <ClCompile Include="GrAnimManager.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
@@ -186,6 +189,9 @@
     </ClInclude>
     <ClInclude Include="FlyCamera.h">
       <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="GrAnimManager.h">
+      <Filter>Core\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,12 +4,11 @@
 
 GrAnimation::GrAnimation()
 {
-	this->type = ComponentType::ANIMATION;
+
 }
 
 GrAnimation::GrAnimation(string name, double duration, double ticksPerSecond)
 {
-	this->type = ComponentType::ANIMATION;
 	this->name = name;
 	this->duration = duration;
 	this->ticksPerSecond = ticksPerSecond;
@@ -19,15 +18,10 @@ GrAnimation::~GrAnimation()
 {
 }
 
-void GrAnimation::start()
-{
-	
-}
-
-void GrAnimation::update(float deltaTime)
+void GrAnimation::update(float deltaTime, GrSkeleton* skeleton)
 {
 	int currentTick = floor(this->animTime * this->ticksPerSecond);
-	int nextTick = currentTick + 1;
+	int nextTick = currentTick + this->direction;
 
 	if (currentTick > this->duration)
 	{
@@ -39,7 +33,6 @@ void GrAnimation::update(float deltaTime)
 		nextTick = 0;
 	}
 	float factor = (this->animTime - currentTick / this->ticksPerSecond) * this->ticksPerSecond;
-	GrSkeleton* skeleton = (GrSkeleton*) this->object->getComponentByType(ComponentType::SKELETON);
 	if (skeleton != nullptr)  //Can't animate something without bones
 	{
 		map<string, GrAnimationNode*>::iterator iter;
@@ -72,12 +65,38 @@ void GrAnimation::update(float deltaTime)
 	
 		}
 	}
-	this->animTime += deltaTime*0.1; //Animation speed can be adjusted here
+	this->animTime += deltaTime*this->speed; //Animation speed can be adjusted here
 }
 
-void GrAnimation::cleanup()
+void GrAnimation::transition(float transitionFactor, GrSkeleton* skeleton)
 {
+	if (skeleton != nullptr)  //Can't animate something without bones
+	{
+		map<string, GrAnimationNode*>::iterator iter;
+		for (iter = this->animNodes.begin(); iter != this->animNodes.end(); iter++)
+		{
+			GrAnimationNode* animNode = iter->second;
+			GrBone* bone = skeleton->getBoneByName(animNode->name);
+			if (bone != nullptr)
+			{
+				
+				glm::vec3 p1(bone->position.x, bone->position.y, bone->position.z);
+				glm::vec3 p2(animNode->posKeys[0].x, animNode->posKeys[0].y, animNode->posKeys[0].z);
+				glm::vec3 p = glm::mix(p1, p2, transitionFactor);
+				bone->setPosition(p.x, p.y, p.z);
+				glm::quat r1 = glm::quat(bone->rotation);
+				glm::quat r2(animNode->rotKeys[0].w, animNode->rotKeys[0].x, animNode->rotKeys[0].y, animNode->rotKeys[0].z);
+				bone->setRotation(glm::slerp(r1, r2, transitionFactor));
+				//bone->setScale(animNode->scaleKeys[currentTick].x, animNode->scaleKeys[currentTick].y, animNode->scaleKeys[currentTick].z);	
+			}
 
+		}
+	}
+}
+
+void GrAnimation::resetAnimation()
+{
+	this->animTime = 0;
 }
 
 GrAnimationNode::GrAnimationNode(aiNodeAnim * node)
@@ -104,4 +123,13 @@ GrAnimationNode::GrAnimationNode(aiNodeAnim * node)
 void GrAnimationNode::updateBone(GrBone * bone, float animTime, float totalDuration)
 {
 
+}
+
+GrAnimFrame GrAnimationNode::getAnimFrame(int i)
+{
+	GrAnimFrame frame;
+	frame.posKey = &this->posKeys.at(i);
+	frame.rotKey = &this->rotKeys.at(i);
+	frame.scaleKey = &this->scaleKeys.at(i);
+	return frame;
 }

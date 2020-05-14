@@ -7,6 +7,7 @@
 #include "grMesh.h"
 #include "grTexture.h"
 #include "GrAnimation.h"
+#include "GrAnimManager.h"
 #include "GrSkeleton.h"
 #include "Object.h"
 #include "Geometry.h"
@@ -53,6 +54,7 @@ public:
 		return tmp;
 	}
 	Object* loadModel(GameManager* gm, const std::string& fileName);
+	static vector<GrAnimation*> loadAnimations(const aiScene* scene);
 	void cleanup();
 private:
 	string directory;
@@ -66,7 +68,7 @@ private:
 	Material* loadMaterial(GameManager* gm, const aiScene* scene, unsigned int materialIndex);
 	void loadTexture(aiMaterial* aiMat, Material* gMat, aiTextureType textType, const aiScene* scene);
 	void loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry);
-	void loadAnimations(const aiScene* scene, Object* root);
+
 	unsigned char* loadEmbeddedTexture(const aiTexture * textureData, int *width, int *height, int *nrComponents);
 	//Assimp To Glm conversions
 	glm::vec3 aiColorToGlm(aiColor3D aiColor) {

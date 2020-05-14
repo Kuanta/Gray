@@ -2,9 +2,17 @@
 #include <assimp\scene.h>
 #include <map>
 #include <math.h>
-#include "Component.h"
 #include "GrSkeleton.h"
 
+struct GrAnimFrame
+{
+	/*
+		Simple structure that holds pointers to a single frame. 
+	*/
+	glm::vec3* posKey;
+	glm::vec3* scaleKey;
+	glm::quat* rotKey;
+};
 class GrAnimationNode
 {
 public:
@@ -16,25 +24,28 @@ public:
 	int keyNum;
 	vector<float> times;
 
-
 	void updateBone(GrBone* bone, float animTime, float totalDuration);
+	GrAnimFrame getAnimFrame(int i);
+	
 };
 
-class GrAnimation : public Component
+class GrAnimation
 {
 public:
 	GrAnimation();
 	GrAnimation(string name, double duration, double ticksPerSecond);
 	~GrAnimation();
 
-	// Component aracýlýðýyla devralýndý
-	virtual void start() override;
-	virtual void update(float deltaTime) override;
-	virtual void cleanup() override;
+	void update(float deltaTime, GrSkeleton* skeleton);
+	void transition(float transitionFactor, GrSkeleton* skeleton);
+	void resetAnimation();
 	string name;
+	map<string, GrAnimationNode*> animNodes;
 	double duration;
 	double ticksPerSecond;
-	map<string, GrAnimationNode*> animNodes;
+	float speed = 1.0f;
+	int direction = 1; //-1 means the animation goes backwards
+
 private:
 	float animTime = 0.0f;
 };

@@ -8,9 +8,19 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 	this->ambientLight = grLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.8f);
 	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.1f,glm::vec3(0.0f,-1.0f, 0.0f));
 	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.7f, 1.0f, 0.014f*0.001, 0.07f*0.001);
-	this->pointLight.setPosition(5, 15, -10);
+	this->pointLight.setPosition(5, 0, -10);
 	this->camera.position.z = 8;
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
+	Model* model = new Model();
+	player = model->loadModel(gm, "assets/walking.fbx");
+	if (player != nullptr)
+	{
+		player->scale = glm::vec3(0.5, 0.5, 0.5);
+		player->position.y = 0;
+		player->position.z = -30;
+		this->em.addElement(player);
+		player->gm = gm;
+	}
 }
 
 
@@ -38,7 +48,6 @@ void GameScene::update(GLFWwindow * window, double deltaTime)
 
 	this->draw(deltaTime);
 	this->em.clearElements();
-
 }
 
 void GameScene::draw(double deltaTime)
@@ -63,6 +72,11 @@ void GameScene::keyInput(int key, int scancode, int action, int mods)
 	if (this->camera.controls != nullptr)
 	{
 		this->camera.controls->keyInput(key, scancode, action, mods);
+	}
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+	{
+		GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
+		animMan->changeAnimation("mixamo.com");
 	}
 }
 

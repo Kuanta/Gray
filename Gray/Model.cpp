@@ -26,7 +26,10 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	}
 	root = this->loadNode(gm, scene->mRootNode, scene);
 	root->addComponent(this->skeleton);
-	this->loadAnimations(scene, root);
+	GrAnimManager* animMan = new GrAnimManager();
+	root->addComponent(animMan);
+	vector<GrAnimation*> anims = this->loadAnimations(scene);
+	animMan->addAnimations(anims);
 
 	//Root transform
 	glm::vec3 position;
@@ -34,7 +37,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	glm::vec3 scale;
 	aiMatrix4x4 rootTransform = scene->mRootNode->mTransformation;
 	glm::mat4 globalInverseTransform = AiToGLMMat4(rootTransform);
-	this->skeleton->globalInverseTransform = glm::transpose(globalInverseTransform);
+	this->skeleton->globalInverseTransform = glm::inverse(globalInverseTransform);
 	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, glm::vec3(), glm::vec4());
 	root->position = position;
 	root->scale = scale;
@@ -66,7 +69,33 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 			bone->parentBone = this->skeleton->getBoneByName(node->parent->name);
 		}
 	}
+
+	//Calculate bind matrices after setting all the parenthoods
+	for (iter = this->skeleton->bones.begin(); iter != this->skeleton->bones.end(); iter++)
+	{
+		GrBone* bone = iter->second;
+		bone->calculateInverseBindMatrix();
+		bone->setToBindPosition();
+	}
 	return root;
+}
+
+vector<GrAnimation*> Model::loadAnimations(const aiScene* scene)
+{
+	vector<GrAnimation*> animations;
+	for (int i = 0; i < scene->mNumAnimations; i++)
+	{
+		aiAnimation* anim = scene->mAnimations[i];
+		GrAnimation* grAnim = new GrAnimation(anim->mName.data, anim->mDuration, anim->mTicksPerSecond);
+		for (int j = 0; j < anim->mNumChannels; j++)
+		{
+			aiNodeAnim* animNode = anim->mChannels[j];
+			GrAnimationNode* node = new GrAnimationNode(animNode);
+			grAnim->animNodes.insert(std::pair<string, GrAnimationNode*>(node->name, node));
+		}
+		animations.push_back(grAnim);
+	}
+	return animations;
 }
 
 Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
@@ -238,14 +267,11 @@ void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geomet
 		string boneName = bone->mName.data;
 		GrBone* grBone = this->skeleton->getBoneByName(boneName);
 		glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(bone->mOffsetMatrix));
-		glm::mat4 nodeTransformation = Model::AiToGLMMat4(node->mTransformation);
+		//glm::mat4 nodeTransformation = Model::AiToGLMMat4(node->mTransformation);
 		if (grBone == nullptr)  //This solved the issue where mesh was deformed, why?
 		{
-			grBone = new GrBone(boneMatrix, nodeTransformation, boneName);
+			grBone = new GrBone(boneMatrix, this->skeleton->globalInverseTransform, boneName);
 			this->skeleton->addBone(boneName, grBone);
-			glm::vec3 position;
-			glm::quat orientation;
-			glm::vec3 scale;
 		}
 		
 		geometry->skeleton = this->skeleton;
@@ -276,23 +302,6 @@ void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geomet
 
 			}
 		}
-	}
-}
-
-void Model::loadAnimations(const aiScene * scene, Object* root)
-{
-	for (int i = 0; i < scene->mNumAnimations; i++)
-	{
-		aiAnimation* anim = scene->mAnimations[i];
-		GrAnimation* grAnim = new GrAnimation(anim->mName.data, anim->mDuration, anim->mTicksPerSecond);
-		for (int j = 0; j < anim->mNumChannels; j++)
-		{
-			aiNodeAnim* animNode = anim->mChannels[j];
-			GrAnimationNode* node = new GrAnimationNode(animNode);
-			grAnim->animNodes.insert(std::pair<string, GrAnimationNode*>(node->name, node));
-		}
-		root->addComponent(grAnim);
-		break; // Add single animation for now
 	}
 }
 

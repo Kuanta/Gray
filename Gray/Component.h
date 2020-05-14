@@ -6,7 +6,7 @@
 enum ComponentType {
 	DEFAULT,
 	MESH,
-	ANIMATION,
+	ANIMATION_MANAGER,
 	SKELETON
 
 };

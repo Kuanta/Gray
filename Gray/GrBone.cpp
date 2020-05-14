@@ -6,15 +6,16 @@ GrBone::GrBone()
 {
 }
 
-GrBone::GrBone(glm::mat4 offsetMatrix, glm::mat4 nodeTransformation, string name)
+GrBone::GrBone(glm::mat4 offsetMatrix, glm::mat4 rootMatrix, string name)
 {
 	this->scale = glm::vec3(1, 1, 1);
 	this->position = glm::vec3(0, 0, 0);
 	this->rotation = glm::quat(1, 0, 0, 0);
 	this->offsetMatrix = offsetMatrix;
-	this->nodeTransformation = nodeTransformation;
+	this->rootMatrix = rootMatrix;
 	this->name = name;
-	this->setTransformMatrix(glm::inverse(this->offsetMatrix));
+	//this->setTransformMatrix(glm::inverse(this->offsetMatrix));
+	//this->transformMatrix = glm::inverse(this->offsetMatrix);
 }
 
 
@@ -78,19 +79,38 @@ void GrBone::updateTransformMatrix()
 void GrBone::setTransformMatrix(glm::mat4 transformMatrix)
 {
 	this->transformMatrix = transformMatrix;
+	glm::quat orientation;
+	glm::decompose(transformMatrix, this->scale, orientation, this->position, glm::vec3(), glm::vec4());
+	this->rotation = glm::eulerAngles(orientation);;
 }
 
 void GrBone::calculateInverseBindMatrix()
 {
 	//Loop through parents
 	GrBone* parent = this->parentBone;
-	vector<glm::mat4> mats;
-	while (parent != nullptr) {
-		mats.insert(mats.begin(),parent->nodeTransformation);
-		parent = parent->parentBone;
-	}
-	for (int i = 0; i < mats.size(); i++)
+	//vector<glm::mat4> mats;
+	//while (parent != nullptr) {
+	//	mats.insert(mats.end(),glm::inverse(parent->offsetMatrix));
+	//	parent = parent->parentBone;
+	//}
+	//this->bindMatrix = this->offsetMatrix;
+	//for (int i = 0; i < mats.size(); i++)
+	//{
+	//	this->bindMatrix = this->bindMatrix* mats.at(i);
+	//}
+	if (this->parentBone != nullptr)
 	{
-		this->bindMatrix *= mats.at(i);
+		this->bindMatrix = this->parentBone->offsetMatrix*glm::inverse(this->offsetMatrix);
 	}
+	else
+	{
+		this->bindMatrix = glm::inverse(this->offsetMatrix);
+	}
+}
+
+void GrBone::setToBindPosition()
+{
+	glm::quat orientation;
+	glm::decompose(this->bindMatrix, this->scale, orientation, this->position, glm::vec3(), glm::vec4());
+	this->rotation = glm::eulerAngles(orientation);
 }

@@ -7,6 +7,8 @@
 #include "grLight.h"
 #include "grDirectionalLight.h"
 #include "grPointLight.h"
+#include "Model.h"
+#include "GrAnimManager.h"
 
 class GameScene : public Scene
 {
@@ -32,5 +34,10 @@ public:
 	virtual void drop_callback(GLFWwindow * window, int count, const char ** paths) override;
 	virtual void framebuffer_size_callback(GLFWwindow * window, int width, int height) override;
 	virtual void cleanup() override;
+
+private:
+	//Debug
+	float testTime=0;
+	Object* player;
 };
 
