@@ -9,15 +9,17 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.1f,glm::vec3(0.0f,-1.0f, 0.0f));
 	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.7f, 1.0f, 0.014f*0.001, 0.07f*0.001);
 	this->pointLight.setPosition(5, 0, -10);
-	this->camera.position.z = 8;
+	this->camera.setPositionZ(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 	Model* model = new Model();
-	player = model->loadModel(gm, "assets/walking.fbx");
+	player = model->loadModel(gm, "assets/arthas/arthas.fbx");
+	model->importAnimations("assets/arthas/arthas_Walk_1.fbx");
+	model->importAnimations("assets/arthas/arthas_Stand_0.fbx");
 	if (player != nullptr)
 	{
-		player->scale = glm::vec3(0.5, 0.5, 0.5);
-		player->position.y = 0;
-		player->position.z = -30;
+		player->setScale(glm::vec3(0.5, 0.5, 0.5));
+		player->setPositionY(0);
+		player->setPositionZ(-30);
 		this->em.addElement(player);
 		player->gm = gm;
 	}
@@ -42,7 +44,7 @@ void GameScene::update(GLFWwindow * window, double deltaTime)
 		{
 			(*it)->update(deltaTime);
 		}
-		this->pointLight.position = this->camera.position;
+		this->pointLight.setPosition(this->camera.getPosition());
 	}
 	this->camera.getViewMatrix();
 
@@ -52,8 +54,10 @@ void GameScene::update(GLFWwindow * window, double deltaTime)
 
 void GameScene::draw(double deltaTime)
 {
+	this->gm->shaders.defaultShader->setMat4("view", this->camera.getViewMatrix());
+	this->gm->shaders.defaultShader->setMat4("projection", this->camera.projection);
 	//Draw lights
-	this->gm->shaders.defaultShader->setVec3("eyePosition", this->camera.position);
+	this->gm->shaders.defaultShader->setVec3("eyePosition", this->camera.getPosition());
 	this->ambientLight.useLight(this->gm->shaders.defaultShader);
 	this->dirLight.useLight(this->gm->shaders.defaultShader);
 	this->pointLight.useLight(this->gm->shaders.defaultShader);
@@ -73,10 +77,15 @@ void GameScene::keyInput(int key, int scancode, int action, int mods)
 	{
 		this->camera.controls->keyInput(key, scancode, action, mods);
 	}
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
 		GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
-		animMan->changeAnimation("mixamo.com");
+		animMan->changeAnimation("Walk [1]",0.1f);
+	}
+	else if (key == GLFW_KEY_W && action == GLFW_RELEASE)
+	{
+		GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
+		animMan->changeAnimation("Stand [0]",0.1f);
 	}
 }
 

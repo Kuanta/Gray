@@ -69,9 +69,9 @@ void OrbitCamera::update(float deltaTime)
 	this->radiusVel += this->radiusAcc*deltaTime;
 	this->radius = this->radius + this->radiusVel * deltaTime + this->radiusAcc*deltaTime*deltaTime*0.5;
 	//Orbit
-	this->camera->position.x = (cos((PI / 180)*this->pitch) * cos((PI / 180)*this->yaw) * this->radius + this->camera->target.x);
-	this->camera->position.y = (sin((PI / 180)*this->pitch)*this->radius + this->camera->target.y);
-	this->camera->position.z = (sin((PI / 180)*this->yaw)*cos((PI / 180)*this->pitch) * this->radius + this->camera->target.z);
+	this->camera->setPosition((cos((PI / 180)*this->pitch) * cos((PI / 180)*this->yaw) * this->radius + this->camera->target.x),
+	(sin((PI / 180)*this->pitch)*this->radius + this->camera->target.y),
+	(sin((PI / 180)*this->yaw)*cos((PI / 180)*this->pitch) * this->radius + this->camera->target.z));
 
 	this->panRightVel *= this->damping;
 	this->panFrontVel *= this->damping;

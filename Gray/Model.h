@@ -54,6 +54,7 @@ public:
 		return tmp;
 	}
 	Object* loadModel(GameManager* gm, const std::string& fileName);
+	void importAnimations(const std::string& fileName);
 	static vector<GrAnimation*> loadAnimations(const aiScene* scene);
 	void cleanup();
 private:
@@ -62,7 +63,7 @@ private:
 	GrSkeleton* skeleton;
 
 	//Methods
-	Object* loadNode(GameManager* gm, aiNode *node, const aiScene* scene);
+	Object* loadNode(GameManager* gm, aiNode *node, const aiScene* scene, bool isRoot = false);
 	GrMesh* loadMesh(GameManager* gm, aiNode* node, aiMesh *mesh, const aiScene* scene);
 	void loadMaterials(const aiScene* scene);
 	Material* loadMaterial(GameManager* gm, const aiScene* scene, unsigned int materialIndex);

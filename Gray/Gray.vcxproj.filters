@@ -33,6 +33,9 @@
     <Filter Include="Core\Components">
       <UniqueIdentifier>{882216e1-fa41-43fc-8fa3-8ce02fffb3d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{1c98dc56-f79d-4cb5-9b4c-7a349e34bb7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -192,6 +195,9 @@
     </ClInclude>
     <ClInclude Include="GrAnimManager.h">
       <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\math.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

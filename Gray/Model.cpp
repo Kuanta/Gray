@@ -4,6 +4,7 @@
 
 Model::Model()
 {
+	this->root = nullptr;
 }
 
 
@@ -16,15 +17,27 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	// Initialize skeleton
 	this->skeleton = new GrSkeleton();
 
+
 	this->directory = fileName.substr(0, fileName.find_last_of('/'));
 	Assimp::Importer importer;
-	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+	importer.SetPropertyInteger(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, 0);
+	importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
 		cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
 		return nullptr;
 	}
-	root = this->loadNode(gm, scene->mRootNode, scene);
+
+	for (int j = 0; j < scene->mMeshes[0]->mNumBones; j++)
+	{
+		aiBone* ai_bone = scene->mMeshes[0]->mBones[j];
+		glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(ai_bone->mOffsetMatrix));
+		GrBone* bone = new GrBone(this->skeleton, boneMatrix, this->skeleton->globalInverseTransform, ai_bone->mName.data);
+		this->skeleton->addBone(bone->name, bone);
+	}
+
+	root = this->loadNode(gm, scene->mRootNode, scene, true);
 	root->addComponent(this->skeleton);
 	GrAnimManager* animMan = new GrAnimManager();
 	root->addComponent(animMan);
@@ -37,11 +50,14 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	glm::vec3 scale;
 	aiMatrix4x4 rootTransform = scene->mRootNode->mTransformation;
 	glm::mat4 globalInverseTransform = AiToGLMMat4(rootTransform);
+
 	this->skeleton->globalInverseTransform = glm::inverse(globalInverseTransform);
 	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, glm::vec3(), glm::vec4());
-	root->position = position;
-	root->scale = scale;
-	root->rotation = glm::eulerAngles(orientation);
+	root->setPosition(position);
+	root->setRotation(glm::eulerAngles(orientation));
+	root->setScale(scale);
+
+
 
 	//Set Bone Parents
 	/*
@@ -67,9 +83,13 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 		if (node != nullptr && node->parent != nullptr)
 		{
 			bone->parentBone = this->skeleton->getBoneByName(node->parent->name);
+			if (bone->parentBone != nullptr)
+			{
+				bone->parentBone->children.push_back(bone);
+			}
 		}
 	}
-
+	
 	//Calculate bind matrices after setting all the parenthoods
 	for (iter = this->skeleton->bones.begin(); iter != this->skeleton->bones.end(); iter++)
 	{
@@ -80,12 +100,36 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	return root;
 }
 
+void Model::importAnimations(const std::string& fileName)
+{
+	if (this->root == nullptr)
+	{
+
+	}
+	this->directory = fileName.substr(0, fileName.find_last_of('/'));
+	Assimp::Importer importer;
+	importer.SetPropertyInteger(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, 0);
+	importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+	const aiScene* scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
+	if (scene == nullptr) // if is Not Zero
+	{
+		cout << "Couldn't load the animation file" << endl;
+		return;
+	}
+	vector<GrAnimation*> anims = this->loadAnimations(scene);
+	GrAnimManager* animMan = (GrAnimManager*) this->root->getComponentByType(ComponentType::ANIMATION_MANAGER);
+	animMan->addAnimations(anims);
+
+}
+
 vector<GrAnimation*> Model::loadAnimations(const aiScene* scene)
 {
 	vector<GrAnimation*> animations;
+	cout << "Num animations:" << scene->mNumAnimations << endl;
 	for (int i = 0; i < scene->mNumAnimations; i++)
 	{
 		aiAnimation* anim = scene->mAnimations[i];
+		cout << anim->mName.C_Str() << endl;
 		GrAnimation* grAnim = new GrAnimation(anim->mName.data, anim->mDuration, anim->mTicksPerSecond);
 		for (int j = 0; j < anim->mNumChannels; j++)
 		{
@@ -98,7 +142,7 @@ vector<GrAnimation*> Model::loadAnimations(const aiScene* scene)
 	return animations;
 }
 
-Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
+Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, bool isRoot)
 {
 	Object* object = new Object();
 	object->name = node->mName.data;
@@ -107,19 +151,26 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene)
 	glm::quat orientation;
 	glm::vec3 scale;
 	aiMatrix4x4 nodeTransform = node->mTransformation;
-	glm::decompose(AiToGLMMat4(nodeTransform), scale, orientation,position, glm::vec3(), glm::vec4());
-	object->position = position;
-	object->scale = scale;
-	object->rotation = glm::eulerAngles(orientation);
-	for (size_t i = 0; i < node->mNumMeshes; i++)
+
+	glm::decompose(AiToGLMMat4(nodeTransform), scale, orientation, position, glm::vec3(), glm::vec4());
+	object->setPosition(position);
+	object->setRotation(glm::eulerAngles(orientation));
+	object->setScale(scale);
+	if (node->mNumMeshes > 0)
 	{
-		GrMesh* mesh = this->loadMesh(gm, node, scene->mMeshes[node->mMeshes[i]], scene);
-		object->addComponent(mesh);
+		for (size_t i = 0; i < node->mNumMeshes; i++)
+		{
+			GrMesh* mesh = this->loadMesh(gm, node, scene->mMeshes[node->mMeshes[i]], scene);
+			//Load Bones
+			loadBones(scene, node, scene->mMeshes[node->mMeshes[i]], mesh->geometry);
+			mesh->geometry->initBuffers(); //Init buffers after loading bones
+			object->addComponent(mesh);
+		}
 	}
 
 	for (size_t i = 0; i < node->mNumChildren; i++)
 	{
-		Object* child = this->loadNode(gm, node->mChildren[i], scene);
+		Object* child = this->loadNode(gm, node->mChildren[i], scene, false);
 		object->add(child);
 	}
 	
@@ -165,11 +216,6 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 
 	
 	Geometry* geometry = new Geometry(vertices, indices, false);
-
-	//Load Bones
-	loadBones(scene, node, mesh, geometry);
-	geometry->initBuffers(); //Init buffers after loading bones
-
 	GrMesh* grMesh;
 	if (mesh->mMaterialIndex >= 0) {
 		grMesh = new GrMesh(geometry, this->loadMaterial(gm, scene, mesh->mMaterialIndex), mesh->mName.data);
@@ -261,18 +307,25 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 
 void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry)
 {
+	if (this->skeleton->getBoneByName(node->mParent->mName.data) == nullptr)
+	{
+	/*	glm::mat4 identity;
+		GrBone* bone = new GrBone(identity, this->skeleton->globalInverseTransform, identity, node->parent->name);
+		bone->parentBone = bone;
+		this->skeleton->addBone(node->parent->name, bone);*/
+	}
 	for (int i = 0; i < aiMesh->mNumBones; i++)
 	{
 		aiBone* bone = aiMesh->mBones[i];
 		string boneName = bone->mName.data;
 		GrBone* grBone = this->skeleton->getBoneByName(boneName);
-		glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(bone->mOffsetMatrix));
 		//glm::mat4 nodeTransformation = Model::AiToGLMMat4(node->mTransformation);
-		if (grBone == nullptr)  //This solved the issue where mesh was deformed, why?
-		{
-			grBone = new GrBone(boneMatrix, this->skeleton->globalInverseTransform, boneName);
-			this->skeleton->addBone(boneName, grBone);
-		}
+		//if (grBone == nullptr)  //This solved the issue where mesh was deformed, why?
+		//{
+		//	glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(bone->mOffsetMatrix));
+		//	grBone = new GrBone(boneMatrix, this->skeleton->globalInverseTransform, boneName);
+		//	this->skeleton->addBone(boneName, grBone);
+		//}
 		
 		geometry->skeleton = this->skeleton;
 		geometry->bones.push_back(grBone);

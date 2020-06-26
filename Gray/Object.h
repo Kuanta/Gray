@@ -7,7 +7,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "ElementManager.h"
 
-
 class GameManager;
 class Component;
 enum ComponentType;
@@ -22,13 +21,34 @@ public:
 	vector<Component*> components;
 	string name;
 	int id;
-	//Transformation Variables
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
+	
 	glm::vec3 target;
 	glm::mat4 model;
 	//Methods
+	void setPosition(glm::vec3 pos);
+	void setRotation(glm::vec3 rot);
+	void setScale(glm::vec3 scale);
+	void displace(glm::vec3 pos);
+	void updateScale(glm::vec3 scale);
+	void setPosition(float x, float y, float z);
+	void setPositionX(float x) { this->position.x = x; }
+	void setPositionY(float y) { this->position.y = y; }
+	void setPositionZ(float z) { this->position.z = z; }
+	void setRotation(float x, float y, float z);
+	void setRotationX(float x) { this->position.x = x; }
+	void setRotationY(float y) { this->position.y = y; }
+	void setRotationZ(float z) { this->position.z = z; }
+	void setScale(float x, float y, float z);
+	void setScaleX(float x) { this->scale.x = x; }
+	void setScaleY(float y) { this->scale.y = y; }
+	void setScaleZ(float z) { this->scale.z = z; }
+	void displace(float x, float y, float z);
+	void updateScale(float x, float y, float z);
+
+	glm::vec3 getPosition();
+	glm::vec3 getRotation();
+	glm::vec3 getScale();
+
 	Object* getRootObject(); //Returns the greatest grandparent
 	void addComponent(Component* component);
 	void setTarget(glm::vec3 newTarget); // Updates rotations from target
@@ -37,17 +57,24 @@ public:
 	virtual void update(float deltaTime);
 	virtual void draw();
 	virtual void cleanup();
-	void setPosition(glm::vec3 pos);
-	void setPosition(float x, float y, float z);
+
 	Component* getComponentByType(ComponentType type);
 	Object* getChildWithByName(string name);
 	void loopThroughChildren(Component* comp, void (*callback)(const void*, const void*)); //First Argument should be
+	void updateLocalMatrix();
+	glm::mat4 getLocalMatrix();
 protected:
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+	glm::mat4 localMatrix;
+private:
 	void setParent(Object* parent)
 	{
 		this->parent = parent;
 		this->gm = parent->gm;
 	}
 	void updateModel();
+	bool requireModelUpdate = false;
 };
 

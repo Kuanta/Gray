@@ -76,24 +76,18 @@ void Geometry::initBuffers()
 	//Bone IDs
 	glEnableVertexAttribArray(4);
 	glVertexAttribIPointer(4, Geometry::NUM_BONES_PER_VERTEX, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, IDs));
-	//Bone ID2s
-	glEnableVertexAttribArray(5);
-	glVertexAttribIPointer(5, Geometry::NUM_BONES_PER_VERTEX, GL_INT, sizeof(Vertex), (void*)offsetof(Vertex, ID2s));
 	//Weights
-	glEnableVertexAttribArray(6);
-	glVertexAttribPointer(6, Geometry::NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
-	//Weights2
-	glEnableVertexAttribArray(7);
-	glVertexAttribPointer(7, Geometry::NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights2));
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, Geometry::NUM_BONES_PER_VERTEX, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Weights));
 	// vertex tangent
-	glEnableVertexAttribArray(8);
-	glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Tangent));
 	// vertex bitangent
-	glEnableVertexAttribArray(9);
-	glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
+	glEnableVertexAttribArray(7);
+	glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Bitangent));
 	// colors
-	glEnableVertexAttribArray(10);
-	glVertexAttribPointer(10, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
+	glEnableVertexAttribArray(8);
+	glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, Color));
 	
 	glBindVertexArray(0);
 }
@@ -108,9 +102,8 @@ void Geometry::draw(Shader* shader)
 		glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 1);
 		for (int i = 0; i < this->bones.size(); i++)
 		{
-			this->bones[i]->updateTransformMatrix(); //An animation node may not change all the bones, update transform matrix every iteration
 			glm::mat4 boneMatrix = this->bones[i]->getTransformMatrix();
-			boneMatrices.push_back(this->skeleton->globalInverseTransform*boneMatrix*this->bones[i]->offsetMatrix);
+			boneMatrices.push_back(boneMatrix*this->bones[i]->offsetMatrix);
 
 		}
 		glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,

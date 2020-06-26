@@ -56,12 +56,10 @@ void grTexture::loadTexture(const char* filename)
 
 void grTexture::loadTexture(unsigned char * data, int width, int height)
 {
-	cout << "w:" << width << " h:" << height << endl;
 	this->width = width;
 	this->height = height;
 	glGenTextures(1, &this->textureID);
 	glBindTexture(GL_TEXTURE_2D, this->textureID);
-	cout << "Generated at :" << this->textureID << endl;
 	//Texture Params
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);

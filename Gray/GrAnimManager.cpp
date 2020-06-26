@@ -41,7 +41,6 @@ void GrAnimManager::update(float deltaTime)
 		}
 		this->transitionTime -= deltaTime;
 	}
-	
 }
 
 void GrAnimManager::cleanup()
@@ -70,21 +69,24 @@ void GrAnimManager::addAnimations(vector<GrAnimation*> anims)
 	}
 }
 
-void GrAnimManager::changeAnimation(string animName)
+void GrAnimManager::changeAnimation(string animName, float transitionTime)
 {
-	this->changeAnimation(this->animations.at(animName));
-}
-
-void GrAnimManager::changeAnimation(int animId)
-{
-}
-
-void GrAnimManager::changeAnimation(GrAnimation* newAnim)
-{
-	if (!this->transitioning) //Don't change animation while transitioning
+	if (this->animations.find(animName) != this->animations.end())
 	{
-		this->transitionTo(newAnim);
+		this->changeAnimation(this->animations.at(animName),transitionTime);
 	}
+	else {
+		cout << "Couldn't find " << animName << endl;
+	}
+}
+
+void GrAnimManager::changeAnimation(int animId, float transitionTime)
+{
+}
+
+void GrAnimManager::changeAnimation(GrAnimation* newAnim, float transitionTime)
+{
+	this->transitionTo(newAnim, transitionTime);
 	
 }
 

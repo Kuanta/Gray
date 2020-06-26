@@ -20,16 +20,16 @@ int main()
 	gm->currentScene = scene;
 
 	////Brick
-	//Object* box = new Object();
-	//BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
-	//Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
-	//mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
-	//GrMesh* mesh = new GrMesh(bg, mat);
-	//box->name = string("Brick");
-	//box->gm = gm;
-	//mesh->material->gm = gm;
-	//box->position.x = -25;
-	//mesh->addToObject(box);
+	Object* box = new Object();
+	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
+	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
+	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
+	GrMesh* mesh = new GrMesh(bg, mat);
+	box->name = string("Brick");
+	box->gm = gm;
+	mesh->material->gm = gm;
+	box->setPosition(-25, 0, 0);
+	mesh->addToObject(box);
 
 	////Wooden Box
 	//Object* woodBox = new Object();
@@ -63,7 +63,7 @@ int main()
 	//Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
 	
 
-	//scene->em.addElement(box);
+	scene->em.addElement(box);
 	//scene->em.addElement(woodBox);
 	//scene->em.addElement(sfBox);
 	
@@ -84,7 +84,7 @@ int main()
 
 	while (!glfwWindowShouldClose(gm->window))
 	{
-		//box->position.x = cos(glfwGetTime()) * 5;
+		box->setPosition(cos(glfwGetTime()) * 5, 0, 0);
 		gm->update();
 	}
 }

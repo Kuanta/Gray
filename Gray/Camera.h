@@ -16,9 +16,9 @@ public:
 	glm::vec3 up;
 	glm::vec3 right;
 	glm::vec3 left;
-	float getRoll() { return this->rotation.z; }
-	float getPitch() { return this->rotation.x; }
-	float getYaw() { return this->rotation.y; }
+	float getRoll() { return this->getRotation().z; }
+	float getPitch() { return this->getRotation().x; }
+	float getYaw() { return this->getRotation().y; }
 	glm::vec3 getFrontVector();
 	glm::vec3 getRightVector();
 	glm::mat4 getViewMatrix();

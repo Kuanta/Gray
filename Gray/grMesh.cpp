@@ -42,8 +42,8 @@ void GrMesh::draw()
 		shader->use();
 		//Set Model-View_Projection
 		shader->setMat4("model", this->object->model);
-		shader->setMat4("view", this->object->getRootObject()->gm->currentScene->camera.getViewMatrix());
-		shader->setMat4("projection", this->object->getRootObject()->gm->currentScene->camera.projection);
+		//shader->setMat4("view", this->object->getRootObject()->gm->currentScene->camera.getViewMatrix());
+		//shader->setMat4("projection", this->object->getRootObject()->gm->currentScene->camera.projection);
 		//BUG FIX: MATERIAL SHOULD BE DRAWN FIRST
 		this->material->draw(shader);
 		this->geometry->draw(shader);	

@@ -23,10 +23,7 @@ public:
 	string name;
 	int keyNum;
 	vector<float> times;
-
-	void updateBone(GrBone* bone, float animTime, float totalDuration);
-	GrAnimFrame getAnimFrame(int i);
-	
+	GrAnimFrame getAnimFrame(float relTime, float ticksPerSecond, int direction);
 };
 
 class GrAnimation

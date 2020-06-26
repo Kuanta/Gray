@@ -27,12 +27,31 @@ GrBone * GrSkeleton::getBoneByName(string boneName)
 	}
 }
 
+void GrSkeleton::markBone(GrBone* bone)
+{
+	this->bonesToUpdate.push(bone);
+}
+
 void GrSkeleton::start()
 {
 }
 
 void GrSkeleton::update(float deltaTime)
 {
+	GrBone* bone;
+	while (!this->bonesToUpdate.empty())
+	{
+		bone = this->bonesToUpdate.front();
+		bone->updateTransformMatrix();
+		bone->requiresUpdate = false;
+		this->bonesToUpdate.pop();
+	}
+	/*map<string, GrBone*>::iterator iter;
+	for (iter = this->bones.begin(); iter != this->bones.end(); iter++)
+	{
+		GrBone* bone = iter->second;
+		bone->updateTransformMatrix();
+	}*/
 }
 
 void GrSkeleton::cleanup()

@@ -17,10 +17,12 @@ public:
 	void addAnimation(string name, GrAnimation* anim);
 	void addAnimation(GrAnimation* anim);
 	void addAnimations(vector<GrAnimation*> anims);
-	void changeAnimation(string animName);
-	void changeAnimation(int animId);
-	void changeAnimation(GrAnimation* newAnim);
+	void changeAnimation(string animName, float transitionTime=1.0f);
+	void changeAnimation(int animId, float transitionTime);
+	void changeAnimation(GrAnimation* newAnim, float transitionTime=1.0f);
 	void resetAnimation();
+	void resetToIdle();
+	void resetToBind();
 	void transitionTo(GrAnimation* anim, float transitionTime=1.0f);
 	map<string, GrAnimation*> animations;
 
@@ -28,7 +30,9 @@ public:
 
 private:
 	GrAnimation* currentAnimation = nullptr;
-
+	GrAnimation* secondaryAnimation = nullptr;
+	float animationFactor = 1.0f; //Used in blending
+	GrAnimation* idleAnimation = nullptr;
 	//Transition variables
 	bool transitioning;
 	GrAnimation* targetAnimation = nullptr;

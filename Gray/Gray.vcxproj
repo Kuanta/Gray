@@ -170,6 +170,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="utils\math.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shaders\simple_fragment.txt" />

@@ -8,6 +8,7 @@ Object::Object()
 	this->position = glm::vec3(0, 0, 0);
 	this->rotation = glm::vec3(0, 0, 0);
 	this->scale = glm::vec3(1, 1, 1);
+	this->updateLocalMatrix();
 	this->gm = nullptr;
 }
 
@@ -52,6 +53,7 @@ void Object::setTarget(glm::vec3 newTarget)
 		(this->position.z - this->target.z) * (this->position.z - this->target.z));
 	this->rotation.y = atan2(this->target.z - this->position.z, this->target.x - this->position.z);
 	this->rotation.x = asin(radius / (this->target.y - this->position.y));
+	this->updateLocalMatrix();
 }
 
 void Object::add(Object * object)
@@ -67,8 +69,6 @@ void Object::remove(Object * object)
 
 void Object::update(float deltaTime)
 {
-	this->updateModel();
-
 	//Update components
 	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
 	{
@@ -83,6 +83,12 @@ void Object::update(float deltaTime)
 		}
 	}
 	this->children.clearElements();
+
+	if (this->requireModelUpdate)
+	{
+		this->updateModel();
+		this->requireModelUpdate = false;
+	}
 }
 
 void Object::draw()
@@ -118,6 +124,31 @@ void Object::cleanup()
 void Object::setPosition(glm::vec3 pos)
 {
 	this->position = pos;
+	this->updateLocalMatrix();
+}
+
+void Object::setRotation(glm::vec3 rot)
+{
+	this->rotation = rot;
+	this->updateLocalMatrix();
+}
+
+void Object::setScale(glm::vec3 scale)
+{
+	this->scale = scale;
+	this->updateLocalMatrix();
+}
+
+void Object::displace(glm::vec3 pos)
+{
+	this->position += pos;
+	this->updateLocalMatrix();
+}
+
+void Object::updateScale(glm::vec3 scale)
+{
+	this->scale = this->scale*scale;
+	this->updateLocalMatrix();
 }
 
 void Object::setPosition(float x, float y, float z)
@@ -125,6 +156,54 @@ void Object::setPosition(float x, float y, float z)
 	this->position.x = x;
 	this->position.y = y;
 	this->position.z = z;
+	this->updateLocalMatrix();
+}
+
+void Object::setRotation(float x, float y, float z)
+{
+	this->rotation.x = x;
+	this->rotation.y = y;
+	this->rotation.z = z;
+	this->updateLocalMatrix();
+}
+
+void Object::setScale(float x, float y, float z)
+{
+	this->scale.x = x;
+	this->scale.y = y;
+	this->scale.z = z;
+	this->updateLocalMatrix();
+}
+
+void Object::displace(float x, float y, float z)
+{
+	this->position.x += x;
+	this->position.y += y;
+	this->position.z += z;
+	this->updateLocalMatrix();
+}
+
+void Object::updateScale(float x, float y, float z)
+{
+	this->scale.x *= x;
+	this->scale.y *= y;
+	this->scale.z *= z;
+	this->updateLocalMatrix();
+}
+
+glm::vec3 Object::getPosition()
+{
+	return this->position;
+}
+
+glm::vec3 Object::getRotation()
+{
+	return this->rotation;
+}
+
+glm::vec3 Object::getScale()
+{
+	return this->scale;
 }
 
 Component* Object::getComponentByType(ComponentType type)
@@ -177,26 +256,34 @@ void Object::loopThroughChildren(Component* comp, void(*callback)(const void*, c
 	}
 }
 
+void Object::updateLocalMatrix()
+{
+	glm::mat4 model;
+	model = glm::translate(model, this->position);
+	model = glm::rotate(model, glm::radians(this->rotation.y), glm::vec3(0, 1, 0)); //Yaw
+	model = glm::rotate(model, glm::radians(this->rotation.x), glm::vec3(1, 0, 0)); //Pitch
+	model = glm::rotate(model, glm::radians(this->rotation.z), glm::vec3(0, 0, 1)); //Roll
+	model = glm::scale(model, this->scale);
+	this->localMatrix = model;
+	this->requireModelUpdate = true;
+}
+
+glm::mat4 Object::getLocalMatrix()
+{
+	return this->localMatrix;
+}
+
 void Object::updateModel()
 {
 	//Get parents
 	glm::mat4 model;
 	Object* parent = this->parent;
 	while (parent != nullptr) {
-		model = glm::translate(model, parent->position);
-		model = glm::rotate(model, glm::radians(parent->rotation.y), glm::vec3(0, 1, 0)); //Yaw
-		model = glm::rotate(model, glm::radians(parent->rotation.x), glm::vec3(1, 0, 0)); //Pitch
-		model = glm::rotate(model, glm::radians(parent->rotation.z), glm::vec3(0, 0, 1)); //Roll
-		model = glm::scale(model, parent->scale);
+		model *= parent->getLocalMatrix();
 		parent = parent->parent;
 
 	}
 
-	model = glm::translate(model, this->position);
-	model = glm::rotate(model, glm::radians(this->rotation.y), glm::vec3(0, 1, 0)); //Yaw
-	model = glm::rotate(model, glm::radians(this->rotation.x), glm::vec3(1, 0, 0)); //Pitch
-	model = glm::rotate(model, glm::radians(this->rotation.z), glm::vec3(0, 0, 1)); //Roll
-	model = glm::scale(model, this->scale);
-
+	model *= this->localMatrix;
 	this->model = model;
 }
