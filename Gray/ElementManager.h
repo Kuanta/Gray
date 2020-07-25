@@ -16,6 +16,7 @@ template <class T>
 class ElementManager
 {
 public:
+	void (*callback)(T)=nullptr;
 	vector<T> elements;
 	vector<int> freeIds;
 	vector<int> toDelete;
@@ -63,7 +64,6 @@ public:
 			}
 
 		}
-		cout << endl;
 		if (elementExists)
 		{
 			//Does this element already marked for removal?
@@ -93,14 +93,12 @@ public:
 			if (this->elements[id] != nullptr)
 			{
 				this->freeIds.push_back(id);
-				this->elements[id]->cleanup();
-				delete this->elements[id];
+				if (this->callback != nullptr)
+				{
+					this->callback(this->elements[id]);
+				}
 				this->elements[id] = nullptr;
 				numOfElements--;
-			}
-			else
-			{
-				//This element already cleaned
 			}
 		}
 	}
@@ -110,10 +108,11 @@ public:
 		{
 			if ((*it) != nullptr)
 			{
-				(*it)->cleanup();
-				delete (*it);
+				if (this->callback != nullptr)
+				{
+					this->callback(*it);
+				}
 			}
-
 		}
 		this->numOfElements = 0;
 		this->freeIds.clear();

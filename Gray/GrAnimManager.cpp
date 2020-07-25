@@ -18,11 +18,28 @@ void GrAnimManager::update(float deltaTime)
 	GrSkeleton* skeleton = (GrSkeleton*)this->object->getComponentByType(ComponentType::SKELETON);
 	if (!this->transitioning)
 	{
-		if (this->currentAnimation)
+		map<string, GrAnimation>::iterator iter;
+		linked::Node<GrAnimation*>* currNode = this->activeAnimatons.head;
+		while (currNode != nullptr)
+		{
+			linked::Node<GrAnimation*>* nextNode = currNode->next;
+			GrAnimation* anim = (GrAnimation*)currNode->data;
+			if (!anim->active)
+			{
+				//This animation has been deactivated, remove it
+				this->activeAnimatons.popElement(currNode);		
+			}
+			else {
+				anim->update(deltaTime, skeleton);
+			}
+			currNode = nextNode;
+		}
+
+	/*	if (this->currentAnimation)
 		{
 			
 			this->currentAnimation->update(deltaTime, skeleton);
-		}
+		}*/
 	}
 	else
 	{
@@ -31,7 +48,8 @@ void GrAnimManager::update(float deltaTime)
 		{
 			factor = 1.0f;
 			this->transitioning = false;
-			this->currentAnimation = this->targetAnimation;
+			this->addToActive(this->targetAnimation,1.0f);
+			//this->currentAnimation = this->targetAnimation;
 			this->targetAnimation = nullptr;
 		}
 		else
@@ -69,7 +87,7 @@ void GrAnimManager::addAnimations(vector<GrAnimation*> anims)
 	}
 }
 
-void GrAnimManager::changeAnimation(string animName, float transitionTime)
+void GrAnimManager::changeAnimation(string animName, float transitionTime, bool loop)
 {
 	if (this->animations.find(animName) != this->animations.end())
 	{
@@ -80,14 +98,25 @@ void GrAnimManager::changeAnimation(string animName, float transitionTime)
 	}
 }
 
-void GrAnimManager::changeAnimation(int animId, float transitionTime)
+void GrAnimManager::changeAnimation(int animId, float transitionTime, bool loop)
 {
 }
 
-void GrAnimManager::changeAnimation(GrAnimation* newAnim, float transitionTime)
+void GrAnimManager::changeAnimation(GrAnimation* newAnim, float transitionTime, bool loop)
 {
+	//this->activeAnimations.clearElements();
+	newAnim->loop = true;
 	this->transitionTo(newAnim, transitionTime);
 	
+}
+
+GrAnimation* GrAnimManager::getAnimation(string name)
+{
+	if (this->animations.find(name) != this->animations.end())
+	{
+		return this->animations.at(name);
+	}
+	return nullptr;
 }
 
 void GrAnimManager::resetAnimation()
@@ -106,4 +135,34 @@ void GrAnimManager::transitionTo(GrAnimation* anim, float transitionTime)
 void GrAnimManager::mergeAnimations(GrAnimManager* animMan)
 {
 	this->animations.insert(animMan->animations.begin(), animMan->animations.end());
+}
+
+void GrAnimManager::addToActive(string name, float weight, bool loop)
+{
+	GrAnimation* anim = this->getAnimation(name);
+	if (anim != nullptr)
+	{
+		this->addToActive(anim, weight, loop);
+	}
+	else {
+		cout << "Couldn't find " << name << endl;
+	}
+}
+
+void GrAnimManager::addToActive(GrAnimation* anim, float weight, bool loop)
+{
+	//Don't add an already active animation
+	if (!anim->active)
+	{
+		anim->weight = weight;
+		anim->active = true;
+		anim->loop = loop;
+		this->activeAnimatons.addElement(anim);
+	}
+
+}
+
+void GrAnimManager::clearAnimCallback(GrAnimation* anim)
+{
+	anim->resetAnimation();
 }

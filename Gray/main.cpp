@@ -10,11 +10,34 @@
 #include "OrbitCamera.h"
 #include "grLight.h"
 
+#include "containers.h"
 
 using namespace std;
 
 int main()
 {
+	//Debug
+	linked::LinkedList<int> lis;
+	lis.addElement(0);
+	lis.addElement(1);
+	lis.addElement(2);
+	lis.addElement(3);
+	linked::Node<int>* iterator = lis.head;
+	while (iterator != nullptr)
+	{
+		cout << iterator->data << endl;
+		iterator = iterator->next;
+	}
+	lis.popElement(lis.head);
+	lis.popElement(lis.tail);
+	lis.popElement(lis.tail);
+	iterator = lis.head;
+	while (iterator != nullptr)
+	{
+		cout << iterator->data << endl;
+		iterator = iterator->next;
+	}
+
 	GameManager* gm = new GameManager(1024, 800);
 	GameScene* scene = new GameScene(gm);
 	gm->currentScene = scene;

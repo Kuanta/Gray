@@ -24,6 +24,9 @@ public:
 	int keyNum;
 	vector<float> times;
 	GrAnimFrame getAnimFrame(float relTime, float ticksPerSecond, int direction);
+	glm::vec3 currPos;
+	glm::vec3 currRot;
+	glm::vec3 currScale;
 };
 
 class GrAnimation
@@ -34,16 +37,31 @@ public:
 	~GrAnimation();
 
 	void update(float deltaTime, GrSkeleton* skeleton);
+	void fadeTo(float targetWeight, float speed);
 	void transition(float transitionFactor, GrSkeleton* skeleton);
 	void resetAnimation();
 	string name;
+	GrSkeleton* skeleton;
 	map<string, GrAnimationNode*> animNodes;
 	double duration;
 	double ticksPerSecond;
 	float speed = 1.0f;
 	int direction = 1; //-1 means the animation goes backwards
+	float weight = 1.0f; //Weight of the animation during blending
 
+	glm::vec3* currPos;
+	glm::quat* currRot;
+	glm::vec3* currScale;
+
+	bool active = false; //Will be set to true when added to activeAnimations. If set to false again will be removed from active animations
+	bool fading = false;
+	bool loop = true; //If loop, will continue after completing a cycle
+
+	//Callback functions
+	void setToRemove(); //When called, will set the remove flag to true
 private:
 	float animTime = 0.0f;
+	float targetWeight;
+	float fadeSpeed;
 };
 

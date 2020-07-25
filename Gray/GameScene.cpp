@@ -1,6 +1,7 @@
 #include "GameScene.h"
 
-
+GrAnimation* walk=nullptr;
+GrAnimation* stand=nullptr;
 
 GameScene::GameScene(GameManager* gm) : Scene(gm)
 {
@@ -15,6 +16,13 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 	player = model->loadModel(gm, "assets/arthas/arthas.fbx");
 	model->importAnimations("assets/arthas/arthas_Walk_1.fbx");
 	model->importAnimations("assets/arthas/arthas_Stand_0.fbx");
+	model->importAnimations("assets/arthas/arthas_Attack1H_82.fbx"); //"Attack1H [82]
+	this->animMan = (GrAnimManager*)player->getComponentByType(ComponentType::ANIMATION_MANAGER);
+
+	stand = this->animMan->getAnimation("Stand [0]");
+	walk = this->animMan->getAnimation("Walk [1]");
+	this->animMan->addToActive(stand, 1.0f, true);
+	this->animMan->addToActive(walk, 0.0f, true);
 	if (player != nullptr)
 	{
 		player->setScale(glm::vec3(0.5, 0.5, 0.5));
@@ -79,13 +87,22 @@ void GameScene::keyInput(int key, int scancode, int action, int mods)
 	}
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
-		animMan->changeAnimation("Walk [1]",0.1f);
+		//GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
+		//animMan->changeAnimation("Walk [1]",0.1f);
+		walk->weight = 1.0f;
+		stand->weight = 0.0f;
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_RELEASE)
 	{
-		GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
-		animMan->changeAnimation("Stand [0]",0.1f);
+		//GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
+		//animMan->changeAnimation("Stand [0]",0.1f);
+		walk->weight = 0.0f;
+		stand->weight = 1.0f;
+	}
+
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+	{
+		this->animMan->addToActive("Attack1H [82]",0.5f, false);
 	}
 }
 

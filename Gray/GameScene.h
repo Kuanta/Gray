@@ -39,5 +39,6 @@ private:
 	//Debug
 	float testTime=0;
 	Object* player;
+	GrAnimManager* animMan=nullptr;
 };
 

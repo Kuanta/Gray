@@ -162,6 +162,7 @@
     <ClInclude Include="grPointLight.h" />
     <ClInclude Include="GrSkeleton.h" />
     <ClInclude Include="grTexture.h" />
+    <ClInclude Include="containers.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="grMesh.h" />
     <ClInclude Include="Model.h" />

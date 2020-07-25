@@ -20,8 +20,18 @@ GrAnimation::~GrAnimation()
 
 void GrAnimation::update(float deltaTime, GrSkeleton* skeleton)
 {
+	if(this->fading)
+	{
+	}
 	if (this->animTime > this->duration)
 	{
+		if (!this->loop)
+		{
+			// This animation doesn't loop
+			this->active = false;
+			this->animTime = 0;
+			return;
+		}
 		this->animTime -= this->duration;
 	}
 	
@@ -50,23 +60,45 @@ void GrAnimation::update(float deltaTime, GrSkeleton* skeleton)
 				if (animNode->keyNum > 1)
 				{
 					GrAnimFrame f = animNode->getAnimFrame(animTime / duration, this->ticksPerSecond, this->direction);
-					bone->setPosition(f.posKey->x, f.posKey->y, f.posKey->z);
-					bone->setRotation(*f.rotKey);
-					bone->setScale(f.scaleKey->x, f.scaleKey->y, f.scaleKey->z);
+					this->currPos = f.posKey;
+					this->currRot = f.rotKey;
+					this->currScale = f.scaleKey;
+					//bone->setPosition(f.posKey->x, f.posKey->y, f.posKey->z);
+					//bone->setRotation(*f.rotKey);
+					//bone->setScale(f.scaleKey->x, f.scaleKey->y, f.scaleKey->z);
+					bone->addAnimationFrame(*f.posKey, *f.rotKey, *f.scaleKey, this->weight);
 				}
 				else
 				{
-					bone->setPosition(animNode->posKeys[0].x, animNode->posKeys[0].y, animNode->posKeys[0].z);
+			/*		bone->setPosition(animNode->posKeys[0].x, animNode->posKeys[0].y, animNode->posKeys[0].z);
 					bone->setRotation(animNode->rotKeys[0]);
-					bone->setScale(animNode->scaleKeys[0].x, animNode->scaleKeys[0].y, animNode->scaleKeys[0].z);
+					bone->setScale(animNode->scaleKeys[0].x, animNode->scaleKeys[0].y, animNode->scaleKeys[0].z);*/
+					bone->addAnimationFrame(animNode->posKeys[0], animNode->rotKeys[0], animNode->scaleKeys[0], this->weight);
 				}
-				bone->updateLocalMatrix();
 				bone->markForUpdate();
 			}
 	
 		}
+
 	}
 	this->animTime += deltaTime*this->speed*this->direction; //Animation speed can be adjusted here
+}
+
+void GrAnimation::fadeTo(float targetWeight, float speed)
+{
+	this->fading = true;
+	this->targetWeight = targetWeight;
+	if (this->targetWeight > this->weight)
+	{
+		this->fadeSpeed = abs(speed);
+	}
+	else if (this->targetWeight < this->weight)
+	{
+		this->fadeSpeed = -abs(speed);
+	}
+	else {
+		this->fading = true;
+	}
 }
 
 void GrAnimation::transition(float transitionFactor, GrSkeleton* skeleton)

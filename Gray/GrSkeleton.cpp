@@ -42,6 +42,7 @@ void GrSkeleton::update(float deltaTime)
 	while (!this->bonesToUpdate.empty())
 	{
 		bone = this->bonesToUpdate.front();
+		bone->blendAnimationFrames();
 		bone->updateTransformMatrix();
 		bone->requiresUpdate = false;
 		this->bonesToUpdate.pop();
