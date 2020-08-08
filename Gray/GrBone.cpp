@@ -85,13 +85,8 @@ void GrBone::updateTransformMatrix()
 	glm::mat4 parentMatrix;
 	while (parent != nullptr)
 	{
-		//glm::mat4 pMat;
-		//pMat = glm::translate(pMat, parent->position);
-		//pMat *= glm::mat4_cast(parent->rotation);
-		//pMat = glm::scale(pMat, parent->scale);
 		pMats.insert(pMats.begin(), parent->getLocalMatrix());
 		parent = parent->parentBone;
-
 	}
 
 	for (int i = 0; i < pMats.size(); i++)
@@ -106,6 +101,13 @@ void GrBone::updateTransformMatrix()
 void GrBone::updateLocalMatrix()
 {
 	glm::mat4 mat;
+	if (this->transition)
+	{
+		this->position = glm::mix(this->position, this->targetPos, this->transitionFactor);
+		this->rotation = glm::slerp(this->rotation, this->targetRot, this->transitionFactor);
+		this->scale = glm::mix(this->scale, this->targetScale, this->transitionFactor);
+	}
+
 	mat = glm::translate(mat, this->position);
 	mat *= glm::mat4_cast(this->rotation);
 	mat = glm::scale(mat, this->scale);
@@ -165,9 +167,9 @@ void GrBone::markForUpdate()
 		//It may have been already marked
 		if (!(*it)->requiresUpdate)
 		{
-			this->skeleton->markBone((*it));
+			//this->skeleton->markBone((*it));
 			(*it)->markForUpdate();
-			(*it)->requiresUpdate = true;
+			//(*it)->requiresUpdate = true;
 		}
 	}
 }
@@ -182,51 +184,47 @@ void GrBone::addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 sca
 
 void GrBone::blendAnimationFrames()
 {
-	if (this->posQueue.size() == 1)
+	glm::vec3 _targetPos(0.0f, 0.0f, 0.0f);
+	glm::vec3 _targetScale(0.0f, 0.0f, 0.0f);
+	glm::vec3 _targetRot(0.0f, 0.0f, 0.0f);
+	float totalWeights = 0.0f;
+	for (int i = 0; i < this->posQueue.size(); i++)
 	{
-		float weight = this->animWeights.at(0);
-		if (weight > 0)
-		{
-			glm::vec3 posKey = this->posQueue.at(0);
-			glm::quat rotKey = this->rotQueue.at(0);
-			glm::vec3 scaleKey = this->scaleQueue.at(0);
-			this->setPosition(posKey.x, posKey.y, posKey.z);
-			this->setRotation(rotKey);
-			this->setScale(scaleKey.x, scaleKey.y, scaleKey.z);
-		}
+		float weight = this->animWeights.at(i);
+		totalWeights += weight;
+		_targetPos += this->posQueue.at(i) * weight;
+		_targetScale += this->scaleQueue.at(i) * weight;
+		_targetRot += glm::eulerAngles(this->rotQueue.at(i)) * weight;
 
 	}
-	else if(this->posQueue.size() > 1){
-		glm::vec3 currPos = this->posQueue.at(0);
-		glm::quat currRot = this->rotQueue.at(0);
-		glm::vec3 currScale = this->scaleQueue.at(0);
-		for (int i = 1; i < this->posQueue.size(); i++)
+	if (totalWeights > 0)
+	{
+		_targetPos = _targetPos / totalWeights;
+		_targetRot = _targetRot / totalWeights;
+		_targetScale = _targetScale / totalWeights;
+
+		if (this->transition)
 		{
-			float preWeight = this->animWeights.at(i-1);
-			glm::vec3 posKey = this->posQueue.at(i);
-			glm::quat rotKey = this->rotQueue.at(i);
-			glm::vec3 scaleKey = this->scaleQueue.at(i);
-			float weight = this->animWeights.at(i);
-			float relWeight;
-			if (preWeight + weight == 0)
-			{
-				relWeight = 0;
-			}
-			else
-			{
-				relWeight = weight / (preWeight + weight);
-			}
-			currPos = glm::mix(currPos, posKey, relWeight);
-			currRot = glm::slerp(currRot, rotKey,  relWeight);
-			currScale = glm::mix(currScale, scaleKey, relWeight);
+			this->setTargetPosition(_targetPos.x, _targetPos.y, _targetPos.z);
+			this->setTargetRotation(glm::quat(_targetRot));
+			this->setTargetScale(_targetScale.x, _targetScale.y, _targetScale.z);
 		}
-		this->position = currPos;
-		this->setRotation(currRot);
-		this->scale = currScale;
+		else
+		{
+			this->setPosition(_targetPos.x, _targetPos.y, _targetPos.z);
+			this->setRotation(glm::quat(_targetRot));
+			this->setScale(_targetScale.x, _targetScale.y, _targetScale.z);
+		}
+
+		this->updateLocalMatrix();
+		this->clearQueues();
 	}
+}
+
+void GrBone::clearQueues()
+{
 	this->posQueue.clear();
 	this->rotQueue.clear();
 	this->scaleQueue.clear();
 	this->animWeights.clear();
-	this->updateLocalMatrix();
 }

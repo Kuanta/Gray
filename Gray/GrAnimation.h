@@ -4,6 +4,7 @@
 #include <math.h>
 #include "GrSkeleton.h"
 
+class GrAnimManager;
 struct GrAnimFrame
 {
 	/*
@@ -36,12 +37,13 @@ public:
 	GrAnimation(string name, double duration, double ticksPerSecond);
 	~GrAnimation();
 
-	void update(float deltaTime, GrSkeleton* skeleton);
+	void update(float deltaTime, GrSkeleton* skeleton, bool transition, float transitionFactor = 0.0f);
 	void fadeTo(float targetWeight, float speed);
 	void transition(float transitionFactor, GrSkeleton* skeleton);
 	void resetAnimation();
 	string name;
 	GrSkeleton* skeleton;
+	GrAnimManager* animManager;
 	map<string, GrAnimationNode*> animNodes;
 	double duration;
 	double ticksPerSecond;
@@ -56,9 +58,7 @@ public:
 	bool active = false; //Will be set to true when added to activeAnimations. If set to false again will be removed from active animations
 	bool fading = false;
 	bool loop = true; //If loop, will continue after completing a cycle
-
-	//Callback functions
-	void setToRemove(); //When called, will set the remove flag to true
+	
 private:
 	float animTime = 0.0f;
 	float targetWeight;

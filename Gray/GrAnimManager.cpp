@@ -16,48 +16,34 @@ void GrAnimManager::start()
 void GrAnimManager::update(float deltaTime)
 {
 	GrSkeleton* skeleton = (GrSkeleton*)this->object->getComponentByType(ComponentType::SKELETON);
-	if (!this->transitioning)
+	float factor = 0.0f;
+	if (this->transitioning)
 	{
-		map<string, GrAnimation>::iterator iter;
-		linked::Node<GrAnimation*>* currNode = this->activeAnimatons.head;
-		while (currNode != nullptr)
-		{
-			linked::Node<GrAnimation*>* nextNode = currNode->next;
-			GrAnimation* anim = (GrAnimation*)currNode->data;
-			if (!anim->active)
-			{
-				//This animation has been deactivated, remove it
-				this->activeAnimatons.popElement(currNode);		
-			}
-			else {
-				anim->update(deltaTime, skeleton);
-			}
-			currNode = nextNode;
-		}
-
-	/*	if (this->currentAnimation)
-		{
-			
-			this->currentAnimation->update(deltaTime, skeleton);
-		}*/
+		factor = deltaTime / this->transitionTime;
 	}
-	else
+	map<string, GrAnimation>::iterator iter;
+	linked::Node<GrAnimation*>* currNode = this->activeAnimatons.head;
+	while (currNode != nullptr)
 	{
-		float factor;
+		linked::Node<GrAnimation*>* nextNode = currNode->next;
+		GrAnimation* anim = (GrAnimation*)currNode->data;
+		if (!anim->active)
+		{
+			//This animation has been deactivated, remove it
+			this->activeAnimatons.popElement(currNode);
+		}
+		else {
+			anim->update(deltaTime, skeleton, this->transitioning, factor);
+		}
+		currNode = nextNode;
+	}
+	if (this->transitioning)
+	{
+		this->transitionTime -= deltaTime;
 		if (deltaTime > this->transitionTime)
 		{
-			factor = 1.0f;
 			this->transitioning = false;
-			this->addToActive(this->targetAnimation,1.0f);
-			//this->currentAnimation = this->targetAnimation;
-			this->targetAnimation = nullptr;
 		}
-		else
-		{
-			factor = deltaTime / this->transitionTime;
-			this->targetAnimation->transition(factor, skeleton);
-		}
-		this->transitionTime -= deltaTime;
 	}
 }
 
@@ -83,31 +69,9 @@ void GrAnimManager::addAnimations(vector<GrAnimation*> anims)
 		if ((*it) != nullptr)
 		{
 			this->addAnimation(*it);
+			(*it)->animManager = this;
 		}
 	}
-}
-
-void GrAnimManager::changeAnimation(string animName, float transitionTime, bool loop)
-{
-	if (this->animations.find(animName) != this->animations.end())
-	{
-		this->changeAnimation(this->animations.at(animName),transitionTime);
-	}
-	else {
-		cout << "Couldn't find " << animName << endl;
-	}
-}
-
-void GrAnimManager::changeAnimation(int animId, float transitionTime, bool loop)
-{
-}
-
-void GrAnimManager::changeAnimation(GrAnimation* newAnim, float transitionTime, bool loop)
-{
-	//this->activeAnimations.clearElements();
-	newAnim->loop = true;
-	this->transitionTo(newAnim, transitionTime);
-	
 }
 
 GrAnimation* GrAnimManager::getAnimation(string name)
@@ -124,6 +88,18 @@ void GrAnimManager::resetAnimation()
 
 }
 
+void GrAnimManager::startTransition(float transitionTime)
+{
+	if (!this->transitioning)
+	{
+		this->transitioning = true;
+		this->transitionTime = transitionTime;
+	}
+	else {
+		cout << "Transition while transition" << endl;
+	}
+}
+
 void GrAnimManager::transitionTo(GrAnimation* anim, float transitionTime)
 {
 	this->transitionTime = transitionTime; //TODO: Set this as optional
@@ -137,19 +113,19 @@ void GrAnimManager::mergeAnimations(GrAnimManager* animMan)
 	this->animations.insert(animMan->animations.begin(), animMan->animations.end());
 }
 
-void GrAnimManager::addToActive(string name, float weight, bool loop)
+void GrAnimManager::addToActive(string name, float weight, bool loop, void* (*callback)())
 {
 	GrAnimation* anim = this->getAnimation(name);
 	if (anim != nullptr)
 	{
-		this->addToActive(anim, weight, loop);
+		this->addToActive(anim, weight, loop, callback);
 	}
 	else {
 		cout << "Couldn't find " << name << endl;
 	}
 }
 
-void GrAnimManager::addToActive(GrAnimation* anim, float weight, bool loop)
+void GrAnimManager::addToActive(GrAnimation* anim, float weight, bool loop, void* (*callback)())
 {
 	//Don't add an already active animation
 	if (!anim->active)

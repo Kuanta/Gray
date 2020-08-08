@@ -102,8 +102,9 @@ void Geometry::draw(Shader* shader)
 		glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 1);
 		for (int i = 0; i < this->bones.size(); i++)
 		{
+			
 			glm::mat4 boneMatrix = this->bones[i]->getTransformMatrix();
-			boneMatrices.push_back(boneMatrix*this->bones[i]->offsetMatrix);
+			boneMatrices.push_back(skeleton->globalInverseTransform*boneMatrix*this->bones[i]->offsetMatrix);
 
 		}
 		glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,

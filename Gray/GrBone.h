@@ -45,7 +45,9 @@ public:
 	void markForUpdate(); //Marks children bones for updates
 	void addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 scaleKey, float weight);
 	void blendAnimationFrames();
-	float targetScale = 1.0f; //Current p-r-s will be determined by : interpolate(current, target, targetScale)
+	void clearQueues();
+	bool transition = false;
+	float transitionFactor = 1.0f; //Current p-r-s will be determined by : interpolate(current, target, targetScale)
 
 private:
 	vector<glm::vec3> posQueue;

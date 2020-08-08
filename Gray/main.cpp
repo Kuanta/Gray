@@ -79,8 +79,8 @@ int main()
 	//sfBox->position.z = 5;
 	
 	
-	
-	//Object* scene2 = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
+	Model* model = new Model();
+	Object* scene2 = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
 	//Object* scene2 = model->loadModel(gm, "assets/paladin_j_nordstrom.fbx");
 	
 	//Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");

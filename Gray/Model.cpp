@@ -54,7 +54,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	this->skeleton->globalInverseTransform = glm::inverse(globalInverseTransform);
 	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, glm::vec3(), glm::vec4());
 	root->setPosition(position);
-	root->setRotation(glm::eulerAngles(orientation));
+	root->setRotation(glm::eulerAngles(orientation)+glm::vec3(0,-90,0));
 	root->setScale(scale);
 
 
@@ -202,7 +202,6 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 			vertex.Weights2[j] = 0;
 		}
 		vertices.push_back(vertex);
-		
 	}
 
 	for (int i = 0; i <mesh->mNumFaces; i++)
@@ -307,13 +306,6 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 
 void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry)
 {
-	if (this->skeleton->getBoneByName(node->mParent->mName.data) == nullptr)
-	{
-	/*	glm::mat4 identity;
-		GrBone* bone = new GrBone(identity, this->skeleton->globalInverseTransform, identity, node->parent->name);
-		bone->parentBone = bone;
-		this->skeleton->addBone(node->parent->name, bone);*/
-	}
 	for (int i = 0; i < aiMesh->mNumBones; i++)
 	{
 		aiBone* bone = aiMesh->mBones[i];
@@ -333,14 +325,16 @@ void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geomet
 		for (int j = 0; j < bone->mNumWeights; j++)
 		{
 			aiVertexWeight weight = bone->mWeights[j];
-			for (int b = 0; b < 8; b++)
+
+			for (int b = 0; b < 4; b++)
 			{
 				if (b < 4)
 				{
 					if (geometry->vertices.at(weight.mVertexId).IDs[b] == -1)
 					{
 						geometry->vertices.at(weight.mVertexId).IDs[b] = i;
-						geometry->vertices.at(weight.mVertexId).Weights[b] = weight.mWeight;
+						//TODO: Why multiplying the weight works? (Also try multiplying with a very large number)
+						geometry->vertices.at(weight.mVertexId).Weights[b] = weight.mWeight*10; 
 						break;
 					}
 				}
