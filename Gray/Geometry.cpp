@@ -129,6 +129,11 @@ void Geometry::draw(Shader* shader)
 	glBindVertexArray(0);
 }
 
+Geometry* Geometry::clone()
+{
+	return this;
+}
+
 void Geometry::cleanup()
 {
 }

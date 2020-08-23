@@ -5,6 +5,7 @@
 #include "GameScene.h"
 #include "GameManager.h"
 #include "BoxGeometry.h"
+#include "Plane.h"
 #include "Material.h"
 #include "grMesh.h"
 #include "OrbitCamera.h"
@@ -53,6 +54,20 @@ int main()
 	mesh->material->gm = gm;
 	box->setPosition(-25, 0, 0);
 	mesh->addToObject(box);
+	box->setShader(gm->shaders.defaultShader);
+
+	//Plane
+	Object* plane = new Object();
+	Plane* pg = new Plane(10.0f, 10.0f);
+	Material* mat_plane = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
+	mat_plane->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
+	mat_plane->shininess = 32.0f;
+	GrMesh* plane_mesh = new GrMesh(pg, mat_plane);
+	plane->setRotation(glm::vec3(-90,0,0));
+	plane->setPosition(glm::vec3(0, 0, 20));
+	plane->setScale(5,5,5);
+	plane->setShader(gm->shaders.defaultShader);
+	plane->addComponent(plane_mesh);
 
 	////Wooden Box
 	//Object* woodBox = new Object();
@@ -87,6 +102,7 @@ int main()
 	
 
 	scene->em.addElement(box);
+	scene->em.addElement(plane);
 	//scene->em.addElement(woodBox);
 	//scene->em.addElement(sfBox);
 	

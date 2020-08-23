@@ -34,11 +34,12 @@ void GrMesh::update(float deltaTime)
 	
 }
 
-void GrMesh::draw()
+void GrMesh::draw(Shader* shader)
 {
-	if (this->object->getRootObject()->gm != nullptr)
+	//if (this->object->getRootObject()->gm != nullptr)
+	if(shader != nullptr)
 	{
-		Shader* shader = this->object->getRootObject()->gm->shaders.defaultShader;
+		//Shader* shader = this->object->getRootObject()->gm->shaders.defaultShader;
 		shader->use();
 		//Set Model-View_Projection
 		shader->setMat4("model", this->object->model);
@@ -54,6 +55,15 @@ void GrMesh::cleanup()
 {
 	this->material->cleanup();
 	this->geometry->cleanup();
+}
+
+Component* GrMesh::clone()
+{
+	Geometry* geo = this->geometry->clone();
+	Material* mat = this->material->clone();
+	GrMesh* cloned = new GrMesh(geo, mat);
+
+	return cloned;
 }
 
 

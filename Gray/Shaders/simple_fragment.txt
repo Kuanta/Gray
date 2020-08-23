@@ -81,10 +81,10 @@ void main()
 vec3 calcDirectionalLight(DirectionalLight light, Material material, vec3 normal,vec3 fragPos,vec3 eyePos)
 {
 	vec3 viewDir = normalize(eyePos - fragPos);
-	vec3 reflectDir = normalize(reflect(-normalize(light.direction), normal));
+	vec3 reflectDir = normalize(reflect(-normalize(light.direction), normal)); //Bling-Phong
 
 	//Ambient
-	vec3 ambientColor = light.color*light.intensity;
+	vec3 ambientColor; //= light.color*light.intensity;
 
 	//Diffuse
 	float diffuseFactor = max(dot(normal, -normalize(light.direction)),0.0f);
@@ -99,15 +99,18 @@ vec3 calcDirectionalLight(DirectionalLight light, Material material, vec3 normal
 vec3 calcPointLight(PointLight light, Material material, vec3 normal,vec3 fragPos,vec3 eyePos)
 {
 	vec3 viewDir = normalize(eyePos - fragPos);
+	vec3 lightDir = normalize(light.position - fragPos);
+	vec3 halfway = normalize(viewDir+lightDir);  //Blinn-Phong Model
 	vec3 ambientColor,diffuseColor,specularColor;
-	vec3 lightDir=normalize(light.position-fragPos);
 	float diff=max(dot(normal,lightDir),0.0);
 	vec3 reflectDir=reflect(-lightDir,normal);
-	float spec=pow(max(dot(viewDir,reflectDir),0.0),material.shininess);
+
+	//float spec=pow(max(dot(viewDir,reflectDir),0.0),material.shininess);
+	float spec=pow(max(dot(normal, halfway),0.0),material.shininess);
 	float distance=length(light.position-fragPos);
 	float attenuation=1.0/(light.constant+light.linear*distance+light.quadratic*(distance*distance));
 	
-	ambientColor = light.color*light.intensity*attenuation;
+	//ambientColor = light.color*light.intensity*attenuation;
 	diffuseColor = light.color*diff*light.intensity*attenuation;
 	specularColor = light.color*light.intensity*spec*attenuation;
 	

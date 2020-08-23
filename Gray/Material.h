@@ -25,16 +25,18 @@ public:
 	Material();
 	Material(glm::vec3 diffuse, glm::vec3 ambient, glm::vec3 specular, float shininess);
 	~Material();
-	GameManager* gm = nullptr;
+	
 
 	//Getters and Setters
 	void setTexture(const char* filename, TextureTypes textureType);
 	void setTexture(grTexture* texture, TextureTypes textureType);
 	grTexture* getTexture(TextureTypes textureType);
 	void draw(Shader* shader);
+	Material* clone();
 	void cleanup();
 
 	//Uniforms
+	GameManager* gm = nullptr;
 	glm::vec3 diffuse;
 	glm::vec3 ambient;
 	glm::vec3 specular;

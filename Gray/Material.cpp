@@ -90,6 +90,21 @@ void Material::draw(Shader* shader)
 	shader->setFloat("material.shininess", this->shininess);
 }
 
+Material* Material::clone()
+{
+	Material* cloned = new Material();
+	cloned->gm = this->gm;
+	cloned->diffuse = this->diffuse;
+	cloned->ambient = this->ambient;
+	cloned->specular = this->specular;
+	cloned->shininess = this->shininess;
+	cloned->diffuseIntensity = this->diffuseIntensity;
+	cloned->ambientIntensity = this->ambientIntensity;
+	cloned->specularIntensity = this->specularIntensity;
+	cloned->setTexture(this->diffuseMap, TextureTypes::DIFFUSE_TEXTURE);
+	return cloned;
+}
+
 void Material::cleanup()
 {
 	this->diffuseMap->clearTexture();

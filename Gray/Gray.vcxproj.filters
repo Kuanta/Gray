@@ -104,9 +104,6 @@
     <ClCompile Include="grBone.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="grMesh.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="GrAnimation.cpp">
       <Filter>Core\Components</Filter>
     </ClCompile>
@@ -115,6 +112,15 @@
     </ClCompile>
     <ClCompile Include="GrAnimManager.cpp">
       <Filter>Core\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="GrPrefab.cpp">
+      <Filter>Kaynak Dosyalar</Filter>
+    </ClCompile>
+    <ClCompile Include="grMesh.cpp">
+      <Filter>Core\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,9 +187,6 @@
     <ClInclude Include="grBone.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="grMesh.h">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="GrAnimation.h">
       <Filter>Core\Components</Filter>
     </ClInclude>
@@ -201,6 +204,15 @@
     </ClInclude>
     <ClInclude Include="containers.h">
       <Filter>Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="GrPrefab.h">
+      <Filter>Üst Bilgi Dosyaları</Filter>
+    </ClInclude>
+    <ClInclude Include="grMesh.h">
+      <Filter>Core\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -40,6 +40,9 @@ private:
 	bool transitioning=false;
 	GrAnimation* targetAnimation = nullptr;
 	float transitionTime = 0.0f;
-	float totalWeights = 0; //TOtal weights of active animations. Used for normalization
+	float totalWeights = 0;
+	// Inherited via Component
+	virtual Component* clone() override;
+	//TOtal weights of active animations. Used for normalization
 };
 

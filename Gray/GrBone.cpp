@@ -159,19 +159,21 @@ void GrBone::markForUpdate()
 	{
 		this->skeleton->markBone(this);
 		this->requiresUpdate = true;
-	}
-	
-	//Update the children too
-	for (vector<GrBone*>::iterator it = this->children.begin(); it != this->children.end(); it++)
-	{
-		//It may have been already marked
-		if (!(*it)->requiresUpdate)
+
+		//Update the children too
+		for (vector<GrBone*>::iterator it = this->children.begin(); it != this->children.end(); it++)
 		{
-			//this->skeleton->markBone((*it));
-			(*it)->markForUpdate();
-			//(*it)->requiresUpdate = true;
+			//It may have been already marked
+			if (!(*it)->requiresUpdate)
+			{
+				//this->skeleton->markBone((*it));
+				(*it)->markForUpdate();
+				//(*it)->requiresUpdate = true;
+			}
 		}
 	}
+	
+	
 }
 
 void GrBone::addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 scaleKey, float weight)
@@ -180,6 +182,10 @@ void GrBone::addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 sca
 	this->rotQueue.push_back(rotKey);
 	this->scaleQueue.push_back(scaleKey);
 	this->animWeights.push_back(weight);
+	if (this->posQueue.size() > 500)
+	{
+		cout<<this->posQueue.size() <<endl;
+	}
 }
 
 void GrBone::blendAnimationFrames()
@@ -215,10 +221,24 @@ void GrBone::blendAnimationFrames()
 			this->setRotation(glm::quat(_targetRot));
 			this->setScale(_targetScale.x, _targetScale.y, _targetScale.z);
 		}
-
 		this->updateLocalMatrix();
-		this->clearQueues();
 	}
+	
+	this->clearQueues();  //There can still be frames in queues even if the weights are zero. For example an animation with zero weight affecting a bone. If this bone
+	//is not affected by the remaining animations, the queue for that bone my grow without end. 
+}
+
+GrBone* GrBone::clone()
+{
+	GrBone* bone = new GrBone();
+	bone->scale = glm::vec3(1, 1, 1);
+	bone->position = glm::vec3(0, 0, 0);
+	bone->rotation = glm::quat(1, 0, 0, 0);
+	bone->offsetMatrix = this->offsetMatrix;
+	bone->rootMatrix = this->rootMatrix;
+	bone->name = this->name;
+	bone->bindMatrix = this->bindMatrix;
+	return bone;
 }
 
 void GrBone::clearQueues()

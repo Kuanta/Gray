@@ -132,6 +132,7 @@
     <ClCompile Include="grDirectionalLight.cpp" />
     <ClCompile Include="grLight.cpp" />
     <ClCompile Include="grPointLight.cpp" />
+    <ClCompile Include="GrPrefab.cpp" />
     <ClCompile Include="GrSkeleton.cpp" />
     <ClCompile Include="grTexture.cpp" />
     <ClCompile Include="main.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="OrbitCamera.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
@@ -160,6 +162,7 @@
     <ClInclude Include="grDirectionalLight.h" />
     <ClInclude Include="grLight.h" />
     <ClInclude Include="grPointLight.h" />
+    <ClInclude Include="GrPrefab.h" />
     <ClInclude Include="GrSkeleton.h" />
     <ClInclude Include="grTexture.h" />
     <ClInclude Include="containers.h" />
@@ -168,6 +171,7 @@
     <ClInclude Include="Model.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="OrbitCamera.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />

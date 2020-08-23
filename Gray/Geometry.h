@@ -34,6 +34,7 @@ public:
 	void setIndices(unsigned int indices[], int indicesSize);
 	void initBuffers();
 	void draw(Shader* shader);
+	Geometry* clone();
 	void cleanup();
 	const static int MAX_BONE = 100;
 	const static int NUM_BONES_PER_VERTEX = 4;

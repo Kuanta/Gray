@@ -27,6 +27,28 @@ Object * Object::getRootObject()
 	return rootObject;
 }
 
+Object* Object::clone(Object* parent)
+{
+	Object* newObject = new Object();
+	//Clone the components
+	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		Component* clonedComp = (*iter)->clone();
+		newObject->addComponent(clonedComp);
+	}
+	for (vector<Object*>::iterator iter = this->children.elements.begin(); iter != this->children.elements.end(); iter++)
+	{
+		Object* clonedObject = (*iter)->clone(newObject);
+		newObject->add(clonedObject);
+	}
+	if (parent != nullptr) {
+		newObject->setParent(parent);
+	}
+	newObject->shader = this->shader;
+	newObject->gm = this->gm;
+	return newObject;
+}
+
 void Object::addComponent(Component * component)
 {
 	bool componentExists = false;
@@ -91,14 +113,14 @@ void Object::update(float deltaTime)
 	}
 }
 
-void Object::draw()
+void Object::draw(Shader* shader)
 {
 	//Draw components
 	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
 	{
 		if ((*iter) != nullptr)
 		{
-			(*iter)->draw();
+			(*iter)->draw(shader);
 		}
 	}
 
@@ -107,10 +129,32 @@ void Object::draw()
 	{
 		if ((*it) != nullptr)
 		{
-			(*it)->draw();
+			(*it)->draw(shader);
 		}
 	}
 
+}
+
+void Object::draw()
+{
+	//Difference from the function that takes a Shader as input is that this function is called (hopefuly) for the root object
+	//Draw components
+	for (vector<Component*>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		if ((*iter) != nullptr)
+		{
+			(*iter)->draw(this->shader);
+		}
+	}
+
+	//Draw Child objects
+	for (vector<Object*>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->draw(this->shader);
+		}
+	}
 }
 
 void Object::cleanup()
@@ -120,6 +164,14 @@ void Object::cleanup()
 		(*iter)->cleanup();
 		delete (*iter);
 	}
+}
+void Object::setShader(Shader* shader)
+{
+	this->shader = shader;
+}
+Shader* Object::getShader()
+{
+	return this->shader;
 }
 void Object::setPosition(glm::vec3 pos)
 {

@@ -6,6 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "ElementManager.h"
+#include "Shader.h"
 
 class GameManager;
 class Component;
@@ -25,6 +26,8 @@ public:
 	glm::vec3 target;
 	glm::mat4 model;
 	//Methods
+	void setShader(Shader* shader);
+	Shader* getShader();
 	void setPosition(glm::vec3 pos);
 	void setRotation(glm::vec3 rot);
 	void setScale(glm::vec3 scale);
@@ -50,13 +53,15 @@ public:
 	glm::vec3 getScale();
 
 	Object* getRootObject(); //Returns the greatest grandparent
+	Object* clone(Object* parent=nullptr);
 	void addComponent(Component* component);
 	void setTarget(glm::vec3 newTarget); // Updates rotations from target
 	void add(Object* object);
 	void remove(Object* object);
 	virtual void update(float deltaTime);
+	virtual void draw(Shader* shader);
 	virtual void draw();
-	virtual void cleanup();
+	void cleanup();
 
 	Component* getComponentByType(ComponentType type);
 	Object* getChildWithByName(string name);
@@ -76,5 +81,6 @@ private:
 	}
 	void updateModel();
 	bool requireModelUpdate = false;
+	Shader* shader=nullptr;
 };
 

@@ -25,10 +25,16 @@ bool GameManager::init(int width, int height)
 		return false;
 	}
 	glfwMakeContextCurrent(window);
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))  //Load GL functioýns
 	{
 		return false;
 	}
+
+	//ALternatively
+	/*if (!gladLoadGL()) {
+		std::cerr << "Unable to load OpenGL functions!" << std::endl;
+		exit(EXIT_FAILURE);
+	}*/
 	glViewport(0, 0, width, height);
 
 	//Set input callbacks

@@ -4,6 +4,7 @@
 Component::Component()
 {
 	this->type = ComponentType::DEFAULT;
+	this->object = nullptr;
 }
 
 
@@ -27,6 +28,10 @@ void Component::fixedUpdate()
 }
 
 void Component::draw()
+{
+}
+
+void Component::draw(Shader* shader)
 {
 }
 

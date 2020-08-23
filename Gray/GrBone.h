@@ -45,6 +45,7 @@ public:
 	void markForUpdate(); //Marks children bones for updates
 	void addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 scaleKey, float weight);
 	void blendAnimationFrames();
+	GrBone* clone();
 	void clearQueues();
 	bool transition = false;
 	float transitionFactor = 1.0f; //Current p-r-s will be determined by : interpolate(current, target, targetScale)

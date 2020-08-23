@@ -97,6 +97,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 		bone->calculateInverseBindMatrix();
 		bone->setToBindPosition();
 	}
+	this->loadedModel = root;
 	return root;
 }
 

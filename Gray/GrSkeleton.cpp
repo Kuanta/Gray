@@ -27,6 +27,18 @@ GrBone * GrSkeleton::getBoneByName(string boneName)
 	}
 }
 
+vector<glm::mat4> GrSkeleton::getBoneMatrices()
+{
+	vector<glm::mat4> boneMatrices;
+	map<string, GrBone*>::iterator it;
+	for (it = this->bones.begin(); it != this->bones.end(); it++)
+	{
+		glm::mat4 boneMatrix = (it->second)->getTransformMatrix();
+		boneMatrices.push_back(this->globalInverseTransform * boneMatrix * (it->second)->offsetMatrix);
+	}
+	return boneMatrices;
+}
+
 void GrSkeleton::markBone(GrBone* bone)
 {
 	this->bonesToUpdate.push(bone);
@@ -55,6 +67,52 @@ void GrSkeleton::update(float deltaTime)
 	}*/
 }
 
+void GrSkeleton::draw(Shader* shader)
+{
+	if (shader != nullptr)
+	{
+		shader->use();
+		vector<glm::mat4> boneMatrices;
+		map<string, GrBone*>::iterator it;
+		for (it = this->bones.begin(); it != this->bones.end(); it++)
+		{
+			glm::mat4 boneMatrix = (it->second)->getTransformMatrix();
+			boneMatrices.push_back(this->globalInverseTransform * boneMatrix * (it->second)->offsetMatrix);
+		}
+		if (boneMatrices.size() > 0)
+		{
+			glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 1);
+			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,
+				glm::value_ptr(boneMatrices[0]));
+		}
+		else {
+			glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 0);
+		}
+	}
+}
+
 void GrSkeleton::cleanup()
 {
+}
+
+Component* GrSkeleton::clone()
+{
+	GrSkeleton* skeleton = new GrSkeleton();
+	skeleton->globalInverseTransform = this->globalInverseTransform;
+	map<string, GrBone*>::iterator it;
+	for (it = this->bones.begin(); it != this->bones.end(); it++)
+	{
+		GrBone* cloned = it->second->clone();
+		
+		if (it->second->parentBone != nullptr) {
+			GrBone* parentOfCloned = skeleton->getBoneByName(it->second->parentBone->name);
+			if (skeleton->getBoneByName(it->second->parentBone->name) == nullptr)
+			{
+				parentOfCloned = it->second->parentBone->clone();
+			}
+			cloned->parentBone = parentOfCloned;
+		}
+		skeleton->addBone((std::string) it->first, (GrBone*)it->second);
+	}
+	return skeleton;
 }

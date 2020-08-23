@@ -58,9 +58,9 @@ void GrAnimation::update(float deltaTime, GrSkeleton* skeleton, bool transition,
 					bone->transitionFactor = transitionFactor;
 					bone->transition = true;
 				}
+				bone->updateLocalMatrix();
 				bone->markForUpdate();				
 			}
-	
 		}
 		//Set the transition factor
 	}
@@ -110,7 +110,6 @@ void GrAnimation::transition(float transitionFactor, GrSkeleton* skeleton)
 				bone->updateLocalMatrix();
 				bone->markForUpdate();
 			}
-
 		}
 	}
 }

@@ -6,14 +6,15 @@ GrAnimation* stand=nullptr;
 GameScene::GameScene(GameManager* gm) : Scene(gm)
 {
 	this->camera = Camera(75, 1280 / 800, 0.1f, 100000000.0f);
-	this->ambientLight = grLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.5f);
-	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.1f, glm::vec3(0.0f, -1.0f, 0.0f));
-	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.3f, 1.0f, 0.014f * 0.001, 0.07f * 0.001);
-	this->pointLight.setPosition(5, 0, -10);
+	this->ambientLight = grLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.0f);
+	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.2f, glm::vec3(0.0f, -1.0f, 0.0f));
+	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.6f, 1.0f, 0.014f * 0.001, 0.07f * 0.01);
+	this->pointLight.setPosition(2,20, 20);
 	this->camera.setPositionY(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 	Model* model = new Model();
 	player = model->loadModel(gm, "assets/arthas/arthas.fbx");
+	player->setShader(gm->shaders.defaultShader);
 	model->importAnimations("assets/arthas/arthas_Walk_1.fbx");
 	model->importAnimations("assets/arthas/arthas_Stand_0.fbx");
 	model->importAnimations("assets/arthas/arthas_Attack1H_82.fbx"); //"Attack1H [82]
@@ -23,7 +24,7 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 	stand = this->animMan->getAnimation("Stand [0]");
 	walk = this->animMan->getAnimation("Walk [1]");
 	//this->animMan->addToActive("EmoteKiss [49]", 1.0f, true);
-	this->animMan->addToActive(stand, 0.0f, true);
+	this->animMan->addToActive(stand, 1.0f, true);
 	this->animMan->addToActive(walk, 0.0f, true);
 	if (player != nullptr)
 	{
@@ -33,6 +34,12 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 		this->em.addElement(player);
 		player->gm = gm;
 	}
+
+	//Object* clone = player->clone();
+	//clone->setScale(glm::vec3(0.3,0.3,0.3));
+	//clone->setPositionY(3.0f);
+	//clone->setPositionZ(4);
+	//this->em.addElement(clone);
 }
 
 
@@ -46,6 +53,8 @@ void GameScene::fixedUpdate()
 
 void GameScene::update(GLFWwindow * window, double deltaTime)
 {
+	printf("\r");
+	printf("Delta Time:%f", deltaTime);
 	this->camera.controls->update(deltaTime);
 
 	for (vector<Object*>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
@@ -54,7 +63,7 @@ void GameScene::update(GLFWwindow * window, double deltaTime)
 		{
 			(*it)->update(deltaTime);
 		}
-		this->pointLight.setPosition(this->camera.getPosition());
+		//this->pointLight.setPosition(this->camera.getPosition());
 	}
 	this->camera.getViewMatrix();
 
@@ -89,16 +98,12 @@ void GameScene::keyInput(int key, int scancode, int action, int mods)
 	}
 	if (key == GLFW_KEY_W && action == GLFW_PRESS)
 	{
-		//GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
-		//animMan->changeAnimation("Walk [1]",0.1f);
 		walk->weight = 1.0f;
 		stand->weight = 0.0f;
 		animMan->startTransition(0.1f);
 	}
 	else if (key == GLFW_KEY_W && action == GLFW_RELEASE)
 	{
-		//GrAnimManager* animMan = (GrAnimManager*)this->player->getComponentByType(ComponentType::ANIMATION_MANAGER);
-		//animMan->changeAnimation("Stand [0]",0.1f);
 		walk->weight = 0.0f;
 		stand->weight = 1.0f;
 		animMan->startTransition(0.1f);

@@ -23,7 +23,10 @@ public:
 	virtual void update(float deltaTime) = 0;
 	virtual void fixedUpdate();
 	virtual void cleanup() = 0;
-	virtual void draw();
+	//TODO:Are two draw function definition necessary?
+	virtual void draw(); 
+	virtual void draw(Shader* shader);
+	virtual Component* clone() = 0;
 	virtual void processInput(int key, int scancode, int action, int mods);
 	Object* object; //Object that this component belongs to
 };

@@ -95,9 +95,6 @@ void GrAnimManager::startTransition(float transitionTime)
 		this->transitioning = true;
 		this->transitionTime = transitionTime;
 	}
-	else {
-		cout << "Transition while transition" << endl;
-	}
 }
 
 void GrAnimManager::transitionTo(GrAnimation* anim, float transitionTime)
@@ -141,4 +138,10 @@ void GrAnimManager::addToActive(GrAnimation* anim, float weight, bool loop, void
 void GrAnimManager::clearAnimCallback(GrAnimation* anim)
 {
 	anim->resetAnimation();
+}
+
+Component* GrAnimManager::clone()
+{
+	GrAnimManager* cloned = new GrAnimManager();
+	return cloned;
 }
