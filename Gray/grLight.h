@@ -4,12 +4,12 @@
 #include "Object.h"
 #include "Shader.h"
 
-class grLight : public Object
+class GrLight : public Object
 {
 public:
-	grLight();
-	grLight(glm::vec3 color, float intensity);
-	~grLight();
+	GrLight();
+	GrLight(glm::vec3 color, float intensity);
+	~GrLight();
 	glm::vec3 color;
 	float intensity;
 	virtual void useLight(Shader* shader);

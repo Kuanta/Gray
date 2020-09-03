@@ -37,6 +37,8 @@ public:
 
 	//Uniforms
 	GameManager* gm = nullptr;
+
+	//Blinn-Phong
 	glm::vec3 diffuse;
 	glm::vec3 ambient;
 	glm::vec3 specular;
@@ -45,6 +47,10 @@ public:
 	float ambientIntensity = 1;
 	float specularIntensity = 1;
 
+	//PBR
+	bool metalness;
+	float rougness;
+	glm::vec3 color;
 private:
 	//Textures
 	grTexture* diffuseMap;

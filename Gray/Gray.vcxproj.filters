@@ -36,15 +36,15 @@
     <Filter Include="Math">
       <UniqueIdentifier>{1c98dc56-f79d-4cb5-9b4c-7a349e34bb7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core\Materials">
+      <UniqueIdentifier>{ee08b7ce-94f2-4de7-bc76-2be4d4bab924}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Kaynak Dosyalar</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="Geometry.cpp">
@@ -70,9 +70,6 @@
     </ClCompile>
     <ClCompile Include="glad.c">
       <Filter>Kaynak Dosyalar</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="OrbitCamera.cpp">
       <Filter>Controls</Filter>
@@ -122,15 +119,21 @@
     <ClCompile Include="Plane.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Core\Materials</Filter>
+    </ClCompile>
+    <ClCompile Include="GrPbrLight.cpp">
+      <Filter>Core\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="Geometry.h">
@@ -214,12 +217,24 @@
     <ClInclude Include="Plane.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Core\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="GrPbrLight.h">
+      <Filter>Core\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shaders\simple_vertex.txt">
       <Filter>Shaders</Filter>
     </Text>
     <Text Include="Shaders\simple_fragment.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="pbr_fragment.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>

@@ -6,7 +6,7 @@
 #include "Object.h"
 #include "grLight.h"
 #include "grDirectionalLight.h"
-#include "grPointLight.h"
+#include "grPointLight.h"  
 #include "Model.h"
 #include "GrAnimManager.h"
 
@@ -17,7 +17,9 @@ public:
 	~GameScene();
 	
 	ElementManager<Object*> em;
-	grLight ambientLight;
+	ElementManager<GrLight*> lights;
+
+	GrLight ambientLight;
 	grDirectionalLight dirLight;
 	grPointLight pointLight;
 	// Scene aracýlýðýyla devralýndý

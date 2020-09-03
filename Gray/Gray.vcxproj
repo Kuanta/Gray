@@ -131,6 +131,7 @@
     <ClCompile Include="GrBone.cpp" />
     <ClCompile Include="grDirectionalLight.cpp" />
     <ClCompile Include="grLight.cpp" />
+    <ClCompile Include="GrPbrLight.cpp" />
     <ClCompile Include="grPointLight.cpp" />
     <ClCompile Include="GrPrefab.cpp" />
     <ClCompile Include="GrSkeleton.cpp" />
@@ -143,7 +144,7 @@
     <ClCompile Include="OrbitCamera.cpp" />
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GrAnimManager.h" />
@@ -161,6 +162,7 @@
     <ClInclude Include="GrBone.h" />
     <ClInclude Include="grDirectionalLight.h" />
     <ClInclude Include="grLight.h" />
+    <ClInclude Include="GrPbrLight.h" />
     <ClInclude Include="grPointLight.h" />
     <ClInclude Include="GrPrefab.h" />
     <ClInclude Include="GrSkeleton.h" />
@@ -174,10 +176,12 @@
     <ClInclude Include="Plane.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="utils\math.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="pbr_fragment.txt" />
     <Text Include="Shaders\simple_fragment.txt" />
     <Text Include="Shaders\simple_vertex.txt" />
   </ItemGroup>

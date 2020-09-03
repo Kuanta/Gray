@@ -2,6 +2,11 @@
 
 //Input Methods
 
+Shader* GameManager::getShader(SHADER_TYPE shaderType)
+{
+	return this->shaderMan.getShaderByType(shaderType);
+}
+
 bool GameManager::init(int width, int height)
 {
 	glfwInit();
@@ -52,10 +57,6 @@ bool GameManager::init(int width, int height)
 
 	//Set window pointer to this
 	glfwSetWindowUserPointer(window, this);
-	
-
-	//Define Shaders
-	this->shaders.defaultShader = new Shader("Shaders/simple_vertex.txt", "Shaders/simple_fragment.txt");
 
 	return true;
 }

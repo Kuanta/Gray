@@ -5,6 +5,7 @@
 #include <glad\glad.h>
 #include <iostream>
 #include "Scene.h"
+#include "ShaderManager.h"
 #include "Shader.h"
 
 
@@ -13,6 +14,7 @@ using namespace std;
 struct Shaders
 {
 	Shader* defaultShader;
+	Shader* pbrShader;
 };
 
 class GameManager
@@ -20,7 +22,9 @@ class GameManager
 public:
 	GLFWwindow* window;
 	Scene* currentScene;
-	Shaders shaders;
+	ShaderManager shaderMan;
+	
+	Shader* getShader(SHADER_TYPE shaderType);
 	bool init(int width, int height);
 	void update();
 	void changeScene(Scene* newScene);

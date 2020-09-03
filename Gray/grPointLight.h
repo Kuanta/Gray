@@ -2,7 +2,7 @@
 #include "grLight.h"
 #include "Shader.h"
 
-class grPointLight : public grLight
+class grPointLight : public GrLight
 {
 public:
 	grPointLight();

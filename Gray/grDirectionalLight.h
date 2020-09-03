@@ -1,7 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "grLight.h"
-class grDirectionalLight : public grLight
+class grDirectionalLight : public GrLight
 {
 public:
 	grDirectionalLight();

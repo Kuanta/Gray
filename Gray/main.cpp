@@ -54,7 +54,7 @@ int main()
 	mesh->material->gm = gm;
 	box->setPosition(-25, 0, 0);
 	mesh->addToObject(box);
-	box->setShader(gm->shaders.defaultShader);
+	box->setShader(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
 
 	//Plane
 	Object* plane = new Object();
@@ -66,7 +66,7 @@ int main()
 	plane->setRotation(glm::vec3(-90,0,0));
 	plane->setPosition(glm::vec3(0, 0, 20));
 	plane->setScale(5,5,5);
-	plane->setShader(gm->shaders.defaultShader);
+	plane->setShader(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
 	plane->addComponent(plane_mesh);
 
 	////Wooden Box
