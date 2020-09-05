@@ -136,6 +136,7 @@
     <ClCompile Include="GrPrefab.cpp" />
     <ClCompile Include="GrSkeleton.cpp" />
     <ClCompile Include="grTexture.cpp" />
+    <ClCompile Include="LightManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="grMesh.cpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="GrSkeleton.h" />
     <ClInclude Include="grTexture.h" />
     <ClInclude Include="containers.h" />
+    <ClInclude Include="LightManager.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="grMesh.h" />
     <ClInclude Include="Model.h" />

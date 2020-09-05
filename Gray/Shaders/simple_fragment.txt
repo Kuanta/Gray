@@ -38,6 +38,17 @@ struct PointLight
 	float linear;
 	float quadratic;
 };
+
+struct Light
+{
+	vec3 color;
+	float intensity;
+
+};
+layout (std140, binding=1) uniform Lights
+{
+	
+};
 uniform vec3 eyePosition;
 uniform sampler2D diffuseMap;
 uniform Material material;

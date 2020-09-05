@@ -13,6 +13,7 @@ public:
 	GameManager* gm; //To access changeScene method
 	GLFWwindow* window;
 	Camera camera;
+	ElementManager<Object*> em;
 
 	virtual void fixedUpdate()=0;
 	virtual void update(GLFWwindow* window, double deltaTime)=0;

@@ -16,8 +16,7 @@ public:
 	GameScene(GameManager* gm);
 	~GameScene();
 	
-	ElementManager<Object*> em;
-	ElementManager<GrLight*> lights;
+
 
 	GrLight ambientLight;
 	grDirectionalLight dirLight;

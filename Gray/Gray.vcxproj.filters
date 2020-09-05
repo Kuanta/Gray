@@ -128,6 +128,9 @@
     <ClCompile Include="ShaderManager.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="LightManager.cpp">
+      <Filter>Core\Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
@@ -225,6 +228,9 @@
     </ClInclude>
     <ClInclude Include="ShaderManager.h">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="LightManager.h">
+      <Filter>Core\Lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -12,6 +12,12 @@ out vec2 TexCoords;
 out vec3 Color;
 flat out int faulty;
 
+layout (std140, binding=0) uniform Matrices
+{
+	mat4 model;
+	mat4 vector;
+	mat4 projection;
+};
 
 uniform mat4 model;
 uniform mat4 view;
