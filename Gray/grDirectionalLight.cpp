@@ -7,7 +7,7 @@ grDirectionalLight::grDirectionalLight():GrLight()
 	this->direction = glm::vec3(0,-1,0);
 }
 
-grDirectionalLight::grDirectionalLight(glm::vec3 color, float intensity, glm::vec3 direction):GrLight(color, intensity)
+grDirectionalLight::grDirectionalLight(glm::vec3 color, float intensity, glm::vec3 direction):GrLight(LIGHT_TYPES::DIRECTIONAL, color, intensity)
 {
 	this->direction = direction;
 }

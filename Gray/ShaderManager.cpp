@@ -1,4 +1,5 @@
 #include "ShaderManager.h"
+#include "GameManager.h"
 
 ShaderManager::ShaderManager()
 {
@@ -31,6 +32,8 @@ void ShaderManager::initShader(SHADER_TYPE shaderType)
 		Shader* shader = this->createShader(shaderType);
 		this->shaders.insert(std::pair<SHADER_TYPE, Shader*>(shaderType, shader));
 	}
+
+	//This uniform buffers must be bind to this shader
 }
 
 void ShaderManager::deleteShader(SHADER_TYPE shaderType)
@@ -61,6 +64,13 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 		break;
 	default:
 		break;
+	}
+
+	if (shader != nullptr)
+	{
+		//Whenever a new shader created, set up the binding points. UniformBuffers must be initialized before ShaderManager
+		this->gm->matricesBuffer->setBindingPoint(shader);
+		this->gm->lightsBuffer->setBindingPoint(shader);
 	}
 	return shader;
 }

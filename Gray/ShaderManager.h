@@ -4,11 +4,12 @@
 
 enum class SHADER_TYPE { DEFAULT_SHADER = 0, PBR_SHADER };
 
+class GameManager;
 class ShaderManager
 {
 public:
 	ShaderManager();
-
+	GameManager* gm;
 	std::map<SHADER_TYPE, Shader*> shaders;
 	
 	//Methods

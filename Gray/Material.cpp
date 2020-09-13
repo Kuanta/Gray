@@ -5,20 +5,20 @@
 Material::Material()
 {
 	//glm variables initiates themselves
+	this->color = glm::vec3(0);
 	this->shininess = 0;
+	this->metalness = false;
+	this->rougness = 0;
 	this->diffuseMap = nullptr;
-	this->diffuse = glm::vec3(0.5, 0.5, 0.5);
-	this->ambient = glm::vec3(0.5, 0.5, 0.5);
-	this->specular = glm::vec3(0.5, 0.5, 0.5);
-	this->shininess = 0.5;
 }
 
-Material::Material(glm::vec3 diffuse, glm::vec3 ambient, glm::vec3 specular, float shininess)
+Material::Material(glm::vec3 color, float shininess, bool metalness, float rougness)
 {
-	this->diffuse = diffuse;
-	this->ambient = ambient;
-	this->specular = specular;
+	this->color = color;
 	this->shininess = shininess;
+	this->metalness = metalness;
+	this->rougness = rougness;
+	this->diffuseMap = nullptr;
 }
 
 
@@ -84,23 +84,17 @@ void Material::draw(Shader* shader)
 	}
 
 	//Set uniforms
-	shader->setVec3("material.diffuse", this->diffuse);
-	shader->setVec3("material.ambient", this->ambient);
-	shader->setVec3("material.specular", this->specular);
+	shader->setVec3("material.color", this->color);
 	shader->setFloat("material.shininess", this->shininess);
+	shader->setBool("material.metal", this->metalness);
+	shader->setFloat("material.roughness", this->rougness);
 }
 
 Material* Material::clone()
 {
 	Material* cloned = new Material();
 	cloned->gm = this->gm;
-	cloned->diffuse = this->diffuse;
-	cloned->ambient = this->ambient;
-	cloned->specular = this->specular;
 	cloned->shininess = this->shininess;
-	cloned->diffuseIntensity = this->diffuseIntensity;
-	cloned->ambientIntensity = this->ambientIntensity;
-	cloned->specularIntensity = this->specularIntensity;
 	cloned->setTexture(this->diffuseMap, TextureTypes::DIFFUSE_TEXTURE);
 	return cloned;
 }

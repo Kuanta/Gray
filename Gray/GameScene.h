@@ -15,16 +15,8 @@ class GameScene : public Scene
 public:
 	GameScene(GameManager* gm);
 	~GameScene();
-	
 
-
-	GrLight ambientLight;
-	grDirectionalLight dirLight;
-	grPointLight pointLight;
 	// Scene aracýlýðýyla devralýndý
-	virtual void fixedUpdate() override;
-	virtual void update(GLFWwindow * window, double deltaTime) override;
-	virtual void draw(double deltaTime) override;
 	virtual void keyInput(int key, int scancode, int action, int mods) override;
 	virtual void character_callback(GLFWwindow * window, unsigned int codepoint) override;
 	virtual void charmods_callback(GLFWwindow * window, unsigned int codepoint, int mods) override;

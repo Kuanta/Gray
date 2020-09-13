@@ -131,6 +131,9 @@
     <ClCompile Include="LightManager.cpp">
       <Filter>Core\Lights</Filter>
     </ClCompile>
+    <ClCompile Include="UniformBuffer.cpp">
+      <Filter>Kaynak Dosyalar</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Object.h">
@@ -232,6 +235,9 @@
     <ClInclude Include="LightManager.h">
       <Filter>Core\Lights</Filter>
     </ClInclude>
+    <ClInclude Include="UniformBuffer.h">
+      <Filter>Üst Bilgi Dosyaları</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Shaders\simple_vertex.txt">
@@ -240,7 +246,7 @@
     <Text Include="Shaders\simple_fragment.txt">
       <Filter>Shaders</Filter>
     </Text>
-    <Text Include="pbr_fragment.txt">
+    <Text Include="Shaders\pbr_fragment.txt">
       <Filter>Shaders</Filter>
     </Text>
   </ItemGroup>

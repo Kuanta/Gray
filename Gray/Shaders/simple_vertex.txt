@@ -1,4 +1,4 @@
-#version 330 core
+#version 420 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aUvs;
@@ -14,14 +14,13 @@ flat out int faulty;
 
 layout (std140, binding=0) uniform Matrices
 {
-	mat4 model;
-	mat4 vector;
-	mat4 projection;
+	mat4 view;		//16*4 bytes
+	mat4 projection;	//16*4 bytes
+	vec3 eyePosition;	//16
+						//Total: 16*8+16 = 16*9
 };
 
 uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
 uniform int hasBones;
 const int MAX_BONES=100;
 const int NUM_BONES_PER_VERTEX=4;

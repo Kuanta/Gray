@@ -10,8 +10,8 @@ Shader* GameManager::getShader(SHADER_TYPE shaderType)
 bool GameManager::init(int width, int height)
 {
 	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
@@ -58,6 +58,12 @@ bool GameManager::init(int width, int height)
 	//Set window pointer to this
 	glfwSetWindowUserPointer(window, this);
 
+	//Shader Manager requires a pointer to the game manager so that it can bind uniform buffer whenever a new shader is initialized
+	this->shaderMan.gm = this;
+
+	//Initialize Buffers
+	this->matricesBuffer = new UniformBuffer(16*9, "Matrices", 0);
+	this->lightsBuffer = new UniformBuffer(MAX_NUM_LIGHTS*80 + 4, "Lights", 1);
 	return true;
 }
 void GameManager::update()
@@ -76,8 +82,13 @@ void GameManager::update()
 
 void GameManager::changeScene(Scene * newScene)
 {
-	this->currentScene->cleanup();
+	if (this->currentScene != nullptr)
+	{
+		this->currentScene->cleanup();
+	}
 	this->currentScene = newScene;
+	this->currentScene->matricesBuffer = this->matricesBuffer;
+	this->currentScene->lm.lightsBuffer = this->lightsBuffer;
 }
 
 GameManager::GameManager(int width, int height)

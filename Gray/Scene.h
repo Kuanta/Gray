@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "Camera.h"
+#include "LightManager.h"
+#include "UniformBuffer.h"
 
 
 class GameManager;
@@ -14,10 +16,16 @@ public:
 	GLFWwindow* window;
 	Camera camera;
 	ElementManager<Object*> em;
+	LightManager lm;
+	UniformBuffer* matricesBuffer = nullptr;
 
-	virtual void fixedUpdate()=0;
-	virtual void update(GLFWwindow* window, double deltaTime)=0;
-	virtual void draw(double deltaTime)=0;
+	void add(Object* object);
+	void add(GrLight* light);
+	void remove(Object* object);
+	void remove(GrLight* light);
+	virtual void fixedUpdate();
+	virtual void update(GLFWwindow* window, double deltaTime);
+	virtual void draw(double deltaTime);
 	virtual void keyInput(int key, int scancode, int action, int mods)=0;
 	virtual void character_callback(GLFWwindow* window, unsigned int codepoint)=0;
 	virtual void charmods_callback(GLFWwindow* window, unsigned int codepoint, int mods)=0;

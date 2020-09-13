@@ -17,36 +17,17 @@ using namespace std;
 
 int main()
 {
-	//Debug
-	linked::LinkedList<int> lis;
-	lis.addElement(0);
-	lis.addElement(1);
-	lis.addElement(2);
-	lis.addElement(3);
-	linked::Node<int>* iterator = lis.head;
-	while (iterator != nullptr)
-	{
-		cout << iterator->data << endl;
-		iterator = iterator->next;
-	}
-	lis.popElement(lis.head);
-	lis.popElement(lis.tail);
-	lis.popElement(lis.tail);
-	iterator = lis.head;
-	while (iterator != nullptr)
-	{
-		cout << iterator->data << endl;
-		iterator = iterator->next;
-	}
-
 	GameManager* gm = new GameManager(1024, 800);
 	GameScene* scene = new GameScene(gm);
-	gm->currentScene = scene;
-
+	gm->changeScene(scene);
+	GrLight* ambient = createAmbientLight(glm::vec3(0.8, 0.6, 0.1), 0.2);
+	GrLight* point = createPointLight(glm::vec3(0.8, 0.7,0.9), 0.8, glm::vec3(2, 10, 20), 1.0f, 0.014f * 0.001, 0.07f * 0.01);
+	scene->add(ambient);
+	scene->add(point);
 	////Brick
 	Object* box = new Object();
 	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
-	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
+	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true,1);
 	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
 	GrMesh* mesh = new GrMesh(bg, mat);
 	box->name = string("Brick");
@@ -59,71 +40,34 @@ int main()
 	//Plane
 	Object* plane = new Object();
 	Plane* pg = new Plane(10.0f, 10.0f);
-	Material* mat_plane = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 16);
+	Material* mat_plane = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true, 1);
 	mat_plane->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
 	mat_plane->shininess = 32.0f;
+	mat_plane->rougness = 20;
+	mat_plane->metalness = true;
 	GrMesh* plane_mesh = new GrMesh(pg, mat_plane);
 	plane->setRotation(glm::vec3(-90,0,0));
 	plane->setPosition(glm::vec3(0, 0, 20));
 	plane->setScale(5,5,5);
-	plane->setShader(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
+	plane->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
 	plane->addComponent(plane_mesh);
-
-	////Wooden Box
-	//Object* woodBox = new Object();
-	//BoxGeometry* woodBoxGeo = new BoxGeometry(5, 5, 5);
-	//Material* woodBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
-	//woodBoxMat->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
-	//GrMesh* woodBoxMesh = new GrMesh(woodBoxGeo, woodBoxMat);
-	//woodBox->name = "Wood";
-	//woodBox->gm = gm;
-	//woodBoxMesh->material->gm = gm;
-	//woodBox->position.x = 5;
-	//woodBoxMesh->addToObject(woodBox);
-
-	////Sci-fi
-	//BoxGeometry* sfBoxGeo = new BoxGeometry(5, 5, 5);
-	//Material* sfBoxMat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f), 4);
-	//sfBoxMat->setTexture("assets/metal.png", DIFFUSE_TEXTURE);
-	//GrMesh* sfBoxMesh = new GrMesh(sfBoxGeo, sfBoxMat);
-	//Object* sfBox = new Object();
-	//sfBoxMesh->addToObject(sfBox);
-	//sfBox->name = "SciFi";
-	//sfBox->gm = gm;
-	//sfBox->position.x =-5;
-	//sfBox->position.z = 5;
-	
 	
 	Model* model = new Model();
-	Object* scene2 = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
-	//Object* scene2 = model->loadModel(gm, "assets/paladin_j_nordstrom.fbx");
-	
-	//Object* scene2 = model->loadModel(gm, "assets/Sylvanas/Sylvanas.fbx");
-	
+	Object* knight = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
 
-	scene->em.addElement(box);
-	scene->em.addElement(plane);
-	//scene->em.addElement(woodBox);
-	//scene->em.addElement(sfBox);
-	
+	scene->add(box);
+	scene->add(plane);
+	scene->add(knight);
+
 	
 	OrbitCamera* oc = new OrbitCamera(&scene->camera);
 	scene->camera.controls = oc;
-	/*Object* parentMesh = new Object();
-	Object* parentMesh2 = new Object();
-	parentMesh->add(parentMesh2);
-	parentMesh2->add(mesh);
-	
-	parentMesh->position.z = -15;
-	parentMesh->position.x = 0;
-	parentMesh->position.y = 0;
-	parentMesh->scale.x = 2;*/
 	
 	scene->camera.setTarget(glm::vec3(0, 0, -10));
 
 	while (!glfwWindowShouldClose(gm->window))
 	{
-		box->setPosition(cos(glfwGetTime()) * 5, 0, 0);
+		point->setPositionX(20*cos(glfwGetTime() * 5));
 		gm->update();
 	}
 }

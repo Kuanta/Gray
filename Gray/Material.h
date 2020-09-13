@@ -23,7 +23,7 @@ class Material
 {
 public:
 	Material();
-	Material(glm::vec3 diffuse, glm::vec3 ambient, glm::vec3 specular, float shininess);
+	Material(glm::vec3 color, float shininess, bool metalness, float rougness);
 	~Material();
 	
 
@@ -39,18 +39,18 @@ public:
 	GameManager* gm = nullptr;
 
 	//Blinn-Phong
-	glm::vec3 diffuse;
-	glm::vec3 ambient;
-	glm::vec3 specular;
+	glm::vec3 color;
 	float shininess = 32;
-	float diffuseIntensity = 1;
-	float ambientIntensity = 1;
-	float specularIntensity = 1;
 
 	//PBR
 	bool metalness;
 	float rougness;
-	glm::vec3 color;
+
+	//General Properties
+	glm::vec3 diffuse;
+	glm::vec3 ambient;
+	glm::vec3 specular;
+
 private:
 	//Textures
 	grTexture* diffuseMap;

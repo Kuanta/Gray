@@ -6,10 +6,7 @@ GrAnimation* stand=nullptr;
 GameScene::GameScene(GameManager* gm) : Scene(gm)
 {
 	this->camera = Camera(75, 1280 / 800, 0.1f, 100000000.0f);
-	this->ambientLight = GrLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.0f);
-	this->dirLight = grDirectionalLight(glm::vec3(0.4, 0.4, 0.4), 0.2f, glm::vec3(0.0f, -1.0f, 0.0f));
-	this->pointLight = grPointLight(glm::vec3(0.945f, 0.855f, 0.643f), 0.6f, 1.0f, 0.014f * 0.001, 0.07f * 0.01);
-	this->pointLight.setPosition(2,20, 20);
+
 	this->camera.setPositionY(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 	Model* model = new Model();
@@ -34,60 +31,11 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 		this->em.addElement(player);
 		player->gm = gm;
 	}
-
-	//Object* clone = player->clone();
-	//clone->setScale(glm::vec3(0.3,0.3,0.3));
-	//clone->setPositionY(3.0f);
-	//clone->setPositionZ(4);
-	//this->em.addElement(clone);
 }
 
 
 GameScene::~GameScene()
 {
-}
-
-void GameScene::fixedUpdate()
-{
-}
-
-void GameScene::update(GLFWwindow * window, double deltaTime)
-{
-	printf("\r");
-	printf("Delta Time:%f", deltaTime);
-	this->camera.controls->update(deltaTime);
-
-	for (vector<Object*>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
-	{
-		if ((*it) != nullptr)
-		{
-			(*it)->update(deltaTime);
-		}
-		//this->pointLight.setPosition(this->camera.getPosition());
-	}
-	this->camera.getViewMatrix();
-
-	this->draw(deltaTime);
-	this->em.clearElements();
-}
-
-void GameScene::draw(double deltaTime)
-{
-	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setMat4("view", this->camera.getViewMatrix());
-	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setMat4("projection", this->camera.projection);
-	//Draw lights
-	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setVec3("eyePosition", this->camera.getPosition());
-	this->ambientLight.useLight(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
-	this->dirLight.useLight(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
-	this->pointLight.useLight(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
-	for (vector<Object*>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
-	{
-		if ((*it) != nullptr)
-		{
-			(*it)->draw();
-		}
-
-	}
 }
 
 void GameScene::keyInput(int key, int scancode, int action, int mods)

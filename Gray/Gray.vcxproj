@@ -146,6 +146,7 @@
     <ClCompile Include="Plane.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
+    <ClCompile Include="UniformBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GrAnimManager.h" />
@@ -180,10 +181,11 @@
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="UniformBuffer.h" />
     <ClInclude Include="utils\math.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="pbr_fragment.txt" />
+    <Text Include="Shaders\pbr_fragment.txt" />
     <Text Include="Shaders\simple_fragment.txt" />
     <Text Include="Shaders\simple_vertex.txt" />
   </ItemGroup>

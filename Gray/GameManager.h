@@ -1,5 +1,6 @@
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
+#define MAX_NUM_LIGHTS 100
 
 #include <GLFW/glfw3.h>
 #include <glad\glad.h>
@@ -7,6 +8,7 @@
 #include "Scene.h"
 #include "ShaderManager.h"
 #include "Shader.h"
+#include "UniformBuffer.h"
 
 
 using namespace std;
@@ -23,7 +25,9 @@ public:
 	GLFWwindow* window;
 	Scene* currentScene;
 	ShaderManager shaderMan;
-	
+	UniformBuffer* matricesBuffer = nullptr;
+	UniformBuffer* lightsBuffer = nullptr;
+
 	Shader* getShader(SHADER_TYPE shaderType);
 	bool init(int width, int height);
 	void update();
@@ -43,6 +47,7 @@ public:
 	GameManager(int width, int height);
 	GameManager();
 	~GameManager();
+
 private:
 	double currentFrame;
 	double lastFrame = 0;
