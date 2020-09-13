@@ -28,14 +28,16 @@ int main()
 	Object* box = new Object();
 	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
 	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true,1);
+	mat->rougness = 5;
+	mat->metalness = true;
 	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
 	GrMesh* mesh = new GrMesh(bg, mat);
 	box->name = string("Brick");
 	box->gm = gm;
 	mesh->material->gm = gm;
-	box->setPosition(-25, 0, 0);
+	box->setPosition(5, 0, 20);
 	mesh->addToObject(box);
-	box->setShader(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
+	box->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
 
 	//Plane
 	Object* plane = new Object();
@@ -67,7 +69,7 @@ int main()
 
 	while (!glfwWindowShouldClose(gm->window))
 	{
-		point->setPositionX(20*cos(glfwGetTime() * 5));
+		point->setPositionX(20*cos(glfwGetTime() * 0.4));
 		gm->update();
 	}
 }

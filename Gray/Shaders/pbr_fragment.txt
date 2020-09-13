@@ -71,7 +71,7 @@ vec3 schlickFresnel(Material material, vec3 lightDir, vec3 halfWay)
 
 float geomSmith(Material material, vec3 normal, vec3 view){
 	float k = (material.roughness+1.0)*(material.roughness+1.0)/8.0;
-	float dotProd = dot(normal, view);
+	float dotProd = max(dot(normal, view), 0);
 	return dotProd/(dotProd*(1-k)+k);
 }
 
@@ -107,7 +107,7 @@ vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec
 	float geo = geomSmith(material, normal, viewDir);
 	float ndf = ggxDistribution(material, dot(normal, halfway));
 
-	vec3 specular = 0.25*fresnel*geo*ndf/(dot(normal, lightDir)*dot(normal, viewDir));
+	vec3 specular = 0.25*fresnel*geo*ndf/(max(dot(normal, lightDir), 0)*max(dot(normal, viewDir), 0));
 	vec3 diffuse = light.color.xyz;
 	float incomingRadiance = lightIntensity;
 	if(light.type != DIRECTIONAL_LIGHT)
