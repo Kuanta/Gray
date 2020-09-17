@@ -9,6 +9,7 @@ Shader* GameManager::getShader(SHADER_TYPE shaderType)
 
 bool GameManager::init(int width, int height)
 {
+	//GLFW
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
@@ -64,12 +65,15 @@ bool GameManager::init(int width, int height)
 	//Initialize Buffers
 	this->matricesBuffer = new UniformBuffer(16*9, "Matrices", 0);
 	this->lightsBuffer = new UniformBuffer(MAX_NUM_LIGHTS*80 + 4, "Lights", 1);
+
+	//OPENGL
+	glEnable(GL_DEPTH_TEST);  //Enable depth testing
+	glDepthFunc(GL_LESS);  //Type of depth chechking
+
 	return true;
 }
 void GameManager::update()
 {
-	
-	glEnable(GL_DEPTH_TEST);
 	currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;

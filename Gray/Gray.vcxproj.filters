@@ -249,5 +249,8 @@
     <Text Include="Shaders\pbr_fragment.txt">
       <Filter>Shaders</Filter>
     </Text>
+    <Text Include="outline_fragment.txt">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>

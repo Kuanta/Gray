@@ -62,6 +62,8 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 	case SHADER_TYPE::PBR_SHADER:
 		shader = new Shader("Shaders/simple_vertex.txt", "Shaders/pbr_fragment.txt");
 		break;
+	case SHADER_TYPE::OUTLINE_FRAGMENT:
+		shader = new Shader("Shaders/simple_vertex.txt", "Shaders/outline_fragment.txt");
 	default:
 		break;
 	}

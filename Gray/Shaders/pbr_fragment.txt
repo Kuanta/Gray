@@ -49,7 +49,7 @@ layout (std140, binding=1) uniform Lights
 	//Total: 80*MAX_NUM_LIGHTS+4
 };
 
-uniform sampler2D diffuseMap;
+layout(binding=0) uniform sampler2D diffuseMap;
 uniform Material material;
 uniform int containsTexture;
 
