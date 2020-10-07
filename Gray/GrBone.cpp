@@ -182,10 +182,6 @@ void GrBone::addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 sca
 	this->rotQueue.push_back(rotKey);
 	this->scaleQueue.push_back(scaleKey);
 	this->animWeights.push_back(weight);
-	if (this->posQueue.size() > 500)
-	{
-		cout<<this->posQueue.size() <<endl;
-	}
 }
 
 void GrBone::blendAnimationFrames()

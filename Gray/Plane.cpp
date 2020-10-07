@@ -1,6 +1,6 @@
 #include "Plane.h"
 
-Plane::Plane(float width, float height)
+Plane::Plane(float width, float height, float uvScale)
 {
 	this->width = width;
 	this->height = height;
@@ -10,12 +10,11 @@ Plane::Plane(float width, float height)
 		-0.5 * width, 0.5 * height, 0,
 		0.5 * width, 0.5 * height, 0
 	};
-	float uvScale = 3.5f;
 	float uvs[] = {
-		0.0f, 1.0f*uvScale,0.0f,
-		1.0f*uvScale, 1.0f*uvScale,0.0f,
 		0.0f, 0.0f,0.0f,
-		1.0f*uvScale, 0.0f,0.0f
+		1.0f*uvScale, 0.0f,0.0f,
+		0.0f, 1.0f * uvScale,0.0f,
+		1.0f*uvScale, 1.0f * uvScale,0.0f
 	};
 	float normals[] = {
 		0.0f, 0.0f, 1.0f,

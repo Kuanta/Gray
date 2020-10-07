@@ -186,6 +186,8 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="outline_fragment.txt" />
+    <Text Include="Shaders\fbo_fragment.txt" />
+    <Text Include="Shaders\fbo_vertex.txt" />
     <Text Include="Shaders\pbr_fragment.txt" />
     <Text Include="Shaders\simple_fragment.txt" />
     <Text Include="Shaders\simple_vertex.txt" />

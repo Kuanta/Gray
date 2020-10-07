@@ -41,8 +41,6 @@ void Scene::fixedUpdate()
 
 void Scene::update(GLFWwindow* window, double deltaTime)
 {
-	printf("\r");
-	printf("Delta Time:%f", deltaTime);
 	this->camera.controls->update(deltaTime);
 
 	for (vector<Object*>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
@@ -60,6 +58,9 @@ void Scene::update(GLFWwindow* window, double deltaTime)
 
 void Scene::draw(double deltaTime)
 {
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
 	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setMat4("view", this->camera.getViewMatrix());
 	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setMat4("projection", this->camera.projection);
 	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setVec3("eyePosition", this->camera.getPosition());

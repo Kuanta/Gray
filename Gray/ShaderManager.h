@@ -2,7 +2,7 @@
 #include <map>
 #include "Shader.h"
 
-enum class SHADER_TYPE { DEFAULT_SHADER = 0, PBR_SHADER, OUTLINE_FRAGMENT };
+enum class SHADER_TYPE { DEFAULT_SHADER = 0, PBR_SHADER, OUTLINE_FRAGMENT , FBO_SHADER};
 
 class GameManager;
 class ShaderManager

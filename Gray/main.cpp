@@ -17,8 +17,9 @@ using namespace std;
 
 int main()
 {
-	GameManager* gm = new GameManager(1024, 800);
+	GameManager* gm = new GameManager(1200, 800);
 	GameScene* scene = new GameScene(gm);
+	scene->initFbo();
 	gm->changeScene(scene);
 	GrLight* ambient = createAmbientLight(glm::vec3(0.8, 0.6, 0.1), 0.2);
 	GrLight* point = createPointLight(glm::vec3(0.8, 0.7,0.9), 0.8, glm::vec3(2, 10, 20), 1.0f, 0.014f * 0.001, 0.07f * 0.01);
@@ -41,7 +42,7 @@ int main()
 
 	//Plane
 	Object* plane = new Object();
-	Plane* pg = new Plane(10.0f, 10.0f);
+	Plane* pg = new Plane(10.0f, 10.0f, 3.5f);
 	Material* mat_plane = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true, 1);
 	mat_plane->setTexture("assets/wood.png", DIFFUSE_TEXTURE);
 	mat_plane->shininess = 32.0f;

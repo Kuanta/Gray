@@ -252,5 +252,11 @@
     <Text Include="outline_fragment.txt">
       <Filter>Shaders</Filter>
     </Text>
+    <Text Include="Shaders\fbo_fragment.txt">
+      <Filter>Shaders</Filter>
+    </Text>
+    <Text Include="Shaders\fbo_vertex.txt">
+      <Filter>Shaders</Filter>
+    </Text>
   </ItemGroup>
 </Project>
