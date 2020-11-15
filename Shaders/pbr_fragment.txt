@@ -1,0 +1,144 @@
+#version 420 core
+#define PI 3.14
+#define MAX_NUM_LIGHTS 100
+out vec4 FragColor;
+
+in vec2 TexCoords;
+in vec3 FragPos;
+in vec3 Normal;
+in vec3 Color;
+
+struct Material
+{
+	vec3 color;
+	float shininess;
+	bool metal;
+	float roughness;
+};
+
+
+//Light types
+const int AMBIENT_LIGHT = 0;
+const int DIRECTIONAL_LIGHT = 1;
+const int POINT_LIGHT = 2;
+
+struct Light
+{
+	vec4 color;		//4*4 = 16
+	vec4 position;  //4*4 = 32
+	vec4 direction;	//4*4 = 48
+	int type;	//4
+	float intensity;	//4 
+	float constant;	//4
+	float linear;	//4
+	float quadratic;	//4
+	//Total: 48+20 = 68 (Must be a multiple of 16, so ve set it to 16*5=80, LOSS OF 12 BYTES)
+};
+layout (std140, binding=0) uniform Matrices
+{
+	mat4 view;		//16*4 bytes
+	mat4 projection;	//16*4 bytes
+	vec3 eyePosition;	//3*4
+						//Total: 16*8+12
+};
+
+layout (std140, binding=1) uniform Lights
+{
+	Light allLights[MAX_NUM_LIGHTS]; //80*MAX_NUM_LIGHTS
+	int numLights; //Current number of lights in the scene //4
+	//Total: 80*MAX_NUM_LIGHTS+4
+};
+
+layout(binding=0) uniform sampler2D diffuseMap;
+uniform Material material;
+uniform int containsTexture;
+
+vec3 normal = normalize(Normal);
+vec3 viewDir = normalize(eyePosition - FragPos);
+
+//Light Calc. Funcs
+vec3 schlickFresnel(Material material, vec3 lightDir, vec3 halfWay)
+{
+	vec3 F0;
+	if(material.metal)
+	{
+		F0 = material.color;
+	}else{
+		F0 = vec3(0.04);
+	}
+	return F0+(1-F0)*pow(1.0-dot(lightDir, halfWay),5);
+}
+
+float geomSmith(Material material, vec3 normal, vec3 view){
+	float k = (material.roughness+1.0)*(material.roughness+1.0)/8.0;
+	float dotProd = max(dot(normal, view), 0);
+	return dotProd/(dotProd*(1-k)+k);
+}
+
+float ggxDistribution(Material material, float nDotH)
+{
+	float alpha2 = pow(material.roughness,4);
+	float d = (nDotH*nDotH)*(alpha2-1)+1;
+	return alpha2 / (PI*d*d);
+}
+
+vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec3 eyePos){
+	vec3 lightDir;
+	if(light.type == AMBIENT_LIGHT)
+	{
+		return light.color.xyz*light.intensity;
+	}else if(light.type == DIRECTIONAL_LIGHT)
+	{
+		lightDir = normalize(light.direction.xyz);
+	}else if(light.type == POINT_LIGHT)
+	{
+		lightDir = normalize(light.position.xyz - FragPos);
+	}else{
+		return vec3(0);
+	}
+	float lightIntensity = light.intensity*100;
+	vec3 color = vec3(0.0);
+	if(!material.metal){
+		color = material.color;
+	}
+	vec3 halfway = lightDir.xyz+viewDir;
+	halfway=halfway/length(halfway); // normalize
+	vec3 fresnel = schlickFresnel(material, lightDir, halfway);
+	float geo = geomSmith(material, normal, viewDir);
+	float ndf = ggxDistribution(material, dot(normal, halfway));
+
+	vec3 specular = 0.25*fresnel*geo*ndf/(max(dot(normal, lightDir), 0)*max(dot(normal, viewDir), 0));
+	vec3 diffuse = light.color.xyz;
+	float incomingRadiance = lightIntensity;
+	if(light.type != DIRECTIONAL_LIGHT)
+	{
+		//It isn't a directional light
+		float attenuation = pow(length(light.position.xyz-fragPos),2);  //TODO: A better attenuation
+		incomingRadiance = incomingRadiance/attenuation;
+	}
+	return (specular*PI + diffuse)*incomingRadiance*dot(normal, lightDir);
+}
+
+
+void main()
+{  
+	vec3 normal = normalize(Normal);
+	vec3 outColor = vec3(0.0);
+	vec3 eyeVec = eyePosition - FragPos;
+
+	vec3 lightColor = vec3(0.0f);
+	for(int i=0; i<numLights; i++)
+	{
+		Light currLight = allLights[i];
+		lightColor += calcRadiance(material, currLight, normal, FragPos, eyeVec);
+	}
+		//Textures
+	if(containsTexture == 1)
+	{
+		FragColor = texture(diffuseMap, TexCoords) * vec4(lightColor, 1.0);
+	}
+	else
+	{
+		FragColor = vec4(material.color,1) * vec4(lightColor, 1.0);
+	}
+}
