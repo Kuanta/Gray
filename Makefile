@@ -1,7 +1,7 @@
 CC = g++
 VPATH = src/
 OBJ_DIR := build/
-INCLUDE_PATHS = -I include -I D:\Documents\Codes\Cpp\Libraries\Includes -I D:\Documents\Codes\Cpp\Libraries\Includes\glad -I ./src
+INCLUDE_PATHS = -I include -I D:\Documents\Codes\Cpp\Libraries\Includes -I D:\Documents\Codes\Cpp\Libraries\Includes\glad -I ./include
 LIB_PATHS = -L ../Libraries/lib/Assimp
 
 LIBS = -lassimp.dll -lglfw3.dll -lgdi32 -lopengl32
