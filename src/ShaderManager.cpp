@@ -68,6 +68,9 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 	case SHADER_TYPE::FBO_SHADER:
 		shader = new Shader("Shaders/fbo_vertex.txt", "Shaders/fbo_fragment.txt");
 		break;
+	case SHADER_TYPE::SKYBOX_SHADER:
+		shader = new Shader("Shaders/skybox_vertex.txt", "Shaders/skybox_fragment.txt");
+		break;
 	default:
 		break;
 	}

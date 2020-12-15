@@ -302,7 +302,8 @@ Blazej Dariusz Roszkowski                                     github:Michaelange
 //     want the zlib decoder to be available, #define STBI_SUPPORT_ZLIB
 //
 
-
+#ifndef STB_IMAGE_H
+#define STB_IMAGE_H
 #ifndef STBI_NO_STDIO
 #include <stdio.h>
 #endif // STBI_NO_STDIO
@@ -7566,3 +7567,4 @@ ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ------------------------------------------------------------------------------
 */
+#endif

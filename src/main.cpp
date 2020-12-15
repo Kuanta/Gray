@@ -11,7 +11,7 @@
 #include "grMesh.h"
 #include "OrbitCamera.h"
 #include "grLight.h"
-
+#include "Components/Skybox.h"
 #include "containers.h"
 
 
@@ -60,12 +60,24 @@ int main()
 	plane->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
 	plane->addComponent(plane_mesh);
 
+	//Skybox
+	Object* skybox = new Object();
+	//back, bottom, front, left, right
+	vector<string> filepaths = {"./assets/Skyboxes/skybox/right.jpg", 
+	"./assets/Skyboxes/skybox/left.jpg",
+	"./assets/Skyboxes/skybox/top.jpg",
+	"./assets/Skyboxes/skybox/bottom.jpg",
+	"./assets/Skyboxes/skybox/front.jpg",
+	"./assets/Skyboxes/skybox/back.jpg"};
+	Skybox* skyboxComp = new Skybox(gm,filepaths);
+	skybox->addComponent(skyboxComp);
 	Model* model = new Model();
 	Object* knight = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
 	knight->setPosition(0, 2, 10);
 
 	scene->add(box);
 	scene->add(plane);
+	scene->add(skybox);
 	//scene->add(knight);
 
 	

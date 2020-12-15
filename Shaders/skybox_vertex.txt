@@ -1,0 +1,19 @@
+#version 420 core
+layout (location = 0) in vec3 aPos;
+
+
+out vec3 TexCoords;
+
+layout (std140, binding=0) uniform Matrices
+{
+	mat4 view;		//16*4 bytes
+	mat4 projection;	//16*4 bytes
+	vec3 eyePosition;	//16
+						//Total: 16*8+16 = 16*9
+};
+
+void main()
+{
+	TexCoords = aPos;
+    gl_Position = projection*view*vec4(aPos+eyePosition,1.0);
+}

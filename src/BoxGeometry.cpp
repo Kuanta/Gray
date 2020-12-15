@@ -4,12 +4,21 @@
 BoxGeometry::BoxGeometry(float width, float height, float depth)
 {
 	float vertexPoints[] = {
+		//Back
+		width*0.5f, height*0.5f, -depth*0.5f,
+		width*0.5f, -height*0.5f, -depth*0.5f,
+		-width*0.5f, -height*0.5f, -depth*0.5f,
+		-width*0.5f, height*0.5f, -depth*0.5f,
+		//Bottom
+		-width*0.5f, -height*0.5f, depth*0.5f,
+		-width*0.5f, -height*0.5f, -depth*0.5f,
+		width*0.5f, -height*0.5f, -depth*0.5f,
+		width*0.5f, -height*0.5f, depth*0.5f,
 		//Front
 		-width*0.5f, height*0.5f, depth*0.5f,
 		-width*0.5f, -height*0.5f, depth*0.5f,
 		width*0.5f, -height*0.5f, depth*0.5f,
 		width*0.5f, height*0.5f, depth*0.5f,
-		
 		//Left
 		-width*0.5f, height*0.5f, -depth*0.5f,
 		-width*0.5f, -height*0.5f, -depth*0.5f,
@@ -20,33 +29,26 @@ BoxGeometry::BoxGeometry(float width, float height, float depth)
 		width*0.5f, -height*0.5f, depth*0.5f,
 		width*0.5f, -height*0.5f, -depth*0.5f,
 		width*0.5f, height*0.5f, -depth*0.5f,
-
 		//Top
 		width*0.5f, height*0.5f, -depth*0.5f,
 		width*0.5f, height*0.5f, depth*0.5f,
 		-width*0.5f, height*0.5f, depth*0.5f,
 		-width*0.5f, height*0.5f, -depth*0.5f,
-		//Bottom
-		-width*0.5f, -height*0.5f, depth*0.5f,
-		-width*0.5f, -height*0.5f, -depth*0.5f,
-		width*0.5f, -height*0.5f, -depth*0.5f,
-		width*0.5f, -height*0.5f, depth*0.5f,
-		//Back
-		width*0.5f, height*0.5f, -depth*0.5f,
-		width*0.5f, -height*0.5f, -depth*0.5f,
-		-width*0.5f, -height*0.5f, -depth*0.5f,
-		-width*0.5f, height*0.5f, -depth*0.5f
 	};
 	float uvs[] = {
-		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f,
-		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f,
-		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f,
-		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f,
-		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f,
-		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f,
+		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f, //Back
+		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f, //Bottom
+		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f, //Front
+		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f, //Left
+		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f, //Right
+		0.0f,1.0f,0.0f, 0.0f,0.0f,0.0f, 1.0f,0.0f,0.0f, 1.0f,1.0f,0.0f, //Top
 		
 	};
 	float normals[] = {
+		//Back
+		0,0,-1, 0,0,-1, 0,0,-1, 0,0,-1,
+		//Bottom
+		0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0,
 		//Front
 		0,0,1, 0,0,1, 0,0,1, 0,0,1,
 		//Left
@@ -55,10 +57,6 @@ BoxGeometry::BoxGeometry(float width, float height, float depth)
 		1,0,0, 1,0,0 ,1,0,0, 1,0,0,
 		//Top
 		0,1,0, 0,1,0, 0,1,0, 0,1,0,
-		//Bottom
-		0,-1,0, 0,-1,0, 0,-1,0, 0,-1,0,
-		//Back
-		0,0,-1, 0,0,-1, 0,0,-1, 0,0,-1
 	};
 
 	float colors[] = {
