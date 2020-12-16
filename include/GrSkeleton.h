@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <queue>
-#include "Component.h"
+#include "Components/Component.h"
 #include "GrBone.h"
 #include "Shader.h"
 
@@ -19,7 +19,7 @@ public:
 	void markBone(GrBone* bone);  //Marks the bone for update
 	void resetBones(); //Resets bones to their bindPosition
 
-	// Component aracýlýðýyla devralýndý
+	// Component aracï¿½lï¿½ï¿½ï¿½yla devralï¿½ndï¿½
 	virtual void start() override;
 	virtual void update(float deltaTime) override;
 	virtual void draw(Shader* shader) override;

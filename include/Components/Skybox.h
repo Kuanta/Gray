@@ -1,7 +1,7 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
 
-#include "Component.h"
+#include "Components/Component.h"
 #include "BoxGeometry.h"
 #include "Shader.h"
 #include "GameManager.h"

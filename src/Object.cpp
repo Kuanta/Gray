@@ -1,6 +1,6 @@
 #include "Object.h"
 #include "GameManager.h"
-#include "Component.h"
+#include "Components/Component.h"
 
 
 Object::Object()

@@ -2,7 +2,7 @@
 #define MESH_H
 
 #include <iostream>
-#include "Component.h"
+#include "Components/Component.h"
 #include "Geometry.h"
 #include "Material.h"
 #include "Scene.h"

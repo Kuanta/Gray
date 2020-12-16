@@ -1,6 +1,6 @@
 #pragma once
 #include <map>
-#include "Component.h"
+#include "Components/Component.h"
 #include "GrAnimation.h"
 #include "containers.h"
 

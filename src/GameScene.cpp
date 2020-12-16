@@ -33,6 +33,13 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 		this->em.addElement(player);
 		player->gm = gm;
 	}
+	for(int i=0;i<10;i++)
+	{
+		Object* clone = player->clone();
+		clone->setPosition(i*1.5, i*1.5, i*1.5);
+		this->add(clone);
+		clone->gm = this->gm;
+	}
 }
 
 

@@ -35,17 +35,17 @@ public:
 	void displace(glm::vec3 pos);
 	void updateScale(glm::vec3 scale);
 	void setPosition(float x, float y, float z);
-	void setPositionX(float x) { this->position.x = x; }
-	void setPositionY(float y) { this->position.y = y; }
-	void setPositionZ(float z) { this->position.z = z; }
+	void setPositionX(float x) { this->position.x = x; updateLocalMatrix();}
+	void setPositionY(float y) { this->position.y = y; updateLocalMatrix();}
+	void setPositionZ(float z) { this->position.z = z; updateLocalMatrix();}
 	void setRotation(float x, float y, float z);
-	void setRotationX(float x) { this->position.x = x; }
-	void setRotationY(float y) { this->position.y = y; }
-	void setRotationZ(float z) { this->position.z = z; }
+	void setRotationX(float x) { this->position.x = x; updateLocalMatrix();}
+	void setRotationY(float y) { this->position.y = y; updateLocalMatrix();}
+	void setRotationZ(float z) { this->position.z = z; updateLocalMatrix();}
 	void setScale(float x, float y, float z);
-	void setScaleX(float x) { this->scale.x = x; }
-	void setScaleY(float y) { this->scale.y = y; }
-	void setScaleZ(float z) { this->scale.z = z; }
+	void setScaleX(float x) { this->scale.x = x; updateLocalMatrix();}
+	void setScaleY(float y) { this->scale.y = y; updateLocalMatrix();}
+	void setScaleZ(float z) { this->scale.z = z; updateLocalMatrix();}
 	void displace(float x, float y, float z);
 	void updateScale(float x, float y, float z);
 
