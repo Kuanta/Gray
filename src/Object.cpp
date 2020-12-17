@@ -311,7 +311,7 @@ void Object::loopThroughChildren(Component* comp, void(*callback)(const void*, c
 
 void Object::updateLocalMatrix()
 {
-	glm::mat4 model;
+	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, this->position);
 	model = glm::rotate(model, glm::radians(this->rotation.y), glm::vec3(0, 1, 0)); //Yaw
 	model = glm::rotate(model, glm::radians(this->rotation.x), glm::vec3(1, 0, 0)); //Pitch
@@ -329,7 +329,7 @@ glm::mat4 Object::getLocalMatrix()
 void Object::updateModel()
 {
 	//Get parents
-	glm::mat4 model;
+	glm::mat4 model = glm::mat4(1.0f);
 	Object* parent = this->parent;
 	while (parent != nullptr) {
 		model *= parent->getLocalMatrix();

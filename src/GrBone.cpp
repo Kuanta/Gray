@@ -1,4 +1,4 @@
-#include "grBone.h"
+#include "GrBone.h"
 #include "GrSkeleton.h"
 
 
@@ -77,12 +77,11 @@ glm::mat4 GrBone::getLocalMatrix()
 
 void GrBone::updateTransformMatrix()
 {
-	
 	//Get parents transform
 	//this->updateLocalMatrix();
 	GrBone* parent = this->parentBone;
 	vector<glm::mat4> pMats;
-	glm::mat4 parentMatrix;
+	glm::mat4 parentMatrix= glm::mat4(1.0f);
 	while (parent != nullptr)
 	{
 		pMats.insert(pMats.begin(), parent->getLocalMatrix());
@@ -100,7 +99,7 @@ void GrBone::updateTransformMatrix()
 
 void GrBone::updateLocalMatrix()
 {
-	glm::mat4 mat;
+	glm::mat4 mat= glm::mat4(1.0f);
 	if (this->transition && this->targetSet)
 	{
 		this->position = glm::mix(this->position, this->targetPos, this->transitionFactor);

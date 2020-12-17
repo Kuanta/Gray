@@ -12,7 +12,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "Shader.h"
-#include "grBone.h"
+#include "GrBone.h"
 #include "GrSkeleton.h"
 
 using namespace std;
@@ -33,6 +33,7 @@ public:
 	unsigned int VAO, VBO, EBO;
 	void setIndices(unsigned int indices[], int indicesSize);
 	void initBuffers();
+	void updateBoneMatrices();  //Clears and fills the boneMatrices vector
 	void draw(Shader* shader);
 	Geometry* clone();
 	void cleanup();
@@ -40,6 +41,7 @@ public:
 	const static int NUM_BONES_PER_VERTEX = 4;
 protected:
 	bool indexed;
+	vector<glm::mat4> boneMatrices;
 	vector<unsigned int> indices;
 	void initGeometry(vector<Vertex> vertices, bool initBuffers);
 

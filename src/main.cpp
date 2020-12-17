@@ -2,7 +2,6 @@
 #define GLFW_DLL
 #include <iostream>
 #include <math.h>
-#include <windows.h>
 #include "GameScene.h"
 #include "GameManager.h"
 #include "BoxGeometry.h"
@@ -22,9 +21,7 @@ int main()
 	GameManager* gm = new GameManager(1200, 800);
 	GameScene* scene = new GameScene(gm);
 	scene->initFbo();
-
 	gm->changeScene(scene);
-
 	GrLight* ambient = createAmbientLight(glm::vec3(0.8, 0.6, 0.1), 0.2);
 	GrLight* point = createPointLight(glm::vec3(0.8, 0.7,0.9), 0.8, glm::vec3(2, 10, 20), 1.0f, 0.014f * 0.001, 0.07f * 0.01);
 	scene->add(ambient);
@@ -71,9 +68,6 @@ int main()
 	"./assets/Skyboxes/skybox/back.jpg"};
 	Skybox* skyboxComp = new Skybox(gm,filepaths);
 	skybox->addComponent(skyboxComp);
-	Model* model = new Model();
-	Object* knight = model->loadModel(gm, "assets/knight_d_pelegrini.fbx");
-	knight->setPosition(0, 2, 10);
 
 	scene->add(box);
 	scene->add(plane);
@@ -83,7 +77,6 @@ int main()
 	
 	OrbitCamera* oc = new OrbitCamera(&scene->camera);
 	scene->camera.controls = oc;
-	
 	scene->camera.setTarget(glm::vec3(0, 0, -10));
 	while (!glfwWindowShouldClose(gm->window))
 	{

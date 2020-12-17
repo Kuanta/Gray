@@ -10,14 +10,14 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 	this->camera.setPositionY(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 	Model* model = new Model();
-	player = model->loadModel(gm, "assets/arthas/arthas.fbx");
+	player = model->loadModel(gm, "./assets/arthas/arthas.fbx");
 	cout<<"Created Scene"<<endl;
 
 	player->setShader(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
-	model->importAnimations("assets/arthas/arthas_Walk_1.fbx");
-	model->importAnimations("assets/arthas/arthas_Stand_0.fbx");
-	model->importAnimations("assets/arthas/arthas_EmoteDance_132.fbx"); //"Attack1H [82]
-	model->importAnimations("assets/arthas/arthas_EmoteKiss_49.fbx");
+	model->importAnimations("./assets/arthas/arthas_Walk_1.fbx");
+	model->importAnimations("./assets/arthas/arthas_Stand_0.fbx");
+	model->importAnimations("./assets/arthas/arthas_EmoteDance_132.fbx"); //"Attack1H [82]
+	model->importAnimations("./assets/arthas/arthas_EmoteKiss_49.fbx");
 	this->animMan = (GrAnimManager*)player->getComponentByType(ComponentType::ANIMATION_MANAGER);
 	cout<<"Created Scene"<<endl;
 	stand = this->animMan->getAnimation("Stand [0]");
@@ -33,13 +33,18 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 		this->em.addElement(player);
 		player->gm = gm;
 	}
-	for(int i=0;i<10;i++)
+	for(int r=0;r<15;r++)
 	{
-		Object* clone = player->clone();
-		clone->setPosition(i*1.5, i*1.5, i*1.5);
-		this->add(clone);
-		clone->gm = this->gm;
+		for(int i=0; i<12;i++)
+		{
+			Object* clone = player->clone();
+			clone->setPosition(r*25*cos(i*3.14*30/180), 3, r*25*sin(i*3.14*30/180));
+			clone->setScale(0.2f, 0.2f, 0.2f);
+			clone->gm = this->gm;
+			this->add(clone);
+		}
 	}
+
 }
 
 
