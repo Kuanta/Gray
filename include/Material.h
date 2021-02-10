@@ -1,14 +1,15 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#pragma once
+#ifndef Material_H
+#define Material_H
 #include <iostream>
 #include <assimp/scene.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-
+#include "GameManager.h"
 #include "Shader.h"
 #include "grTexture.h"
-#include "GameManager.h"
+
 
 struct Texture {
 	unsigned int id;

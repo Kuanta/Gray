@@ -26,7 +26,11 @@ void Skybox::draw()
 }
 void Skybox::draw(Shader* shader)
 {
-    this->draw();
+    //If a special shader was fed, don't draw skybox
+    if(shader == nullptr)
+    {
+        this->draw();
+    }
 }
 void Skybox::loadSkybox()
 {

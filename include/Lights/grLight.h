@@ -17,6 +17,7 @@ public:
 	GrLight(LIGHT_TYPES type, glm::vec3 color, float intensity, float constant, float linear, float quadratic);
 	~GrLight();
 	virtual void useLight(Shader* shader);
+	virtual glm::mat4 getTransformMat();
 
 	//Properties
 	LIGHT_TYPES type;
@@ -26,6 +27,7 @@ public:
 	float constant;
 	float linear;
 	float quadratic;
+	bool castShadow=false;
 };
 
 //Generator methods for various light types

@@ -5,21 +5,17 @@ GrAnimation* stand=nullptr;
 
 GameScene::GameScene(GameManager* gm) : Scene(gm)
 {
-	this->camera = Camera(75, 1280 / 800, 0.1f, 100000000.0f);
-
+	this->camera = Camera(75, 16/9, 0.1f, 100000000.0f);  
 	this->camera.setPositionY(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 	Model* model = new Model();
 	player = model->loadModel(gm, "./assets/arthas/arthas.fbx");
-	cout<<"Created Scene"<<endl;
-
-	player->setShader(gm->getShader(SHADER_TYPE::DEFAULT_SHADER));
+	player->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
 	model->importAnimations("./assets/arthas/arthas_Walk_1.fbx");
 	model->importAnimations("./assets/arthas/arthas_Stand_0.fbx");
-	model->importAnimations("./assets/arthas/arthas_EmoteDance_132.fbx"); //"Attack1H [82]
+	model->importAnimations("./assets/arthas/arthas_Attack1H_82.fbx"); //"Attack1H [82]
 	model->importAnimations("./assets/arthas/arthas_EmoteKiss_49.fbx");
 	this->animMan = (GrAnimManager*)player->getComponentByType(ComponentType::ANIMATION_MANAGER);
-	cout<<"Created Scene"<<endl;
 	stand = this->animMan->getAnimation("Stand [0]");
 	walk = this->animMan->getAnimation("Walk [1]");
 	//this->animMan->addToActive("EmoteKiss [49]", 1.0f, true);
@@ -27,24 +23,26 @@ GameScene::GameScene(GameManager* gm) : Scene(gm)
 	this->animMan->addToActive(walk, 0.0f, true);
 	if (player != nullptr)
 	{
-		player->setScale(glm::vec3(0.5, 0.5, 0.5));
+		player->setScale(glm::vec3(0.25, 0.25, 0.25));
+		player->setRotationY(-90);
 		player->setPositionY(0);
-		player->setPositionZ(-30);
+		player->setPositionZ(10);
 		this->em.addElement(player);
 		player->gm = gm;
 	}
-	for(int r=0;r<15;r++)
-	{
-		for(int i=0; i<12;i++)
-		{
-			Object* clone = player->clone();
-			clone->setPosition(r*25*cos(i*3.14*30/180), 3, r*25*sin(i*3.14*30/180));
-			clone->setScale(0.2f, 0.2f, 0.2f);
-			clone->gm = this->gm;
-			this->add(clone);
-		}
-	}
-
+	//TODO: If this code doesn't slow down things, then it means that we have solved skeletal animation optimization issue
+	// for(int r=0;r<10;r++)
+	// {
+	// 	for(int i=0; i<5;i++)
+	// 	{
+	// 		Object* clone = player->clone();
+	// 		clone->setPosition(r*25*cos(i*3.14*30/180), 3, r*30*sin(i*3.14*30/180));
+	// 		clone->setScale(0.2f, 0.2f, 0.2f);
+	// 		clone->setRotationY(-90);
+	// 		clone->gm = this->gm;
+	// 		this->add(clone);
+	// 	}
+	// }
 }
 
 
@@ -54,11 +52,7 @@ GameScene::~GameScene()
 
 void GameScene::draw(double deltaTime)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo); //Bind the default fb just in case 
 	Scene::draw(deltaTime);
-
-	this->drawFbo();
-
 }
 
 void GameScene::keyInput(int key, int scancode, int action, int mods)
@@ -82,13 +76,13 @@ void GameScene::keyInput(int key, int scancode, int action, int mods)
 
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 	{
-		this->animMan->addToActive("EmoteDance [132]",1.0f, false);
+		this->animMan->addToActive("Attack1H [82]",1.0f, false);
 		this->animMan->startTransition(0.1f);
 	}
 
 	if (key == GLFW_KEY_K && action == GLFW_PRESS)
 	{
-		this->animMan->addToActive("EmoteKiss [49]", 1.0f, false);
+		this->animMan->addToActive("EmoteKiss [49]", 100.0f, false);
 		this->animMan->startTransition(0.1f);
 	}
 }
@@ -139,62 +133,4 @@ void GameScene::framebuffer_size_callback(GLFWwindow * window, int width, int he
 
 void GameScene::cleanup()
 {
-}
-
-void GameScene::initFbo()
-{
-	/*
-	*	This function is for demo purposes. It initializes a framebuffer alongside with a texture.
-	*/
-	glGenFramebuffers(1, &this->fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
-	glGenTextures(1, &fboTexture);
-	glBindTexture(GL_TEXTURE_2D, fboTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1200, 800, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	//Bind the texture to the frame buffer
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fboTexture, 0);
-
-	//Assign a render object to frame buffer for stencil and depth testing
-	glGenRenderbuffers(1, &rbo);
-	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1200, 800);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-	{
-		cout << "ERROR: Framebuffer is not complete" << endl;
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	this->fboCanvas = new Object();
-	GrMesh* fboCanvasMesh;
-	Plane* pg = new Plane(2.0f, 2.0f);
-	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true, 1);
-	fboCanvasMesh = new GrMesh(pg, mat);
-	this->fboCanvas->addComponent(fboCanvasMesh);
-}
-
-void GameScene::drawFbo()
-{
-	glBindFramebuffer(GL_FRAMEBUFFER,0);
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
-	
-
-	Shader* shader = this->gm->shaderMan.getShaderByType(SHADER_TYPE::FBO_SHADER);
-	shader->use();
-	glDisable(GL_DEPTH_TEST);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, this->fboTexture);
-
-	//glReadBuffer(GL_COLOR_ATTACHMENT0);
-	//unsigned int pixels[4];
-	//glReadPixels(100,100, 1200, 800, GL_RGBA, GL_UNSIGNED_INT,pixels);
-	//cout << pixels[0]<< " - "<<pixels[1]<< endl;
-	this->fboCanvas->draw(shader);
 }

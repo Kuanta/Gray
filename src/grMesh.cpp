@@ -1,4 +1,6 @@
 #include "grMesh.h"
+#include "Material.h"
+
 
 GrMesh::GrMesh(Geometry * geometry, Material * material)
 {

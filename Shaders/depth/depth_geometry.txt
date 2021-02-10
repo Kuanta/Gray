@@ -1,0 +1,10 @@
+#version 420 core
+layout (triangles) in;
+layout (triangle_strip) out;
+out vec4 FragPos; 
+out int gl_Layer;
+void main()
+{
+    gl_Layer = 0;
+    FragPos = vec4(0);
+}  

@@ -1,7 +1,5 @@
 #include "Material.h"
 
-
-
 Material::Material()
 {
 	//glm variables initiates themselves
@@ -75,6 +73,8 @@ grTexture * Material::getTexture(TextureTypes textureType)
 void Material::draw(Shader* shader)
 {
 	shader->use();
+	glActiveTexture(GL_TEXTURE0 + 5);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, 1);
 	if (this->diffuseMap != nullptr && this->diffuseMap->textureExists()) {
 		shader->setBool("containsTexture", 1);
 		this->diffuseMap->useTexture(0);

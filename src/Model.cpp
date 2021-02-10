@@ -1,7 +1,5 @@
 #include "Model.h"
 
-
-
 Model::Model()
 {
 	this->root = nullptr;
@@ -36,7 +34,6 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 		this->skeleton->addBone(bone->name, bone);
 
 	}
-
 	root = this->loadNode(gm, scene->mRootNode, scene, true);
 	root->addComponent(this->skeleton);
 	GrAnimManager* animMan = new GrAnimManager();
@@ -56,7 +53,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	glm::vec4 unitVec4;
 	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, unitVec3, unitVec4);
 	root->setPosition(position);
-	root->setRotation(glm::eulerAngles(orientation)+glm::vec3(0,-90,0));
+	root->setRotation(glm::eulerAngles(orientation));
 	root->setScale(scale);
 
 

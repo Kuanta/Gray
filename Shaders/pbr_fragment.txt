@@ -24,6 +24,7 @@ const int POINT_LIGHT = 2;
 
 struct Light
 {
+	mat4 lightMatrix;
 	vec4 color;		//4*4 = 16
 	vec4 position;  //4*4 = 32
 	vec4 direction;	//4*4 = 48
@@ -32,6 +33,7 @@ struct Light
 	float constant;	//4
 	float linear;	//4
 	float quadratic;	//4
+	int castShadow;
 	//Total: 48+20 = 68 (Must be a multiple of 16, so ve set it to 16*5=80, LOSS OF 12 BYTES)
 };
 layout (std140, binding=0) uniform Matrices
@@ -44,12 +46,13 @@ layout (std140, binding=0) uniform Matrices
 
 layout (std140, binding=1) uniform Lights
 {
-	Light allLights[MAX_NUM_LIGHTS]; //80*MAX_NUM_LIGHTS
+	Light allLights[MAX_NUM_LIGHTS]; //144*MAX_NUM_LIGHTS
 	int numLights; //Current number of lights in the scene //4
-	//Total: 80*MAX_NUM_LIGHTS+4
+	//Total: 144*MAX_NUM_LIGHTS+4
 };
 
 layout(binding=0) uniform sampler2D diffuseMap;
+layout(binding=2) uniform sampler2DShadow shadowMaps; //TODO: The binding point may change in future
 uniform Material material;
 uniform int containsTexture;
 
@@ -83,13 +86,17 @@ float ggxDistribution(Material material, float nDotH)
 }
 
 vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec3 eyePos){
+
+	//Shadow Calculation
+
 	vec3 lightDir;
 	if(light.type == AMBIENT_LIGHT)
 	{
-		return light.color.xyz*light.intensity;
+		return min(max(light.color.xyz*light.intensity,0.0f),1.0f);
 	}else if(light.type == DIRECTIONAL_LIGHT)
 	{
-		lightDir = normalize(light.direction.xyz);
+		lightDir = -1*normalize(light.direction.xyz);
+		return light.color.xyz*max(dot(lightDir, normal),0);
 	}else if(light.type == POINT_LIGHT)
 	{
 		lightDir = normalize(light.position.xyz - FragPos);
@@ -107,10 +114,10 @@ vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec
 	float geo = geomSmith(material, normal, viewDir);
 	float ndf = ggxDistribution(material, dot(normal, halfway));
 
-	vec3 specular = 0.25*fresnel*geo*ndf/(max(dot(normal, lightDir), 0)*max(dot(normal, viewDir), 0));
+	vec3 specular = 0.25*fresnel*geo*ndf/(max(dot(normal, lightDir), 0)*max(dot(normal, viewDir), 0.001));
 	vec3 diffuse = light.color.xyz;
 	float incomingRadiance = lightIntensity;
-	if(light.type != DIRECTIONAL_LIGHT)
+	if(light.type == POINT_LIGHT)
 	{
 		//It isn't a directional light
 		float attenuation = pow(length(light.position.xyz-fragPos),2);  //TODO: A better attenuation
@@ -127,11 +134,34 @@ void main()
 	vec3 eyeVec = eyePosition - FragPos;
 
 	vec3 lightColor = vec3(0.0f);
+	int shadowCount = 0;
+	float shadow = 0;
 	for(int i=0; i<numLights; i++)
 	{
 		Light currLight = allLights[i];
-		lightColor += calcRadiance(material, currLight, normal, FragPos, eyeVec);
+		if(currLight.castShadow == 1)
+		{
+			//Check Shadow
+			vec4 projCoords_ = (currLight.lightMatrix*vec4(FragPos,1.0));
+			vec3 projCoords = projCoords_.xyz/projCoords_.w;
+			projCoords = projCoords*0.5 + 0.5;
+			float closestDepth = texture(shadowMaps, projCoords.xyz);
+			float currentDepth = projCoords.z;
+			if(closestDepth < currentDepth - 0.005)
+			{
+				shadow = 0.1;
+			}else{
+				shadow = 1.0;
+			}
+			shadowCount++;
+		}else
+		{
+			shadow = 1.0f;
+		}
+		
+		lightColor += shadow*min(max(calcRadiance(material, currLight, normal, FragPos, eyeVec),0.0f), 1.0f);
 	}
+	lightColor = min(max(lightColor,0.0f), 1.0f);
 		//Textures
 	if(containsTexture == 1)
 	{

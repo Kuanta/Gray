@@ -1,13 +1,13 @@
+#pragma once
 #ifndef MESH_H
 #define MESH_H
 
 #include <iostream>
 #include "Components/Component.h"
 #include "Geometry.h"
-#include "Material.h"
 #include "Scene.h"
 
-
+class Material;
 class GrMesh : public Component
 {
 public:

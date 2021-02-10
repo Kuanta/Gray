@@ -6,8 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
-#include <assimp/Importer.hpp>
 #include <assimp/scene.h>
+#include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>

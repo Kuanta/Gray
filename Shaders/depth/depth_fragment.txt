@@ -1,0 +1,8 @@
+#version 420 core
+
+layout(location=0) out float fragDepth;
+
+void main()
+{             
+    fragDepth = 100;
+} 

@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "GameManager.h"
+#include "Material.h"
 
 
 Scene::Scene(GameManager * gm)
@@ -8,11 +9,17 @@ Scene::Scene(GameManager * gm)
 	this->gm = gm;
 	this->window = gm->window;
 	this->matricesBuffer = nullptr;
+	this->lm = LightManager(gm, this);
 }
 
 Scene::~Scene()
 {
 
+}
+
+void Scene::init()
+{
+	this->initFbo();
 }
 
 void Scene::add(Object* object)
@@ -56,12 +63,13 @@ void Scene::update(GLFWwindow* window, double deltaTime)
 
 void Scene::draw(double deltaTime)
 {
+	//Enable canvas fbo
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+
+	//Draw the scene
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
-	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setMat4("view", this->camera.getViewMatrix());
-	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setMat4("projection", this->camera.projection);
-	gm->getShader(SHADER_TYPE::DEFAULT_SHADER)->setVec3("eyePosition", this->camera.getPosition());
 
 	//Send Matrices to the buffer
 	if (this->matricesBuffer != nullptr)
@@ -74,14 +82,86 @@ void Scene::draw(double deltaTime)
 
 	//Draw lights
 	this->lm.draw();
+	this->drawElements();
 
+	//Draw the canvas
+	this->drawFbo();
+}
+
+void Scene::activateFbo()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+}
+void Scene::drawElements(Shader* shader)
+{
 	//Draw each element
 	for (vector<Object*>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
 	{
 		if ((*it) != nullptr)
 		{
-			(*it)->draw();
+			if(shader != nullptr)
+			{
+				(*it)->draw(shader);  //For shadowbox method, a simple shader that only draw to depth map will be used for all the objects in the scene
+			}
+			else{
+				(*it)->draw();
+			}
 		}
 
 	}
+}
+
+void Scene::initFbo()
+{
+	/*
+	*	This function is for demo purposes. It initializes a framebuffer alongside with a texture.
+	*/
+	glGenFramebuffers(1, &this->fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+	glGenTextures(1, &fboTexture);
+	glBindTexture(GL_TEXTURE_2D, fboTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,1920,1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);  //TODO: Get width and height from gm
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	//Bind the texture to the frame buffer
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fboTexture, 0);
+
+	//Assign a render object to frame buffer for stencil and depth testing
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1920,1080);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+	{
+		cout << "ERROR: Framebuffer is not complete" << endl;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	this->fboCanvas = new Object();
+	GrMesh* fboCanvasMesh;
+	Plane* pg = new Plane(2.0f, 2.0f);
+	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true, 1);
+	fboCanvasMesh = new GrMesh(pg, mat);
+	this->fboCanvas->addComponent(fboCanvasMesh);
+}
+
+void Scene::drawFbo()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER,0); //Enable the default fbo
+	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+
+	Shader* shader = this->gm->shaderMan.getShaderByType(SHADER_TYPE::FBO_SHADER);
+	shader->use();
+	shader->setFloat("postProcessFactor", this->postProcessFactor);
+	glDisable(GL_DEPTH_TEST);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->fboTexture);
+
+	this->fboCanvas->draw(shader);
 }

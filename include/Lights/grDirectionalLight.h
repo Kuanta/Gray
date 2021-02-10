@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
-#include "grLight.h"
+#include "Lights/grLight.h"
+#include <glm/gtx/string_cast.hpp>
 class grDirectionalLight : public GrLight
 {
 public:
@@ -13,6 +14,8 @@ public:
 
 	//methods
 	virtual void useLight(Shader* shader) override;
+	virtual glm::mat4 getTransformMat() override;
+	
 private:
 	
 };

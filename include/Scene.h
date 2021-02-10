@@ -3,11 +3,12 @@
 #include <iostream>
 #include "Object.h"
 #include "Camera.h"
+#include "Lights/grLight.h"
 #include "LightManager.h"
 #include "UniformBuffer.h"
+#include "Plane.h"
+#include "grMesh.h"
 #include <GLFW/glfw3.h>
-
-
 
 class GameManager;
 using namespace std;
@@ -21,10 +22,12 @@ public:
 	LightManager lm;
 	UniformBuffer* matricesBuffer = nullptr;
 
+	void init();
 	void add(Object* object);
 	void add(GrLight* light);
 	void remove(Object* object);
 	void remove(GrLight* light);
+	void activateShadowMap();
 	virtual void fixedUpdate();
 	virtual void update(GLFWwindow* window, double deltaTime);
 	virtual void draw(double deltaTime);
@@ -42,5 +45,19 @@ public:
 	Scene(GameManager* gm);
 	~Scene();
 
+	void activateFbo(); //If post processing effects are activated, the canvas fbo will be activated
+	void drawElements(Shader* shader=nullptr);
+
+protected:
+
+	//Post Processing
+	unsigned int fbo;
+	unsigned int fboTexture;
+	unsigned int rbo;
+	Object* fboCanvas;
+	void initFbo();
+	void drawFbo();
+	float postProcessFactor = 1.0f;
+	
 };
 

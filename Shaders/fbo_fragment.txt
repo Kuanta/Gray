@@ -2,12 +2,15 @@
 out vec4 FragColor;
   
 in vec2 TexCoords;
-uniform sampler2D screenTexture;
+layout(binding=0) uniform sampler2D screenTexture;
 
-const float offset = 1.0 / 1.0;  
+uniform float postProcessFactor;
+
+float offset;  
 
 void main()
 {
+    offset = 1.0f/1.0f;
     vec2 offsets[9] = vec2[](
         vec2(-offset,  offset), // top-left
         vec2( 0.0f,    offset), // top-center
@@ -35,5 +38,10 @@ void main()
     for(int i = 0; i < 9; i++)
         col += sampleTex[i] * kernel[i];
     
-    FragColor = vec4(col, 1.0);
+    FragColor = vec4(col,1);
+
+    //For debugging depth map
+    /*float color = texture(screenTexture, TexCoords.st).r;
+    FragColor = vec4(color,0,0,1);*/
+   
 } 

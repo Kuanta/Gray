@@ -25,8 +25,9 @@ bool GameManager::init(int width, int height)
 	glfwWindowHint(GLFW_STENCIL_BITS, 16);
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	this->window = glfwCreateWindow(width, height, "Gray", NULL, NULL);
+	this->windowWidth = width; this->windowHeight = height;
 	if (window == NULL)
 	{
 		return false;
@@ -53,9 +54,9 @@ bool GameManager::init(int width, int height)
 	glfwSetMouseButtonCallback(this->window, mouse_button_callback);
 	glfwSetDropCallback(this->window, drop_callback);
 	glfwSetScrollCallback(this->window, scroll_callback);
-	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+	glfwSetFramebufferSizeCallback(this->window, framebuffer_size_callback);
 
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+	glfwSetInputMode(this->window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//Set window pointer to this
 	glfwSetWindowUserPointer(window, this);
@@ -65,7 +66,7 @@ bool GameManager::init(int width, int height)
 
 	//Initialize Buffers
 	this->matricesBuffer = new UniformBuffer(16*9, "Matrices", 0);
-	this->lightsBuffer = new UniformBuffer(MAX_NUM_LIGHTS*80 + 4, "Lights", 1);
+	this->lightsBuffer = new UniformBuffer(MAX_NUM_LIGHTS*144 + 4, "Lights", 1);
 
 	//OPENGL
 	glEnable(GL_DEPTH_TEST);  //Enable depth testing
@@ -92,6 +93,7 @@ void GameManager::changeScene(Scene * newScene)
 	this->currentScene = newScene;
 	this->currentScene->matricesBuffer = this->matricesBuffer;
 	this->currentScene->lm.lightsBuffer = this->lightsBuffer;
+	this->currentScene->init();
 }
 
 GameManager::GameManager(int width, int height)

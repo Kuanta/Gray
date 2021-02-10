@@ -71,6 +71,9 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 	case SHADER_TYPE::SKYBOX_SHADER:
 		shader = new Shader("Shaders/skybox_vertex.txt", "Shaders/skybox_fragment.txt");
 		break;
+	case SHADER_TYPE::DEPTH_SHADER:
+		shader = new Shader("Shaders/depth/depth_vertex.txt", "Shaders/depth/depth_fragment.txt");
+		break;
 	default:
 		break;
 	}

@@ -39,9 +39,9 @@ public:
 	void setPositionY(float y) { this->position.y = y; updateLocalMatrix();}
 	void setPositionZ(float z) { this->position.z = z; updateLocalMatrix();}
 	void setRotation(float x, float y, float z);
-	void setRotationX(float x) { this->position.x = x; updateLocalMatrix();}
-	void setRotationY(float y) { this->position.y = y; updateLocalMatrix();}
-	void setRotationZ(float z) { this->position.z = z; updateLocalMatrix();}
+	void setRotationX(float x) { this->rotation.x = x; updateLocalMatrix();}
+	void setRotationY(float y) { this->rotation.y = y; updateLocalMatrix();}
+	void setRotationZ(float z) { this->rotation.z = z; updateLocalMatrix();}
 	void setScale(float x, float y, float z);
 	void setScaleX(float x) { this->scale.x = x; updateLocalMatrix();}
 	void setScaleY(float y) { this->scale.y = y; updateLocalMatrix();}

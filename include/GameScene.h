@@ -4,9 +4,9 @@
 #include "Camera.h"
 #include "ElementManager.h"
 #include "Object.h"
-#include "grLight.h"
-#include "grDirectionalLight.h"
-#include "grPointLight.h"  
+#include "Lights/grLight.h"
+#include "Lights/grDirectionalLight.h"
+#include "Lights/grPointLight.h"  
 #include "Model.h"
 #include "GrAnimManager.h"
 #include "Plane.h"
@@ -18,7 +18,6 @@ public:
 	GameScene(GameManager* gm);
 	~GameScene();
 
-	// Scene aracýlýðýyla devralýndý
 	virtual void draw(double deltaTime);
 	virtual void keyInput(int key, int scancode, int action, int mods) override;
 	virtual void character_callback(GLFWwindow * window, unsigned int codepoint) override;
@@ -31,21 +30,10 @@ public:
 	virtual void framebuffer_size_callback(GLFWwindow * window, int width, int height) override;
 	virtual void cleanup() override;
 
-	//For demo purposes
-	void initFbo();
-
 private:
 	//Debug
 	float testTime=0;
 	Object* player;
 	GrAnimManager* animMan=nullptr;
-
-	//For demo purposes
-	unsigned int fbo;
-	unsigned int fboTexture;
-	unsigned int rbo;
-	Object* fboCanvas;
-	void drawFbo();
-
 };
 

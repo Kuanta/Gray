@@ -13,6 +13,7 @@
 #include "Geometry.h"
 #include "Material.h"
 #include "GameManager.h"
+#include "stb_image.h"
 
 class Model
 {

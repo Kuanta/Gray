@@ -48,6 +48,7 @@ const int POINT_LIGHT = 2;
 
 struct Light
 {
+	mat4 lightMatrix;
 	vec4 color;		//4*4 = 16
 	vec4 position;  //4*4 = 32
 	vec4 direction;	//4*4 = 48
@@ -56,6 +57,7 @@ struct Light
 	float constant;	//4
 	float linear;	//4
 	float quadratic;	//4
+	bool castShadow;
 	//Total: 48+20 = 68 (Must be a multiple of 16, so ve set it to 16*5=80, LOSS OF 12 BYTES)
 };
 layout (std140, binding=0) uniform Matrices

@@ -1,7 +1,5 @@
 #include "grTexture.h"
 
-
-
 grTexture::grTexture()
 {
 	this->textureID = 0;

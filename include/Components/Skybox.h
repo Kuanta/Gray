@@ -1,12 +1,10 @@
 #ifndef SKYBOX_H
 #define SKYBOX_H
-
 #include "Components/Component.h"
 #include "BoxGeometry.h"
 #include "Shader.h"
 #include "GameManager.h"
 #include "stb_image.h"
-
 
 using namespace std;
 

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef GAME_MANAGER_H
 #define GAME_MANAGER_H
 #define MAX_NUM_LIGHTS 100
@@ -27,6 +28,8 @@ public:
 	ShaderManager shaderMan;
 	UniformBuffer* matricesBuffer = nullptr;
 	UniformBuffer* lightsBuffer = nullptr;
+	int windowWidth;
+	int windowHeight;
 
 	Shader* getShader(SHADER_TYPE shaderType);
 	bool init(int width, int height);

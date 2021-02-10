@@ -1,4 +1,4 @@
-#include "grPointLight.h"
+#include "Lights/grPointLight.h"
 
 
 
@@ -33,4 +33,9 @@ void grPointLight::useLight(Shader * shader)
 	shader->setFloat("pointLight.linear", this->linear);
 	shader->setFloat("pointLight.quadratic", this->quadratic);
 	shader->setFloat("pointLight.constant", this->constant);
+}
+
+glm::mat4 grPointLight::getTransformMat()
+{
+	return glm::mat4(1.0f);
 }

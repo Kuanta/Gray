@@ -1,17 +1,18 @@
 CC = g++
-VPATH = src/
+VPATH = src/ src/Lights
 OBJ_DIR := build/
-INCLUDE_PATHS = -I include -I D:\Documents\Codes\Cpp\Libraries\Includes -I D:\Documents\Codes\Cpp\Libraries\Includes\glad -I ./include -I ../Libraries/include
-LIB_PATHS = -L ../Libraries/lib/Assimp
+INCLUDE_PATHS = -I include -I D:\Documents\Codes\Cpp\Libraries\Includes -I D:\Documents\Codes\Cpp\Libraries\Includes\glad
+INCLUDE_PATHS_UNIX = -I ../Libraries/include
+LIB_PATHS =  
+LIB_PATHS_UNIX = -L ../Libraries/lib/Assimp
 LIBS_UNIX = -lassimp -lGL -lglfw3 -ldl -lX11 -lpthread -lXrandr -ldl
 LIBS = -lassimp.dll -lglfw3.dll -lgdi32 -lopengl32
 SRC_CPP     :=                      \
    $(wildcard src/*.cpp)         \
-   $(wildcard ../Gray_Make/*.cpp)         \
+   $(wildcard src/Lights/*.cpp)         \
 
 SRC_C := \
    $(wildcard src/*.c)         \
-   $(wildcard ../Gray_Make/*.c)         \
 
 BASENAMES_CPP := $(notdir $(SRC_CPP))
 BASENAMES_C := $(notdir $(SRC_C))
@@ -26,6 +27,13 @@ vpath %.h include
 vpath %.o build
 
 all: main
+compileall:
+	make clean
+	make all
+
+compileallwin:
+	make clean
+	make all
 
 # Dep
 deps := $(patsubst %.o, %.d, $(OBJECT_PATHS))
@@ -39,7 +47,7 @@ main: $(OBJECTS)
 	g++ $(OBJECT_PATHS) $(CPP_FLAGS) $(LIB_PATHS) $(LIBS) -o build/main.exe  2> log.txt
 
 unix: $(OBJECTS)
-	g++ $(OBJECT_PATHS) $(CPP_FLAGS) $(LIB_PATHS) $(LIBS_UNIX) -o build/main  2> log.txt
+	g++ $(OBJECT_PATHS) $(CPP_FLAGS) $(LIB_PATHS_UNIX) $(LIBS_UNIX) -o build/main  2> log.txt
 #Patterns
 %.o: %.cpp
 	$(CC) -c $< $(CPP_FLAGS) -o build/$@ $(DEPFLAGS)
@@ -48,8 +56,10 @@ unix: $(OBJECTS)
 	$(CC) -c $< $(CPP_FLAGS) -o build/$@ $(DEPFLAGS)
 
 
-.PHONY: clean
+.PHONY: clean, cleanwin
 clean: 
-	rm -f build/*.o
+	rm -f build\*.o
 
-
+cleanwin:
+	del /S build\*.o
+	del /S build\deps\*.d
