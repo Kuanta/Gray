@@ -6,7 +6,7 @@ Material::Material()
 	this->color = glm::vec3(0);
 	this->shininess = 0;
 	this->metalness = false;
-	this->rougness = 0;
+	this->rougness = 1;
 	this->diffuseMap = nullptr;
 }
 
@@ -84,7 +84,7 @@ void Material::draw(Shader* shader)
 	}
 
 	//Set uniforms
-	shader->setVec3("material.color", this->color);
+	shader->setVec3("material.color", this->diffuse);
 	shader->setFloat("material.shininess", this->shininess);
 	shader->setBool("material.metal", this->metalness);
 	shader->setFloat("material.roughness", this->rougness);

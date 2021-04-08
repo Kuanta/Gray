@@ -5,11 +5,25 @@
 
 Scene::Scene(GameManager * gm)
 {
-	this->camera = Camera();
+	//this->camera = Camera();
 	this->gm = gm;
 	this->window = gm->window;
 	this->matricesBuffer = nullptr;
 	this->lm = LightManager(gm, this);
+	this->keyInputCallback=nullptr;
+	this->characterCallback=nullptr;
+	this->charmodsCallback= nullptr;
+	this->cursorPositionCallback=nullptr;
+	this->cursorEnterCallback = nullptr;
+	this->mouseButtonCallback = nullptr;
+	this->scrollCallback = nullptr;
+	this->dropCallback = nullptr;
+	this->frameBufferSizeCallback = nullptr;
+
+	//Init camera
+	this->camera = Camera(75, 1920.0f/1080.0f, 0.1f, 100000000.0f);  
+	this->camera.setPositionY(8);
+	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 }
 
 Scene::~Scene()
@@ -164,4 +178,9 @@ void Scene::drawFbo()
 	glBindTexture(GL_TEXTURE_2D, this->fboTexture);
 
 	this->fboCanvas->draw(shader);
+}
+
+void Scene::cleanup()
+{
+	
 }

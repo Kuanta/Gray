@@ -1,7 +1,7 @@
 CC = g++
 VPATH = src/ src/Lights
 OBJ_DIR := build/
-INCLUDE_PATHS = -I include -I D:\Documents\Codes\Cpp\Libraries\Includes -I D:\Documents\Codes\Cpp\Libraries\Includes\glad
+INCLUDE_PATHS = -I ./include -I ./examples -I D:\Documents\Codes\Cpp\Libraries\Includes -I D:\Documents\Codes\Cpp\Libraries\Includes\glad 
 INCLUDE_PATHS_UNIX = -I ../Libraries/include
 LIB_PATHS =  
 LIB_PATHS_UNIX = -L ../Libraries/lib/Assimp
@@ -9,6 +9,7 @@ LIBS_UNIX = -lassimp -lGL -lglfw3 -ldl -lX11 -lpthread -lXrandr -ldl
 LIBS = -lassimp.dll -lglfw3.dll -lgdi32 -lopengl32
 SRC_CPP     :=                      \
    $(wildcard src/*.cpp)         \
+   $(wildcard examples/*.cpp) \
    $(wildcard src/Lights/*.cpp)         \
 
 SRC_C := \
@@ -24,6 +25,7 @@ CPP_FLAGS = $(INCLUDE_PATHS) -w -std=c++17
 
 vpath %.cpp src
 vpath %.h include
+vpath %.cpp examples
 vpath %.o build
 
 all: main
@@ -41,7 +43,7 @@ deps := $(patsubst %.o, %.d, $(OBJECT_PATHS))
 DEPFLAGS = -MMD -MF build/deps/$(@:.o=.d)
 
 test:
-	echo $(OBJECTS)
+	echo $(OBJECT_PATHS)
 # Targets
 main: $(OBJECTS)
 	g++ $(OBJECT_PATHS) $(CPP_FLAGS) $(LIB_PATHS) $(LIBS) -o build/main.exe  2> log.txt

@@ -128,7 +128,10 @@ void GameManager::keyCallback(GLFWwindow* window, int key, int scancode, int act
 	if (!gm->quitting)
 	{
 		//Still checking for input while quitting the game causes null pointer errors
-		gm->currentScene->keyInput(key, scancode, action, mods);
+		if(gm->currentScene->keyInputCallback != nullptr)
+		{
+			gm->currentScene->keyInputCallback(key, scancode, action, mods);
+		}
 	}
 
 }
@@ -136,47 +139,68 @@ void GameManager::keyCallback(GLFWwindow* window, int key, int scancode, int act
 void GameManager::character_callback(GLFWwindow * window, unsigned int codepoint)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->character_callback(window, codepoint);
+	if(gm->currentScene->characterCallback != nullptr)
+	{
+		gm->currentScene->characterCallback(window, codepoint);
+	}
 }
 
 void GameManager::charmods_callback(GLFWwindow * window, unsigned int codepoint, int mods)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->charmods_callback(window, codepoint, mods);
+	if(gm->currentScene->charmodsCallback != nullptr)
+	{
+		gm->currentScene->charmodsCallback(window, codepoint, mods);
+	}
 }
 
 void GameManager::cursor_position_callback(GLFWwindow * window, double xpos, double ypos)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->cursor_position_callback(window, xpos, ypos);
+	if(gm->currentScene->cursorPositionCallback != nullptr)
+	{
+		gm->currentScene->cursorPositionCallback(window, xpos, ypos);
+	}
 }
 
 void GameManager::cursor_enter_callback(GLFWwindow * window, int entered)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->cursor_enter_callback(window, entered);
+	if(gm->currentScene->cursorEnterCallback != nullptr)
+	{
+		gm->currentScene->cursorEnterCallback(window, entered);
+	}
 }
 
 void GameManager::mouse_button_callback(GLFWwindow * window, int button, int action, int mods)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->mouse_button_callback(window, button, action, mods);
+	if(gm->currentScene->mouseButtonCallback != nullptr)
+	{
+		gm->currentScene->mouseButtonCallback(window, button, action, mods);
+	}
 }
 
 void GameManager::scroll_callback(GLFWwindow * window, double xoffset, double yoffset)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->scroll_callback(window, xoffset, yoffset);
+	if(gm->currentScene->scrollCallback != nullptr) 
+	{
+		gm->currentScene->scrollCallback(window, xoffset, yoffset);
+	}
 }
 
 void GameManager::drop_callback(GLFWwindow * window, int count, const char ** paths)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->drop_callback(window, count, paths);
+	if(gm->currentScene->dropCallback != nullptr)
+	{
+		gm->currentScene->dropCallback(window, count, paths);
+	}
 }
 
 void GameManager::framebuffer_size_callback(GLFWwindow * window, int width, int height)
 {
 	GameManager* gm = (GameManager*)glfwGetWindowUserPointer(window); //Retrieve the user pointer
-	gm->currentScene->framebuffer_size_callback(window, width, height);
+	if(gm->currentScene->frameBufferSizeCallback != nullptr){gm->currentScene->frameBufferSizeCallback(window, width, height);}
 }

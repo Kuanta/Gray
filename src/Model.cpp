@@ -152,7 +152,7 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, b
 
 	glm::vec3 unitVec3;
 	glm::vec4 unitVec4;
-	glm::decompose(AiToGLMMat4(nodeTransform), scale, orientation, position, unitVec3, unitVec4);
+	glm::decompose(glm::transpose(AiToGLMMat4(nodeTransform)), scale, orientation, position, unitVec3, unitVec4);
 	object->setPosition(position);
 	object->setRotation(glm::eulerAngles(orientation));
 	object->setScale(scale);
