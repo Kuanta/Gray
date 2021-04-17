@@ -71,11 +71,18 @@ vec3 schlickFresnel(Material material, vec3 lightDir, vec3 halfWay)
 	}
 	return F0+(1-F0)*pow(1.0-dot(lightDir, halfWay),5);
 }
-
-float geomSmith(Material material, vec3 normal, vec3 view){
+float geomSchlick(float dotProd, float roughness)
+{
 	float k = (material.roughness+1.0)*(material.roughness+1.0)/8.0;
-	float dotProd = max(dot(normal, view), 0);
+	//float dotProd = max(dot(normal, view), 0);
 	return dotProd/(dotProd*(1-k)+k);
+}
+float geomSmith(Material material, vec3 normal, vec3 view, vec3 halfway){
+	float NdotV = max(dot(normal, view), 0.0f);
+	float NdotL = max(dot(normal, halfway), 0.0f);
+	float ggx2 = geomSchlick(NdotV, material.roughness);
+	float ggx1 = geomSchlick(NdotL, material.roughness);
+	return ggx2;
 }
 
 float ggxDistribution(Material material, float nDotH)
@@ -84,7 +91,6 @@ float ggxDistribution(Material material, float nDotH)
 	float d = (nDotH*nDotH)*(alpha2-1)+1;
 	return alpha2 / (PI*d*d);
 }
-
 vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec3 eyePos){
 
 	//Shadow Calculation
@@ -111,10 +117,10 @@ vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec
 	vec3 halfway = lightDir.xyz+viewDir;
 	halfway=halfway/length(halfway); // normalize
 	vec3 fresnel = schlickFresnel(material, lightDir, halfway);
-	float geo = geomSmith(material, normal, viewDir);
+	float geo = geomSmith(material, normal, viewDir, halfway);
 	float ndf = ggxDistribution(material, dot(normal, halfway));
 
-	vec3 specular = 0.25*fresnel*geo*ndf/(max(dot(normal, lightDir), 0)*max(dot(normal, viewDir), 0.001));
+	vec3 specular = 0.25*fresnel*geo*ndf/(max(dot(normal, lightDir), 0)*max(dot(normal, viewDir), 0));
 	vec3 diffuse = light.color.xyz;
 	float incomingRadiance = lightIntensity;
 	if(light.type == POINT_LIGHT)

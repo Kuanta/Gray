@@ -37,12 +37,6 @@ void run()
 	animMan->addToActive(stand, 1.0f, true);
 	animMan->addToActive(walk, 0.0f, true);
 
-	Model* shrineModel = new Model();
-	Object* shrine = shrineModel->loadModel(gm, "./assets/shrine.fbx");
-	shrine->setScale(0.1f,0.1f,0.1f);
-	shrine->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
-	//this->add(shrine);
-	shrine->gm = gm;
 	if (player != nullptr)
 	{
 		player->setScale(glm::vec3(0.25, 0.25, 0.25));
@@ -86,7 +80,7 @@ void run()
 	Material* mat_plane = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true, 1);
 	mat_plane->setTexture("./assets/wood.png", DIFFUSE_TEXTURE);
 	mat_plane->shininess = 32.0f;
-	mat_plane->rougness = 20;
+	mat_plane->rougness = 0.1f;
 	mat_plane->metalness = true;
 	GrMesh* plane_mesh = new GrMesh(pg, mat_plane);
 	plane->setRotation(glm::vec3(-90,0,0));
@@ -94,6 +88,28 @@ void run()
 	plane->setScale(5,5,5);
 	plane->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
 	plane->addComponent(plane_mesh);
+
+	//Sphere
+	Model* modelSphere = new Model();
+	Object* sphere = modelSphere->loadModel(gm, "./assets/sphere.fbx");
+	sphere->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
+	sphere->setScale(glm::vec3(0.05f, 0.05f, 0.05f));
+	sphere->setPositionZ(15.0f);
+	sphere->setPositionX(7.0f);
+	sphere->setPositionY(15.0f);
+	scene->em.addElement(sphere);
+	sphere->gm = gm;
+
+	//Blender box
+	Model* modelBox = new Model();
+	Object* boxBlend = modelBox->loadModel(gm, "./assets/box.fbx");
+	boxBlend->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
+	boxBlend->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	boxBlend->setPositionZ(15.0f);
+	boxBlend->setPositionX(-7.0f);
+	boxBlend->setPositionY(15.0f);
+	scene->em.addElement(boxBlend);
+	boxBlend->gm = gm;
 
 	//Skybox
 	Object* skybox = new Object();

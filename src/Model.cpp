@@ -255,11 +255,10 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	gMaterial->diffuse = this->aiColorToGlm(diffuseColor);
 	gMaterial->specular = this->aiColorToGlm(specularColor);
 	gMaterial->ambient = this->aiColorToGlm(ambientColor);
-	if (shininess == 0)
-	{
-		shininess = 16; //TODO: Setting a default value for shininess for now
-	}
+	gMaterial->rougness = 0.2f;
 	gMaterial->shininess = shininess;
+	gMaterial->metalness = false;
+	cout<<"Shininess:"<<shininess<<endl;
 
 	//Check Textures
 	//TODO: Check for other texture types

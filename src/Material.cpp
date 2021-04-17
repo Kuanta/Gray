@@ -6,7 +6,7 @@ Material::Material()
 	this->color = glm::vec3(0);
 	this->shininess = 0;
 	this->metalness = false;
-	this->rougness = 1;
+	this->rougness = 0.15f;
 	this->diffuseMap = nullptr;
 }
 
