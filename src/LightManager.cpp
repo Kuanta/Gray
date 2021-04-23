@@ -34,7 +34,7 @@ void LightManager::init()
 	// glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAX_LEVEL, 10);
 	//glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_RGB, 2048, 2048,10, 0, GL_RGB, GL_FLOAT,0);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, 1024, 1024,0,GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, 4096, 4096,0,GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
@@ -97,7 +97,7 @@ void LightManager::draw()
 			{
 				//Draw the scene
 				Shader* depthShader = this->gm->shaderMan.getShaderByType(SHADER_TYPE::DEPTH_SHADER);
-				glViewport(0,0,1024, 1024); //Shadow width and height
+				glViewport(0,0,4096, 4096); //Shadow width and height
 				glBindFramebuffer(GL_FRAMEBUFFER, this->depthMapFBO);
 				glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -121,7 +121,7 @@ void LightManager::draw()
 	glBufferSubData(GL_UNIFORM_BUFFER, 100*144, 4, &this->numberOfLights); //Send the number of lights
 	glBindBuffer(GL_UNIFORM_BUFFER, 0); //Unbind
 	//Activate the texture for shadowmaps
-	glActiveTexture(GL_TEXTURE2);
+	glActiveTexture(GL_TEXTURE0+4);
 	glBindTexture(GL_TEXTURE_2D, this->shadowMaps);
 	this->scene->activateFbo();
 

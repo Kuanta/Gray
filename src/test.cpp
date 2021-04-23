@@ -90,26 +90,26 @@ void run()
 	plane->addComponent(plane_mesh);
 
 	//Sphere
-	Model* modelSphere = new Model();
-	Object* sphere = modelSphere->loadModel(gm, "./assets/sphere.fbx");
-	sphere->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
-	sphere->setScale(glm::vec3(0.05f, 0.05f, 0.05f));
-	sphere->setPositionZ(15.0f);
-	sphere->setPositionX(7.0f);
-	sphere->setPositionY(15.0f);
-	scene->em.addElement(sphere);
-	sphere->gm = gm;
+	// Model* modelSphere = new Model();
+	// Object* sphere = modelSphere->loadModel(gm, "./assets/sphere.fbx");
+	// sphere->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
+	// sphere->setScale(glm::vec3(0.05f, 0.05f, 0.05f));
+	// sphere->setPositionZ(15.0f);
+	// sphere->setPositionX(7.0f);
+	// sphere->setPositionY(15.0f);
+	// scene->em.addElement(sphere);
+	// sphere->gm = gm;
 
-	//Blender box
-	Model* modelBox = new Model();
-	Object* boxBlend = modelBox->loadModel(gm, "./assets/box.fbx");
-	boxBlend->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
-	boxBlend->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
-	boxBlend->setPositionZ(15.0f);
-	boxBlend->setPositionX(-7.0f);
-	boxBlend->setPositionY(15.0f);
-	scene->em.addElement(boxBlend);
-	boxBlend->gm = gm;
+	// //Blender box
+	// Model* modelBox = new Model();
+	// Object* boxBlend = modelBox->loadModel(gm, "./assets/box.fbx");
+	// boxBlend->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
+	// boxBlend->setScale(glm::vec3(0.1f, 0.1f, 0.1f));
+	// boxBlend->setPositionZ(15.0f);
+	// boxBlend->setPositionX(-7.0f);
+	// boxBlend->setPositionY(15.0f);
+	// scene->em.addElement(boxBlend);
+	// boxBlend->gm = gm;
 
 	//Skybox
 	Object* skybox = new Object();

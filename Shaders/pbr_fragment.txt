@@ -52,7 +52,10 @@ layout (std140, binding=1) uniform Lights
 };
 
 layout(binding=0) uniform sampler2D diffuseMap;
-layout(binding=2) uniform sampler2DShadow shadowMaps; //TODO: The binding point may change in future
+layout (binding=1) uniform sampler2D normalMap;
+layout (binding=2) uniform sampler2D bumpMap;
+layout (binding=3) uniform sampler2D displacementMap;
+layout(binding=4) uniform sampler2DShadow shadowMaps; //TODO: The binding point may change in future
 uniform Material material;
 uniform int containsTexture;
 
