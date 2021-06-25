@@ -27,8 +27,8 @@ void run()
 	model->importAnimations("./assets/arthas/arthas_Walk_1.fbx");
 	model->importAnimations("./assets/arthas/arthas_Stand_0.fbx");
 	model->importAnimations("./assets/arthas/arthas_Attack1H_82.fbx"); //"Attack1H [82]
-	model->importAnimations("./assets/arthas/arthas_EmoteKiss_49.fbx");
-
+	//model->importAnimations("./assets/arthas/arthas_EmoteKiss_49.fbx");
+	
 	animMan = (GrAnimManager*)player->getComponentByType(ComponentType::ANIMATION_MANAGER);
 
 	stand = animMan->getAnimation("Stand [0]");
@@ -65,8 +65,9 @@ void run()
 	BoxGeometry* bg = new BoxGeometry(3.0f, 7.0f, 3.0f);
 	Material* mat = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true,1);
 	mat->rougness = 100000.0f;
-	mat->metalness = true;
+	mat->metalness = false;
 	mat->setTexture("assets/brick.png", DIFFUSE_TEXTURE);
+	//mat->setTexture("assets/bricks/bricksNormal.jpg", NORMAL_TEXTURE);
 	GrMesh* mesh = new GrMesh(bg, mat);
 	box->name = string("Brick");
 	box->gm = gm;
@@ -74,11 +75,13 @@ void run()
 	box->setPosition(-5, 0, 20);
 	mesh->addToObject(box);
 	box->setShader(gm->getShader(SHADER_TYPE::PBR_SHADER));
+	box->setPositionY(3.5f);
 	//Plane
 	Object* plane = new Object();
 	Plane* pg = new Plane(10.0f, 10.0f, 3.5f);
 	Material* mat_plane = new Material(glm::vec3(0.5f, 0.5f, 0.5f), 1, true, 1);
-	mat_plane->setTexture("./assets/wood.png", DIFFUSE_TEXTURE);
+	mat_plane->setTexture("assets/wood/wood.png", DIFFUSE_TEXTURE);
+	mat_plane->setTexture("assets/wood/woodNormal.png", NORMAL_TEXTURE);
 	mat_plane->shininess = 32.0f;
 	mat_plane->rougness = 0.1f;
 	mat_plane->metalness = true;
@@ -137,8 +140,6 @@ void run()
 	}
 }
 	
-
-
 void keyInput(int key, int scancode, int action, int mods)
 {
 	if (scene->camera.controls != nullptr)
@@ -161,12 +162,6 @@ void keyInput(int key, int scancode, int action, int mods)
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 	{
 		animMan->addToActive("Attack1H [82]",1.0f, false);
-		animMan->startTransition(0.1f);
-	}
-
-	if (key == GLFW_KEY_K && action == GLFW_PRESS)
-	{
-		animMan->addToActive("EmoteKiss [49]", 100.0f, false);
 		animMan->startTransition(0.1f);
 	}
 }

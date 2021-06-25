@@ -58,7 +58,20 @@ BoxGeometry::BoxGeometry(float width, float height, float depth)
 		//Top
 		0,1,0, 0,1,0, 0,1,0, 0,1,0,
 	};
-
+	float tangents[] = {
+		//Back
+		1,0,0, 1,0,0, 1,0,0, 1,0,0,
+		//Bottom
+		1,0,0, 1,0,0, 1,0,0, 1,0,0,
+		//Front
+		1,0,0, 1,0,0, 1,0,0, 1,0,0,
+		//Left
+		0,0,1, 0,0,1, 0,0,1, 0,0,1,
+		//Right
+		0,0,-1, 0,0,-1 ,0,0,-1, 0,0,-1,
+		//Top
+		1,0,0, 1,0,0, 1,0,0, 1,0,0,
+	};
 	float colors[] = {
 		0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f, 0.5f,0.5f,0.5f,
 		0.9f,0.1f,0.5f, 0.9f,0.1f,0.5f, 0.9f,0.1f,0.5f, 0.9f,0.1f,0.5f,
@@ -91,6 +104,7 @@ BoxGeometry::BoxGeometry(float width, float height, float depth)
 		vert.UVs = glm::vec2(uvs[i], uvs[i+1]);
 		vert.Normal = glm::vec3(normals[i], normals[i+1], normals[i+2]);
 		vert.Color = glm::vec3(colors[i], colors[i+1], colors[i+2]);
+		vert.Tangent = glm::vec3(tangents[i], tangents[i+1], tangents[i+2]);
 		this->vertices.push_back(vert);
 	}
 	this->setIndices(_indices, indexCount);

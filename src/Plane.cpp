@@ -22,6 +22,13 @@ Plane::Plane(float width, float height, float uvScale)
 		0.0f, 0.0f, 1.0f,
 		0.0f, 0.0f, 1.0f
 	};
+	float tangents[] = 
+	{
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f
+	};
 	unsigned int indices[] = {
 		0, 1, 2, 1, 2, 3
 	};
@@ -33,6 +40,7 @@ Plane::Plane(float width, float height, float uvScale)
 		vert.Position = glm::vec3(vertexPoints[i], vertexPoints[i + 1], vertexPoints[i + 2]);
 		vert.UVs = glm::vec2(uvs[i], uvs[i + 1]);
 		vert.Normal = glm::vec3(normals[i], normals[i + 1], normals[i + 2]);
+		vert.Tangent = glm::vec3(tangents[i], tangents[i+1], tangents[i+2]);
 		this->vertices.push_back(vert);
 	}
 	this->setIndices(indices, indexCount);

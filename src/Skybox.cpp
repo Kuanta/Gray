@@ -20,7 +20,10 @@ void Skybox::draw()
 
     this->shader->use();
     glDepthMask(GL_FALSE);
+    glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_CUBE_MAP, this->textureID);
+    shader->setInt("skybox", 0);
+
     this->bg->draw(this->shader);
     glDepthMask(GL_TRUE);
 }

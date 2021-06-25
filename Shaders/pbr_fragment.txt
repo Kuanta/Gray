@@ -7,6 +7,7 @@ in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
 in vec3 Color;
+in mat3 TBN;
 
 struct Material
 {
@@ -58,8 +59,8 @@ layout (binding=3) uniform sampler2D displacementMap;
 layout(binding=4) uniform sampler2DShadow shadowMaps; //TODO: The binding point may change in future
 uniform Material material;
 uniform int containsTexture;
+uniform int containsNormalTexture;
 
-vec3 normal = normalize(Normal);
 vec3 viewDir = normalize(eyePosition - FragPos);
 
 //Light Calc. Funcs
@@ -94,6 +95,7 @@ float ggxDistribution(Material material, float nDotH)
 	float d = (nDotH*nDotH)*(alpha2-1)+1;
 	return alpha2 / (PI*d*d);
 }
+
 vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec3 eyePos){
 
 	//Shadow Calculation
@@ -139,6 +141,14 @@ vec3 calcRadiance(Material material, Light light, vec3 normal, vec3 fragPos, vec
 void main()
 {  
 	vec3 normal = normalize(Normal);
+
+	if(containsNormalTexture == 1)
+	{
+		normal = texture(normalMap, TexCoords).rgb;
+		normal = normal * 2.0 - 1.0;
+		normal = normalize(TBN * normal);
+	}
+
 	vec3 outColor = vec3(0.0);
 	vec3 eyeVec = eyePosition - FragPos;
 

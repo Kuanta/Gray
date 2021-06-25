@@ -4,6 +4,7 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aUvs;
 layout (location = 4) in ivec4 boneIDs;
 layout (location = 5) in vec4 boneWeights;
+layout (location = 6) in vec3 aTangent;
 layout (location = 8) in vec3 aColor;
 
 out vec3 Normal;
@@ -11,7 +12,7 @@ out vec3 FragPos;
 out vec2 TexCoords;
 out vec3 Color;
 out vec4 fragPosLightSpace;
-flat out int faulty;
+out mat3 TBN;
 
 layout (std140, binding=0) uniform Matrices
 {
@@ -49,9 +50,15 @@ void main()
 	}
 	
 	gl_Position = projection * view * model * boneMatrix * vec4(aPos, 1.0);
-	Normal = mat3(transpose(inverse(model * boneMatrix))) * aNormal;
+	//Normal = mat3(transpose(inverse(model * boneMatrix))) * aNormal;
+	//vec3 tangent = mat3(transpose(inverse(model * boneMatrix))) * aTangent;
+	vec3 tangent = normalize(vec3(model * vec4(aTangent,   0.0)));
+   	Normal = normalize(vec3(model * vec4(aNormal,    0.0)));
+	
+	tangent = normalize(tangent-dot(tangent,Normal)*Normal);
+	vec3 bitangent = cross(Normal, tangent);
+	TBN = mat3(tangent, bitangent, Normal);
 	FragPos=vec3(model*vec4(aPos,1.0));
 	TexCoords = aUvs;
 	Color = aColor;
-	faulty = 0;
 }

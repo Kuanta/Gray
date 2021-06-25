@@ -7,7 +7,7 @@ Material::Material()
 	this->shininess = 0;
 	this->metalness = false;
 	this->rougness = 0.15f;
-	this->diffuseMap = nullptr;
+	this->initTextures();
 }
 
 Material::Material(glm::vec3 color, float shininess, bool metalness, float rougness)
@@ -16,14 +16,23 @@ Material::Material(glm::vec3 color, float shininess, bool metalness, float rougn
 	this->shininess = shininess;
 	this->metalness = metalness;
 	this->rougness = rougness;
-	this->diffuseMap = nullptr;
+	this->initTextures();
 }
 
 
 Material::~Material()
 {
+	
 }
 
+void Material::initTextures()
+{
+	this->diffuseMap = nullptr;
+	this->normalMap = nullptr;
+	this->roughnessMap = nullptr;
+	this->metalMap = nullptr;
+	this->dispMap = nullptr;
+}
 void Material::setTexture(const char * filename, TextureTypes textureType)
 {
 	
@@ -36,6 +45,15 @@ void Material::setTexture(const char * filename, TextureTypes textureType)
 			}
 			this->diffuseMap = new grTexture();
 			this->diffuseMap->loadTexture(filename);
+			break;
+		case HEIGHT_TEXTURE:
+		case NORMAL_TEXTURE:
+			if(this->normalMap != nullptr){
+				this->normalMap->clearTexture();
+				delete this->normalMap;
+			}
+			this->normalMap = new grTexture();
+			this->normalMap->loadTexture(filename);
 			break;
 		default:
 			break;
@@ -54,6 +72,15 @@ void Material::setTexture(grTexture * texture, TextureTypes textureType)
 			}
 			this->diffuseMap = texture;
 			break;
+		case HEIGHT_TEXTURE:
+		case NORMAL_TEXTURE:
+			if (this->normalMap != nullptr)
+			{
+				this->normalMap->clearTexture();
+				delete this->normalMap;
+			}
+			this->normalMap = texture;
+			break;
 		default:
 			break;
 	}
@@ -64,6 +91,11 @@ grTexture * Material::getTexture(TextureTypes textureType)
 	switch (textureType) {
 	case DIFFUSE_TEXTURE:
 		return this->diffuseMap;
+		break;
+	case HEIGHT_TEXTURE:
+	case NORMAL_TEXTURE:
+		return this->normalMap;
+		break;
 	default:
 		break;
 	}
@@ -73,14 +105,32 @@ grTexture * Material::getTexture(TextureTypes textureType)
 void Material::draw(Shader* shader)
 {
 	shader->use();
-	glActiveTexture(GL_TEXTURE0 + 5);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 1);
+	
+	
 	if (this->diffuseMap != nullptr && this->diffuseMap->textureExists()) {
+		//Diffuse (Using first 5 maps for shadows)
+		glActiveTexture(GL_TEXTURE0 );
+		glBindTexture(GL_TEXTURE_2D_ARRAY, this->diffuseMap->getTextureID());
+		shader->setInt("diffuseMap", 0);
 		shader->setBool("containsTexture", 1);
 		this->diffuseMap->useTexture(0);
 	}
 	else {
 		shader->setBool("containsTexture", 0);
+	}
+	
+	//Normal
+	if (this->normalMap != nullptr && this->normalMap->textureExists())
+	{
+		glActiveTexture(GL_TEXTURE0 + 1);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, this->normalMap->getTextureID());
+		shader->setInt("normalMap", 1);
+		shader->setBool("containsNormalTexture", 1);
+		this->normalMap->useTexture(1);
+	}
+	else
+	{
+		shader->setBool("containsNormalTexture", 0);
 	}
 
 	//Set uniforms

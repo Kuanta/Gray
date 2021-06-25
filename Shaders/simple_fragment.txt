@@ -1,13 +1,13 @@
 #version 420 core
+#define PI 3.14
 #define MAX_NUM_LIGHTS 100
 out vec4 FragColor;
 
 in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
-in vec3 debugColor;
 in vec3 Color;
-flat in int faulty;
+in mat3 TBN;
 
 struct Material
 {
@@ -91,10 +91,14 @@ vec3 calcLight(Light light, Material material);
 vec3 normal = normalize(Normal);
 vec3 viewDir = normalize(eyePosition - FragPos);
 
-
-
 void main()
-{  
+{ 
+	if(containsNormalTexture == 1)
+	{
+		normal = texture(normalMap, TexCoords).rgb;
+		normal = normal * 2.0 - 1.0;
+		normal = normalize(TBN * normal);
+	}
 	vec3 lightColor = vec3(0.0f);
 	for(int i=0; i<numLights; i++)
 	{

@@ -187,6 +187,7 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 		vertex.Position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 		//Normals
 		vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+		vertex.Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
 		//UVs
 		if (mesh->mTextureCoords[0])
 		{
@@ -258,7 +259,6 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	gMaterial->rougness = 0.2f;
 	gMaterial->shininess = shininess;
 	gMaterial->metalness = false;
-	cout<<"Shininess:"<<shininess<<endl;
 
 	//Check Textures
 	//TODO: Check for other texture types
@@ -266,6 +266,7 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 
 	//Diffuse Textures
 	loadTexture(material, gMaterial, aiTextureType_DIFFUSE, scene);
+	loadTexture(material, gMaterial, aiTextureType_NORMALS, scene);
 	
 	gMaterial->gm = gm;
 	return gMaterial;
@@ -279,8 +280,13 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 	case aiTextureType_DIFFUSE:
 		gTextType = DIFFUSE_TEXTURE;
 		break;
+	case aiTextureType_HEIGHT:  //OBJ has height maps for normal maps
+	case aiTextureType_NORMALS:
+		gTextType = NORMAL_TEXTURE;
+		break;
 	default:
 		gTextType = DIFFUSE_TEXTURE;
+		break;
 	}
 	if (aiMat->GetTexture(textType, 0, &path) == AI_SUCCESS) {
 		grTexture* texture = new grTexture();

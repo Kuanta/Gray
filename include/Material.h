@@ -18,7 +18,7 @@ struct Texture {
 	aiString path;
 };
 
-enum TextureTypes { DIFFUSE_TEXTURE, SPECULAR_TEXTURE, NORMAL_TEXTURE, HEIGHT_TEXTURE };
+enum TextureTypes { DIFFUSE_TEXTURE, SPECULAR_TEXTURE, NORMAL_TEXTURE, HEIGHT_TEXTURE, ROUGHNESS_TEXTURE, METALNESS_TEXTURE, DISP_TEXTURE };
 
 class Material
 {
@@ -29,6 +29,7 @@ public:
 	
 
 	//Getters and Setters
+	void initTextures();
 	void setTexture(const char* filename, TextureTypes textureType);
 	void setTexture(grTexture* texture, TextureTypes textureType);
 	grTexture* getTexture(TextureTypes textureType);
@@ -55,6 +56,12 @@ public:
 private:
 	//Textures
 	grTexture* diffuseMap;
+	grTexture* normalMap;
+	
+	//TODO: To be Implemented...
+	grTexture* roughnessMap;
+	grTexture* metalMap;
+	grTexture* dispMap;
 };
 
 #endif
