@@ -100,7 +100,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	return root;
 }
 
-void Model::importAnimations(const std::string& fileName)
+void Model::importAnimations(const std::string& fileName, const char* animationName)
 {
 	if (this->root == nullptr)
 	{
@@ -117,6 +117,7 @@ void Model::importAnimations(const std::string& fileName)
 		return;
 	}
 	vector<GrAnimation*> anims = this->loadAnimations(scene);
+	anims.at(0)->name = animationName;
 	GrAnimManager* animMan = (GrAnimManager*) this->root->getComponentByType(ComponentType::ANIMATION_MANAGER);
 	animMan->addAnimations(anims);
 
@@ -128,6 +129,8 @@ vector<GrAnimation*> Model::loadAnimations(const aiScene* scene)
 	for (int i = 0; i < scene->mNumAnimations; i++)
 	{
 		aiAnimation* anim = scene->mAnimations[i];
+		cout << "Loading " << anim->mName.data << endl;
+
 		GrAnimation* grAnim = new GrAnimation(anim->mName.data, anim->mDuration, anim->mTicksPerSecond);
 		for (int j = 0; j < anim->mNumChannels; j++)
 		{
@@ -179,6 +182,7 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, b
 
 GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiScene * scene)
 {
+
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
 	for (int i = 0; i < mesh->mNumVertices; i++)
@@ -188,12 +192,12 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 		//Normals
 		vertex.Normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
 		vertex.Tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+
 		//UVs
 		if (mesh->mTextureCoords[0])
 		{
 			vertex.UVs = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
 		}
-		
 		//Initialize boneIDs (Will set correct values while loading bones)
 		for (int j = 0; j < Geometry::NUM_BONES_PER_VERTEX; j++)
 		{
@@ -228,7 +232,7 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 
 	grMesh->material->gm = gm;
 
-	
+
 	return grMesh;
 }
 
@@ -243,7 +247,6 @@ void Model::loadMaterials(const aiScene * scene)
 
 Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned int materialIndex)
 {
-
 	Material* gMaterial = new Material();
 	aiMaterial* material = scene->mMaterials[materialIndex];
 	aiColor3D diffuseColor, specularColor, ambientColor;
@@ -267,6 +270,7 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	//Diffuse Textures
 	loadTexture(material, gMaterial, aiTextureType_DIFFUSE, scene);
 	loadTexture(material, gMaterial, aiTextureType_NORMALS, scene);
+	loadTexture(material, gMaterial, aiTextureType_SHININESS, scene);
 	
 	gMaterial->gm = gm;
 	return gMaterial;
@@ -274,6 +278,7 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 
 void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textType, const aiScene* scene)
 {
+
 	aiString path;
 	TextureTypes gTextType;
 	switch (textType) {
@@ -283,6 +288,9 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 	case aiTextureType_HEIGHT:  //OBJ has height maps for normal maps
 	case aiTextureType_NORMALS:
 		gTextType = NORMAL_TEXTURE;
+		break;
+	case aiTextureType_SHININESS:
+		gTextType = ROUGHNESS_TEXTURE;
 		break;
 	default:
 		gTextType = DIFFUSE_TEXTURE;
@@ -316,6 +324,7 @@ void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geomet
 		aiBone* ai_bone = aiMesh->mBones[i];
 		string boneName = ai_bone->mName.data;
 		GrBone* grBone = this->skeleton->getBoneByName(boneName);
+		//grBone->parentObject = parentObject;
 		//glm::mat4 nodeTransformation = Model::AiToGLMMat4(node->mTransformation);
 		//if (grBone == nullptr)  //This solved the issue where mesh was deformed, why?
 		//{

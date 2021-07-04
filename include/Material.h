@@ -58,7 +58,6 @@ private:
 	grTexture* diffuseMap;
 	grTexture* normalMap;
 	
-	//TODO: To be Implemented...
 	grTexture* roughnessMap;
 	grTexture* metalMap;
 	grTexture* dispMap;

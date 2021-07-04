@@ -72,7 +72,20 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 		shader = new Shader("Shaders/skybox_vertex.txt", "Shaders/skybox_fragment.txt");
 		break;
 	case SHADER_TYPE::DEPTH_SHADER:
-		shader = new Shader("Shaders/depth/depth_vertex.txt", "Shaders/depth/depth_fragment.txt");
+		shader = new Shader("Shaders/depth/depth_vertex.txt","Shaders/depth/depth_fragment.txt");
+		break;
+	case SHADER_TYPE::DEPTH_POINT_SHADER:
+		shader = new Shader("Shaders/depth/depth_point_vertex.txt", "Shaders/depth/depth_point_geometry.txt",
+		 "Shaders/depth/depth_point_fragment.txt");
+		break;
+	case SHADER_TYPE::GBUFFER_SHADER:
+		shader = new Shader("Shaders/gbuffer/gbuffer_vertex.txt", "Shaders/gbuffer/gbuffer_fragment.txt");
+		break;
+	case SHADER_TYPE::GBUFFER_SKY_SHADER:
+		shader = new Shader("Shaders/gbuffer/gbuffer_skybox_vertex.txt", "Shaders/gbuffer/gbuffer_skybox_fragment.txt");
+		break;
+	case SHADER_TYPE::DEFERRED_SHADER:
+		shader = new Shader("Shaders/fbo_vertex.txt", "Shaders/deferred_fragment.txt");
 		break;
 	default:
 		break;

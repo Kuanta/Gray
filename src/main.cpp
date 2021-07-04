@@ -1,6 +1,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "test.h"
+#include "demoScene.h"
 
 int main()
 {

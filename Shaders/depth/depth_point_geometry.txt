@@ -1,0 +1,26 @@
+#version 420 core
+layout (triangles) in;
+layout (triangle_strip, max_vertices=18) out;
+out vec4 FragPos; 
+
+uniform mat4 lightMatrix[6]; //For point lights. Directionals use the first element
+uniform int index;
+
+void main()
+{
+     for(int i=0;i<6;i++)
+        {
+
+            gl_Layer = i+index*6;
+            for(int j = 0; j < 3; ++j) // for each triangle vertex
+            {
+                FragPos = gl_in[j].gl_Position;
+                gl_Position = lightMatrix[i] * FragPos;
+                EmitVertex();
+                
+            }    
+            EndPrimitive();
+        }
+
+
+}  

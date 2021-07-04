@@ -23,6 +23,7 @@ public:
 	vector<Component*> components;
 	string name;
 	int id;
+	bool isStatic = true; //For shadow calculations
 	
 	glm::vec3 target;
 	glm::mat4 model;
@@ -66,22 +67,27 @@ public:
 
 	Component* getComponentByType(ComponentType type);
 	Object* getChildWithByName(string name);
-	void loopThroughChildren(Component* comp, void (*callback)(const void*, const void*)); //First Argument should be
+	void loopThroughChildren(Component* comp, void (*callback)(const void*, const void*));
 	void updateLocalMatrix();
 	glm::mat4 getLocalMatrix();
-protected:
-	glm::vec3 position;
-	glm::vec3 rotation;
-	glm::vec3 scale;
-	glm::mat4 localMatrix;
-private:
-	void setParent(Object* parent)
+	void setLocalMatrix(glm::mat4 localMatrix);
+	void setParent(Object *parent)
 	{
 		this->parent = parent;
 		this->gm = parent->gm;
 	}
 	void updateModel();
 	bool requireModelUpdate = false;
-	Shader* shader=nullptr;
+	Shader *shader = nullptr;
+	bool castShadow = true;
+	bool receiveShadow = true;
+
+protected:
+	glm::vec3 position;
+	glm::vec3 rotation;
+	glm::vec3 scale;
+	glm::mat4 localMatrix;
+
+	
 };
 

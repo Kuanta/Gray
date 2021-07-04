@@ -4,5 +4,5 @@ layout(location=0) out float fragDepth;
 
 void main()
 {             
-    fragDepth = 100;
+    fragDepth = 200;
 } 

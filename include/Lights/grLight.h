@@ -17,7 +17,8 @@ public:
 	GrLight(LIGHT_TYPES type, glm::vec3 color, float intensity, float constant, float linear, float quadratic);
 	~GrLight();
 	virtual void useLight(Shader* shader);
-	virtual glm::mat4 getTransformMat();
+	virtual vector<glm::mat4> getTransformMat(int width, int height);  //For shadow mapping
+	virtual void createDepthMap(unsigned int frameBuffer);
 
 	//Properties
 	LIGHT_TYPES type;
@@ -28,6 +29,11 @@ public:
 	float linear;
 	float quadratic;
 	bool castShadow=false;
+	unsigned int depthMap;
+	float farPlane = 1.0f; //For shadow maps
+	bool staticLight = false; //Static lights won't update their shadowmaps no matter what
+	bool requiresUpdate = true; //If this light moves, update its static depth maps
+	float attenuationFactor = 2.0f;
 };
 
 //Generator methods for various light types

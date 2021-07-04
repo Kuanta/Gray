@@ -3,7 +3,7 @@
 Material::Material()
 {
 	//glm variables initiates themselves
-	this->color = glm::vec3(0);
+	this->diffuse = glm::vec3(0);
 	this->shininess = 0;
 	this->metalness = false;
 	this->rougness = 0.15f;
@@ -12,7 +12,7 @@ Material::Material()
 
 Material::Material(glm::vec3 color, float shininess, bool metalness, float rougness)
 {
-	this->color = color;
+	this->diffuse = color;
 	this->shininess = shininess;
 	this->metalness = metalness;
 	this->rougness = rougness;
@@ -81,6 +81,14 @@ void Material::setTexture(grTexture * texture, TextureTypes textureType)
 			}
 			this->normalMap = texture;
 			break;
+		case ROUGHNESS_TEXTURE:
+			if (this->roughnessMap != nullptr)
+			{
+				this->roughnessMap->clearTexture();
+				delete this->roughnessMap;
+			}
+			this->roughnessMap = texture;
+			break;
 		default:
 			break;
 	}
@@ -133,6 +141,16 @@ void Material::draw(Shader* shader)
 		shader->setBool("containsNormalTexture", 0);
 	}
 
+	//Roughness
+	if(this->roughnessMap != nullptr && this->roughnessMap->textureExists())
+	{
+		glActiveTexture(GL_TEXTURE0+3);
+		glBindTexture(GL_TEXTURE_2D_ARRAY, this->roughnessMap->getTextureID());
+		shader->setInt("roughnessMap", 3);
+		shader->setBool("containsRoughnessTexture", 1);
+	}else{
+		shader->setBool("containsRoughnessTexture", 0);
+	}
 	//Set uniforms
 	shader->setVec3("material.color", this->diffuse);
 	shader->setFloat("material.shininess", this->shininess);

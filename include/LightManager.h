@@ -36,8 +36,8 @@ struct GpuLight {
 	float linear;
 	float quadratic;
 	int castShadow;
-	float dummy5;
-	float dummy6;
+	float far_plane;
+	float attenuationFactor;
 };
 
 class LightManager
@@ -60,13 +60,32 @@ public:
 	Scene* scene;
 	ElementManager<GrLight*> lights;
 	UniformBuffer* lightsBuffer = nullptr;
+	int shadowDepth = 4096;
+	int shadowHeight = 4096;
+	int pointShadowDepth = 2048;
+	int pointShadowHeight = 2048;
 
-private:
 	int numberOfLights = 0; //Number of current lights in the scene
 	void updateBuffer(); //Update buffer only lights change
 	GpuLight lightStructs[MAX_NUM_LIGHTS];
-	unsigned int shadowMaps;  //Texture array
-	unsigned int depthMapFBO;
+	unsigned int depthMap;  //Texture array
+	unsigned int depthCubeMap; //For Point Lights
+
+	unsigned int depthMapStatic; //For static objects
+	unsigned int depthCubeMapStatic; //For static objects
+
+	unsigned int depthMapFBO; //Framebuffer for dynamicdirectionals
+	unsigned int depthMapFBOCube;
+	unsigned int depthMapFBOStatic; //Framebuffer for dynamicdirectionals
+	unsigned int depthMapFBOCubeStatic;
+
+	unsigned int createDepthMap(unsigned int fbo, unsigned int depthMap);
+	unsigned int createCubeMap(unsigned int fbo, unsigned int cubeMap);
+	void prepareDrawing(GrLight *light, unsigned int fbo, bool isStatic, int index); //Use before drawing elements
+
+	int MAX_DIRECT_LIGHT = 3;
+	int MAX_POINT_LIGHT = 30;
+	int test = 10;
 };
 
 #endif //LIGHTMANAGER_H

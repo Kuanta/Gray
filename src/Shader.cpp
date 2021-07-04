@@ -98,6 +98,7 @@ unsigned int Shader::loadShader(const char* shaderPath, unsigned int type)
     catch (std::ifstream::failure e)
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+        std::cout<<shaderPath<<std::endl;
         return -1; //Failed to create shader
     }
     const char* _shaderCode = shaderCode.c_str();

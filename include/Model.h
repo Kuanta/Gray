@@ -56,7 +56,7 @@ public:
 	}
 	Object* loadModel(GameManager* gm, const std::string& fileName);
 	Object* loadedModel = nullptr;
-	void importAnimations(const std::string& fileName);
+	void importAnimations(const std::string &fileName, const char *animationName="");
 	static vector<GrAnimation*> loadAnimations(const aiScene* scene);
 	void cleanup();
 private:

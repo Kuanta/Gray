@@ -21,9 +21,19 @@ Scene::Scene(GameManager * gm)
 	this->frameBufferSizeCallback = nullptr;
 
 	//Init camera
-	this->camera = Camera(75, 1920.0f/1080.0f, 0.1f, 100000000.0f);  
+	this->camera = Camera(75, this->gm->windowWidth / this->gm->windowHeight, 0.1f, 100000.0f);
 	this->camera.setPositionY(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
+
+	//Init gbuffer
+	this->gbuffer = new Gbuffer(this->gm->windowWidth, this->gm->windowHeight);
+	//Init deferred Canvas
+	this->deferredCanvas = new Object();
+	GrMesh *deferredCanvasMesh;
+	Plane *pg = new Plane(2.0f, 2.0f);
+	Material *mat = new Material(glm::vec3(1.0f, 1.0f, 1.0f), 1, true, 1);
+	deferredCanvasMesh = new GrMesh(pg, mat);
+	this->deferredCanvas->addComponent(deferredCanvasMesh);
 }
 
 Scene::~Scene()
@@ -94,10 +104,13 @@ void Scene::draw(double deltaTime)
 		this->matricesBuffer->updateVec3(this->camera.getPosition(), sizeof(glm::mat4) * 2);
 	}
 
-	//Draw lights
-	this->lm.draw();
-	this->drawElements();
+	//Pre forward pass
 
+	//Geometry Pass
+	this->lm.draw();
+	this->gbuffer->setActive();
+	this->drawElements();
+	this->lightPass();
 	//Draw the canvas
 	this->drawFbo();
 }
@@ -124,7 +137,55 @@ void Scene::drawElements(Shader* shader)
 
 	}
 }
+void Scene::drawStaticElements(Shader* shader, bool lightFilter)
+{
+	//Draw each element
+	for (vector<Object *>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
+	{
+		//TODO: Implement shadow casting on and off
+		// if (lightFilter && !(*it)->castShadow)
+		// {
+		// 	//Don't show it in the depth buffer
+		// 	continue;
+		// }
+		if ((*it) != nullptr && (*it)->isStatic && (*it)->castShadow)
+		{
+			if (shader != nullptr)
+			{
 
+				(*it)->draw(shader); //For shadowbox method, a simple shader that only draw to depth map will be used for all the objects in the scene
+			}
+			else
+			{
+				(*it)->draw();
+			}
+		}
+	}
+}
+
+void Scene::drawDynamicElements(Shader* shader, bool lightFilter)
+{
+	//Draw each element
+	for (vector<Object *>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
+	{
+		// if(lightFilter && !(*it)->castShadow)
+		// {
+		// 	//Don't show it in the depth buffer
+		// 	continue;
+		//}
+		if ((*it) != nullptr && !(*it)->isStatic)
+		{
+			if (shader != nullptr)
+			{
+				(*it)->draw(shader); //For shadowbox method, a simple shader that only draw to depth map will be used for all the objects in the scene
+			}
+			else
+			{
+				(*it)->draw();
+			}
+		}
+	}
+}
 void Scene::initFbo()
 {
 	/*
@@ -166,7 +227,7 @@ void Scene::initFbo()
 void Scene::drawFbo()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER,0); //Enable the default fbo
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT);
 	
 
@@ -178,6 +239,33 @@ void Scene::drawFbo()
 	glBindTexture(GL_TEXTURE_2D, this->fboTexture);
 
 	this->fboCanvas->draw(shader);
+}
+
+void Scene::lightPass()
+{
+	this->lm.draw();
+
+	Shader* deferredShader = this->gm->shaderMan.getShaderByType(SHADER_TYPE::DEFERRED_SHADER);
+	deferredShader->use();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, this->gbuffer->gPosition);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->gbuffer->gNormals);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, this->gbuffer->gColors);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, this->gbuffer->gPbr);
+
+	glActiveTexture(GL_TEXTURE0 + 5);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, this->lm.depthMap);
+	glActiveTexture(GL_TEXTURE0 + 6);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, this->lm.depthCubeMap);
+	glActiveTexture(GL_TEXTURE0 + 7);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, this->lm.depthMapStatic);
+	glActiveTexture(GL_TEXTURE0 + 8);
+	glBindTexture(GL_TEXTURE_CUBE_MAP_ARRAY, this->lm.depthCubeMapStatic);
+	this->deferredCanvas->draw(deferredShader);
 }
 
 void Scene::cleanup()

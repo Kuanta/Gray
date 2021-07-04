@@ -6,8 +6,9 @@
 #include "Lights/grLight.h"
 #include "LightManager.h"
 #include "UniformBuffer.h"
-#include "Plane.h"
+#include "Gbuffer.h"
 #include "grMesh.h"
+#include "Plane.h"
 #include <GLFW/glfw3.h>
 
 class GameManager;
@@ -59,6 +60,8 @@ public:
 
 	void activateFbo(); //If post processing effects are activated, the canvas fbo will be activated
 	void drawElements(Shader* shader=nullptr);
+	void drawStaticElements(Shader* shader=nullptr, bool lightFilter=true);
+	void drawDynamicElements(Shader* shader=nullptr, bool lightFilter=true);
 
 protected:
 
@@ -67,9 +70,13 @@ protected:
 	unsigned int fboTexture;
 	unsigned int rbo;
 	Object* fboCanvas;
+	Object* deferredCanvas;
+	Gbuffer* gbuffer;
 	void initFbo();
+	void lightPass();
 	void drawFbo();
 	float postProcessFactor = 1.0f;
+	void renderQuad(); //Used to draw everything on this
 	
 };
 
