@@ -28,7 +28,7 @@ GrMesh::~GrMesh()
 
 void GrMesh::start()
 {
-	this->material->gm = this->object->gm;
+	
 }
 
 void GrMesh::update(float deltaTime)

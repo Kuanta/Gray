@@ -14,9 +14,25 @@ GrSkeleton::~GrSkeleton()
 
 void GrSkeleton::addBone(string boneName, GrBone* bone)
 {
-	this->bones.insert(std::pair<string, GrBone*>(boneName, bone));
-}
+	if(this->bones.find(boneName) == this->bones.end())
+	{
+		//No such key
+		this->bones.insert(std::pair<string, GrBone *>(boneName, bone));
+		this->orderedBones.push_back(bone);
+	}
 
+}
+int GrSkeleton::getBoneIndex(string boneName)
+{
+	for(int i=0;i<this->orderedBones.size();i++)
+	{
+		if (!boneName.compare(this->orderedBones.at(i)->name))
+		{
+			return i;
+		}
+	}
+	return -1; //Couldn't find the bone
+}
 GrBone * GrSkeleton::getBoneByName(string boneName)
 {
 	try {
@@ -48,9 +64,9 @@ void GrSkeleton::start()
 {
 }
 
-void GrSkeleton::update(float deltaTime)
+void GrSkeleton::earlyUpdate(float deltaTime)
 {
-	GrBone* bone;
+	GrBone *bone;
 	while (!this->bonesToUpdate.empty())
 	{
 		bone = this->bonesToUpdate.front();
@@ -59,12 +75,14 @@ void GrSkeleton::update(float deltaTime)
 		bone->requiresUpdate = false;
 		this->bonesToUpdate.pop();
 	}
-	/*map<string, GrBone*>::iterator iter;
-	for (iter = this->bones.begin(); iter != this->bones.end(); iter++)
-	{
-		GrBone* bone = iter->second;
-		bone->updateTransformMatrix();
-	}*/
+}
+void GrSkeleton::lateUpdate(float deltaTime)
+{
+
+}
+void GrSkeleton::update(float deltaTime)
+{
+
 }
 
 void GrSkeleton::draw(Shader* shader)
@@ -73,21 +91,15 @@ void GrSkeleton::draw(Shader* shader)
 	{
 		shader->use();
 		vector<glm::mat4> boneMatrices;
-		map<string, GrBone*>::iterator it;
-		for (it = this->bones.begin(); it != this->bones.end(); it++)
+		vector<GrBone*>::iterator it;
+		for (int i=0;i<orderedBones.size();i++)
 		{
-			glm::mat4 boneMatrix = (it->second)->getTransformMatrix();
-			boneMatrices.push_back(this->globalInverseTransform * boneMatrix * (it->second)->offsetMatrix);
+			GrBone* bone = orderedBones.at(i);
+			glm::mat4 boneMatrix = bone->getTransformMatrix();
+			boneMatrices.push_back(this->globalInverseTransform * boneMatrix * bone->offsetMatrix);
 		}
-		if (boneMatrices.size() > 0)
-		{
-			glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 1);
-			glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,
-				glm::value_ptr(boneMatrices[0]));
-		}
-		else {
-			glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 0);
-		}
+		glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,
+		glm::value_ptr(boneMatrices[0]));
 	}
 }
 
@@ -97,22 +109,37 @@ void GrSkeleton::cleanup()
 
 Component* GrSkeleton::clone()
 {
-	GrSkeleton* skeleton = new GrSkeleton();
-	skeleton->globalInverseTransform = this->globalInverseTransform;
+	GrSkeleton* newSkeleton = new GrSkeleton();
+	newSkeleton->globalInverseTransform = this->globalInverseTransform;
+
+	for(int i=0;i<this->orderedBones.size();i++)
+	{
+		GrBone* bone = this->orderedBones.at(i);
+		GrBone* cloned = bone->clone();
+		cloned->requiresUpdate = false;
+		cloned->skeleton = newSkeleton;
+		newSkeleton->addBone(cloned->name, cloned);
+	}
+	//Parent relations
 	map<string, GrBone*>::iterator it;
 	for (it = this->bones.begin(); it != this->bones.end(); it++)
 	{
-		GrBone* cloned = it->second->clone();
-		
+		GrBone* bone = it->second;
 		if (it->second->parentBone != nullptr) {
-			GrBone* parentOfCloned = skeleton->getBoneByName(it->second->parentBone->name);
-			if (skeleton->getBoneByName(it->second->parentBone->name) == nullptr)
+			GrBone *clonedBone = newSkeleton->getBoneByName(bone->name);
+			GrBone *parentOfCloned = newSkeleton->getBoneByName(it->second->parentBone->name);
+			clonedBone->parentBone = parentOfCloned;
+			if(parentOfCloned != nullptr)
 			{
-				parentOfCloned = it->second->parentBone->clone();
+				parentOfCloned->children.push_back(clonedBone);
 			}
-			cloned->parentBone = parentOfCloned;
 		}
-		skeleton->addBone((std::string) it->first, (GrBone*)it->second);
 	}
-	return skeleton;
+	for(int i=0;i<newSkeleton->orderedBones.size();i++)
+	{
+		GrBone *bone = newSkeleton->orderedBones.at(i);
+		bone->calculateInverseBindMatrix();
+		bone->setToBindPosition();
+	}
+	return newSkeleton;
 }

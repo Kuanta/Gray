@@ -25,7 +25,7 @@ bool GameManager::init(int width, int height)
 	glfwWindowHint(GLFW_STENCIL_BITS, 16);
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 	this->window = glfwCreateWindow(width, height, "Gray", NULL, NULL);
 	this->windowWidth = width; this->windowHeight = height;
 	if (window == NULL)
@@ -63,6 +63,7 @@ bool GameManager::init(int width, int height)
 
 	//Shader Manager requires a pointer to the game manager so that it can bind uniform buffer whenever a new shader is initialized
 	this->shaderMan.gm = this;
+	this->assetMan.gm = this;
 
 	//Initialize Buffers
 	this->matricesBuffer = new UniformBuffer(16*9, "Matrices", 0);
@@ -79,6 +80,7 @@ void GameManager::update()
 	currentFrame = glfwGetTime();
 	deltaTime = currentFrame - lastFrame;
 	lastFrame = currentFrame;
+	this->currentScene->earlyUpdate(deltaTime);
 	this->currentScene->update(this->window, deltaTime);
 	glfwPollEvents();
 	glfwSwapBuffers(window);

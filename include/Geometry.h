@@ -33,7 +33,6 @@ public:
 	unsigned int VAO, VBO, EBO;
 	void setIndices(unsigned int indices[], int indicesSize);
 	void initBuffers();
-	void updateBoneMatrices();  //Clears and fills the boneMatrices vector
 	void draw(Shader* shader);
 	Geometry* clone();
 	void cleanup();
@@ -41,7 +40,6 @@ public:
 	const static int NUM_BONES_PER_VERTEX = 4;
 protected:
 	bool indexed;
-	vector<glm::mat4> boneMatrices;
 	vector<unsigned int> indices;
 	void initGeometry(vector<Vertex> vertices, bool initBuffers);
 
@@ -59,10 +57,8 @@ struct Vertex {
 	glm::vec3 Color;
 	//Bone IDs
 	int IDs[Geometry::NUM_BONES_PER_VERTEX];
-	int ID2s[Geometry::NUM_BONES_PER_VERTEX];
 	//Bone Weights
 	float Weights[Geometry::NUM_BONES_PER_VERTEX];
-	float Weights2[Geometry::NUM_BONES_PER_VERTEX];
 	// tangent
 	glm::vec3 Tangent;
 	// bitangent

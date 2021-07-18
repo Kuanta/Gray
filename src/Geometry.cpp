@@ -90,39 +90,10 @@ void Geometry::initBuffers()
 	
 	glBindVertexArray(0);
 }
-void Geometry::updateBoneMatrices()
-{
-	this->boneMatrices.clear();
-	for (int i = 0; i < this->bones.size(); i++)
-	{
-		glm::mat4 boneMatrix = this->bones[i]->getTransformMatrix();
-		boneMatrices.push_back(skeleton->globalInverseTransform*boneMatrix*this->bones[i]->offsetMatrix);
-	}
-}
+
 void Geometry::draw(Shader* shader)
 {
 	shader->use();
-	//Set Bone uniforms
-	vector<glm::mat4> boneMatrices;
-	if (this->bones.size() > 0)  
-	{
-		//TODO: This for loop drops performance. Can we find a wa
-		glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 1);
-		for (int i = 0; i < this->bones.size(); i++)
-		{
-			glm::mat4 boneMatrix = this->bones[i]->getTransformMatrix();
-			boneMatrices.push_back(skeleton->globalInverseTransform*boneMatrix*this->bones[i]->offsetMatrix);
-
-		}
-		glUniformMatrix4fv(glGetUniformLocation(shader->ID, "gBones"), boneMatrices.size(), GL_FALSE,
-			glm::value_ptr(boneMatrices[0]));
-
-	}
-	else
-	{
-		glUniform1i(glGetUniformLocation(shader->ID, "hasBones"), 0);
-	}
-	
 	glBindVertexArray(this->VAO);
 	if (this->indexed)
 	{

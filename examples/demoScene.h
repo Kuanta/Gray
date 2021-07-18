@@ -2,7 +2,6 @@
 #ifndef DEMO
 #define DEMO
 #define GLFW_DLL
-#include "Model.h"
 #include <iostream>
 #include <math.h>
 #include "Scene.h"

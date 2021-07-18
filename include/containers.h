@@ -70,6 +70,18 @@ namespace linked {
 			delete node;
 			return element;
 		}
+		void clear()
+		{
+			Node<T>* currElement = this->head;
+			while(currElement != nullptr)
+			{
+				Node<T>* nextElement = currElement->next;
+				delete currElement;
+				currElement = nextElement;
+			}
+			this->head = nullptr;
+			this->tail = nullptr;
+		}
 		Node<T>* head = nullptr;
 		Node<T>* tail = nullptr;
 	};

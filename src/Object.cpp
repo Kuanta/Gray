@@ -90,6 +90,38 @@ void Object::remove(Object * object)
 	this->children.removeElement(object);
 }
 
+void Object::earlyUpdate(float deltaTime)
+{
+	//Update components
+	for (vector<Component *>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		(*iter)->earlyUpdate(deltaTime);
+	}
+	//Update children
+	for (vector<Object *>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->earlyUpdate(deltaTime);
+		}
+	}
+}
+void Object::lateUpdate(float deltaTime)
+{
+	//Update components
+	for (vector<Component *>::iterator iter = this->components.begin(); iter != this->components.end(); iter++)
+	{
+		(*iter)->lateUpdate(deltaTime);
+	}
+	//Update children
+	for (vector<Object *>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->lateUpdate(deltaTime);
+		}
+	}
+}
 void Object::update(float deltaTime)
 {
 	//Update components
@@ -319,6 +351,15 @@ void Object::updateLocalMatrix()
 	model = glm::scale(model, this->scale);
 	this->localMatrix = model;
 	this->requireModelUpdate = true;
+	
+	//Childs also need 
+	for (vector<Object *>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->requireModelUpdate = true;
+		}
+	}
 }
 
 glm::mat4 Object::getLocalMatrix()

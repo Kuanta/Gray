@@ -25,7 +25,14 @@ void Component::removeFromObject()
 void Component::fixedUpdate()
 {
 }
+void Component::earlyUpdate(float deltaTime)
+{
 
+}
+void Component::lateUpdate(float deltaTime)
+{
+
+}
 void Component::draw()
 {
 }

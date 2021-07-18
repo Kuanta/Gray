@@ -160,11 +160,7 @@ void Material::draw(Shader* shader)
 
 Material* Material::clone()
 {
-	Material* cloned = new Material();
-	cloned->gm = this->gm;
-	cloned->shininess = this->shininess;
-	cloned->setTexture(this->diffuseMap, TextureTypes::DIFFUSE_TEXTURE);
-	return cloned;
+	return this;
 }
 
 void Material::cleanup()

@@ -8,9 +8,9 @@
 #include <iostream>
 #include "Scene.h"
 #include "ShaderManager.h"
+#include "AssetManager.h"
 #include "Shader.h"
 #include "UniformBuffer.h"
-
 
 using namespace std;
 
@@ -26,6 +26,7 @@ public:
 	GLFWwindow* window;
 	Scene* currentScene;
 	ShaderManager shaderMan;
+	AssetManager assetMan;
 	UniformBuffer* matricesBuffer = nullptr;
 	UniformBuffer* lightsBuffer = nullptr;
 	int windowWidth;

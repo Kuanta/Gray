@@ -22,7 +22,7 @@ void GrAnimManager::update(float deltaTime)
 		factor = deltaTime / this->transitionTime;
 	}
 	map<string, GrAnimation>::iterator iter;
-	linked::Node<GrAnimation*>* currNode = this->activeAnimatons.head;
+	linked::Node<GrAnimation*>* currNode = this->activeAnimations.head;
 	while (currNode != nullptr)
 	{
 		linked::Node<GrAnimation*>* nextNode = currNode->next;
@@ -30,7 +30,7 @@ void GrAnimManager::update(float deltaTime)
 		if (!anim->active)
 		{
 			//This animation has been deactivated, remove it
-			this->activeAnimatons.popElement(currNode);
+			this->activeAnimations.popElement(currNode);
 		}
 		else {
 			anim->update(deltaTime, skeleton, this->transitioning, factor);
@@ -39,6 +39,7 @@ void GrAnimManager::update(float deltaTime)
 	}
 	if (this->transitioning)
 	{
+		cout<<"Transitioning"<<endl;
 		this->transitionTime -= deltaTime;
 		if (deltaTime > this->transitionTime)
 		{
@@ -51,7 +52,13 @@ void GrAnimManager::cleanup()
 {
 
 }
-
+void GrAnimManager::setActiveAnimation(GrAnimation *anim, void *(*callback)())
+{
+	//Changes the active animation to the given one. Clears the existing active animations
+	this->activeAnimations.clear();
+	anim->active = false;
+	this->addToActive(anim, 1.0f, anim->loop);
+}
 void GrAnimManager::addAnimation(string name, GrAnimation* anim)
 {
 	this->animations.insert(std::pair<string, GrAnimation*>(name, anim));
@@ -130,7 +137,7 @@ void GrAnimManager::addToActive(GrAnimation* anim, float weight, bool loop, void
 		anim->weight = weight;
 		anim->active = true;
 		anim->loop = loop;
-		this->activeAnimatons.addElement(anim);
+		this->activeAnimations.addElement(anim);
 	}
 
 }
@@ -143,5 +150,11 @@ void GrAnimManager::clearAnimCallback(GrAnimation* anim)
 Component* GrAnimManager::clone()
 {
 	GrAnimManager* cloned = new GrAnimManager();
+	map<string, GrAnimation *>::iterator iter;
+	for (iter = this->animations.begin(); iter != this->animations.end(); iter++)
+	{
+		GrAnimation* anim = (iter->second);
+		cloned->addAnimation(anim);
+	}
 	return cloned;
 }

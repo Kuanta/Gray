@@ -70,6 +70,26 @@ void Scene::fixedUpdate()
 {
 }
 
+void Scene::earlyUpdate(double deltaTime)
+{
+	for (vector<Object *>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->earlyUpdate(deltaTime);
+		}
+	}
+}
+void Scene::lateUpdate(double deltaTime)
+{
+	for (vector<Object *>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			(*it)->lateUpdate(deltaTime);
+		}
+	}
+}
 void Scene::update(GLFWwindow* window, double deltaTime)
 {
 	this->camera.controls->update(deltaTime);

@@ -10,6 +10,7 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec3 Color;
 in mat3 TBN;
+in flat float debug;
 
 struct Material
 {
@@ -37,6 +38,12 @@ void main()
     }else{
         gColors.rgb = material.color;
     }
+
+    if(debug == 1.0f)
+    {
+        gColors.rgb = Color;
+    }
+
     gColors.a = 1; //TODO: Implement rougness and metalicness in here, or in an additional texture
     
     vec3 normal;

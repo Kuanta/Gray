@@ -78,8 +78,12 @@ glm::mat4 GrBone::getLocalMatrix()
 void GrBone::updateTransformMatrix()
 {
 	//Get parents transform
-	//this->updateLocalMatrix();
 	GrBone* parent = this->parentBone;
+	if(parent == nullptr)
+	{
+		this->transformMatrix = this->localMatrix;
+		return;
+	}
 	vector<glm::mat4> pMats;
 	glm::mat4 parentMatrix= glm::mat4(1.0f);
 	while (parent != nullptr)
@@ -171,12 +175,9 @@ void GrBone::markForUpdate()
 			{
 				//this->skeleton->markBone((*it));
 				(*it)->markForUpdate();
-				//(*it)->requiresUpdate = true;
 			}
 		}
 	}
-	
-	
 }
 
 void GrBone::addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 scaleKey, float weight)
@@ -221,7 +222,7 @@ void GrBone::blendAnimationFrames()
 			this->setRotation(glm::quat(_targetRot));
 			this->setScale(_targetScale.x, _targetScale.y, _targetScale.z);
 		}
-		this->updateLocalMatrix();
+		//this->updateLocalMatrix();
 	}
 	
 	this->clearQueues();  //There can still be frames in queues even if the weights are zero. For example an animation with zero weight affecting a bone. If this bone
@@ -238,6 +239,8 @@ GrBone* GrBone::clone()
 	bone->rootMatrix = this->rootMatrix;
 	bone->name = this->name;
 	bone->bindMatrix = this->bindMatrix;
+	bone->requiresUpdate = false; 
+	bone->updateLocalMatrix();
 	return bone;
 }
 

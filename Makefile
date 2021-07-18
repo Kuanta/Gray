@@ -21,7 +21,7 @@ OBJECTS  := $(BASENAMES_CPP:%.cpp=%.o)  #Don't wrap BASENAMES with $()
 OBJECTS  += $(BASENAMES_C:%.c=%.o)  #Don't wrap BASENAMES with $()
 
 OBJECT_PATHS = $(addprefix $(OBJ_DIR),$(OBJECTS))
-CPP_FLAGS = $(INCLUDE_PATHS) -w -std=c++17
+CPP_FLAGS = $(INCLUDE_PATHS) -w -std=c++17 -ggdb
 
 vpath %.cpp src
 vpath %.h include

@@ -60,6 +60,8 @@ public:
 	void setTarget(glm::vec3 newTarget); // Updates rotations from target
 	void add(Object* object);
 	void remove(Object* object);
+	virtual void earlyUpdate(float deltaTime);
+	virtual void lateUpdate(float deltaTime);
 	virtual void update(float deltaTime);
 	virtual void draw(Shader* shader);
 	virtual void draw();

@@ -26,6 +26,7 @@ public:
 	map<string, GrAnimation*> animations;
 
 	void mergeAnimations(GrAnimManager* animMan);
+	void setActiveAnimation(GrAnimation* anim, void* (*callback)()=nullptr);
 	void addToActive(string name, float weight, bool loop=false, void* (*callback)()=nullptr);
 	void addToActive(GrAnimation* anim, float weight, bool loop=false, void* (*callback)() = nullptr);
 	void static clearAnimCallback(GrAnimation* anim);
@@ -34,7 +35,7 @@ public:
 private:
 	GrAnimation* currentAnimation = nullptr;
 	GrAnimation* secondaryAnimation = nullptr;
-	linked::LinkedList<GrAnimation*> activeAnimatons;
+	linked::LinkedList<GrAnimation*> activeAnimations;
 	float animationFactor = 1.0f; //Used in blending
 	//Transition variables
 	bool transitioning=false;

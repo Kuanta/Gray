@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include "GameManager.h"
 #include "Shader.h"
 #include "grTexture.h"
 
@@ -36,9 +35,6 @@ public:
 	void draw(Shader* shader);
 	Material* clone();
 	void cleanup();
-
-	//Uniforms
-	GameManager* gm = nullptr;
 
 	//Blinn-Phong
 	glm::vec3 color;

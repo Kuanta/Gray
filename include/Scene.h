@@ -30,6 +30,8 @@ public:
 	void remove(GrLight* light);
 	void activateShadowMap();
 	virtual void fixedUpdate();
+	virtual void earlyUpdate(double deltaTime);
+	virtual void lateUpdate(double deltaTime);
 	virtual void update(GLFWwindow* window, double deltaTime);
 	virtual void draw(double deltaTime);
 	// virtual void keyInput(int key, int scancode, int action, int mods)=0;

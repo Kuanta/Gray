@@ -107,8 +107,10 @@ void GrAnimation::transition(float transitionFactor, GrSkeleton* skeleton)
 				bone->setRotation(glm::slerp(r1, r2, transitionFactor));*/
 				bone->transitionFactor = transitionFactor;
 				bone->transition = true;
-				bone->updateLocalMatrix();
-				bone->markForUpdate();
+				//bone->updateLocalMatrix();
+				//bone->markForUpdate();
+			}else{
+				cout<<"Empty "<<animNode->name<<endl;
 			}
 		}
 	}

@@ -19,6 +19,8 @@ public:
 	void addToObject(Object* object);
 	void removeFromObject();
 	virtual void start() = 0; //Will be called when the component is added to an object
+	virtual void earlyUpdate(float deltaTime);
+	virtual void lateUpdate(float deltaTime);
 	virtual void update(float deltaTime) = 0;
 	virtual void fixedUpdate();
 	virtual void cleanup() = 0;

@@ -1,41 +1,46 @@
-#include "Model.h"
+#include "ModelLoader.h"
 
-Model::Model()
+ModelLoader::ModelLoader()
 {
-	this->root = nullptr;
+	
 }
 
 
-Model::~Model()
+ModelLoader::~ModelLoader()
 {
 }
 
-Object* Model::loadModel(GameManager* gm, const std::string & fileName)
+Object* ModelLoader::loadModel(const std::string & fileName)
 {
+	Object *root = new Object();
+	GrSkeleton *skeleton = new GrSkeleton();
 	// Initialize skeleton
-	this->skeleton = new GrSkeleton();
+
 
 	this->directory = fileName.substr(0, fileName.find_last_of('/'));
 	Assimp::Importer importer;
-	importer.SetPropertyInteger(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, 1);
-	importer.SetPropertyInteger(AI_CONFIG_PP_SBP_REMOVE, aiPrimitiveType_LINE | aiPrimitiveType_POINT);
+
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_CalcTangentSpace | aiProcess_GenSmoothNormals);
 	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) // if is Not Zero
 	{
 		cout << "ERROR::ASSIMP:: " << importer.GetErrorString() << endl;
 		return nullptr;
 	}
-
-	for (int j = 0; j < scene->mMeshes[0]->mNumBones; j++)
+	
+	//Load bones first
+	for(int i=0;i<scene->mNumMeshes;i++)
 	{
-		aiBone* ai_bone = scene->mMeshes[0]->mBones[j];
-		glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(ai_bone->mOffsetMatrix));
-		GrBone* bone = new GrBone(this->skeleton, boneMatrix, this->skeleton->globalInverseTransform, ai_bone->mName.data);
-		this->skeleton->addBone(bone->name, bone);
-
+		for (int j = 0; j < scene->mMeshes[i]->mNumBones; j++)
+		{
+			aiBone *ai_bone = scene->mMeshes[i]->mBones[j];
+			glm::mat4 boneMatrix = glm::transpose(ModelLoader::AiToGLMMat4(ai_bone->mOffsetMatrix));
+			GrBone *bone = new GrBone(skeleton, boneMatrix, skeleton->globalInverseTransform, ai_bone->mName.data);
+			skeleton->addBone(bone->name, bone);
+		}
 	}
-	root = this->loadNode(gm, scene->mRootNode, scene, true);
-	root->addComponent(this->skeleton);
+	root = this->loadNode(scene->mRootNode, scene, skeleton, true);
+	root->addComponent(skeleton); //Skeleton must be added first
+
 	GrAnimManager* animMan = new GrAnimManager();
 	root->addComponent(animMan);
 	vector<GrAnimation*> anims = this->loadAnimations(scene);
@@ -48,7 +53,7 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	aiMatrix4x4 rootTransform = scene->mRootNode->mTransformation;
 	glm::mat4 globalInverseTransform = AiToGLMMat4(rootTransform);
 
-	this->skeleton->globalInverseTransform = glm::inverse(globalInverseTransform);
+	skeleton->globalInverseTransform = glm::inverse(globalInverseTransform);
 	glm::vec3 unitVec3;
 	glm::vec4 unitVec4;
 	glm::decompose(AiToGLMMat4(rootTransform), scale, orientation, position, unitVec3, unitVec4);
@@ -75,13 +80,13 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 
 	*/
 	map<string, GrBone*>::iterator iter;
-	for (iter = this->skeleton->bones.begin(); iter != this->skeleton->bones.end(); iter++)
+	for (iter = skeleton->bones.begin(); iter != skeleton->bones.end(); iter++)
 	{
 		GrBone* bone = iter->second;
-		Object* node = this->root->getChildWithByName(bone->name);
+		Object* node = root->getChildWithByName(bone->name);
 		if (node != nullptr && node->parent != nullptr)
 		{
-			bone->parentBone = this->skeleton->getBoneByName(node->parent->name);
+			bone->parentBone = skeleton->getBoneByName(node->parent->name);
 			if (bone->parentBone != nullptr)
 			{
 				bone->parentBone->children.push_back(bone);
@@ -90,21 +95,20 @@ Object* Model::loadModel(GameManager* gm, const std::string & fileName)
 	}
 	
 	//Calculate bind matrices after setting all the parenthoods
-	for (iter = this->skeleton->bones.begin(); iter != this->skeleton->bones.end(); iter++)
+	for (iter = skeleton->bones.begin(); iter != skeleton->bones.end(); iter++)
 	{
 		GrBone* bone = iter->second;
 		bone->calculateInverseBindMatrix();
 		bone->setToBindPosition();
 	}
-	this->loadedModel = root;
 	return root;
 }
 
-void Model::importAnimations(const std::string& fileName, const char* animationName)
+void ModelLoader::importAnimations(Object* root, const std::string& fileName, const char* animationName)
 {
-	if (this->root == nullptr)
+	if (root == nullptr)
 	{
-
+		cout<<"Null Root"<<endl;
 	}
 	this->directory = fileName.substr(0, fileName.find_last_of('/'));
 	Assimp::Importer importer;
@@ -118,12 +122,12 @@ void Model::importAnimations(const std::string& fileName, const char* animationN
 	}
 	vector<GrAnimation*> anims = this->loadAnimations(scene);
 	anims.at(0)->name = animationName;
-	GrAnimManager* animMan = (GrAnimManager*) this->root->getComponentByType(ComponentType::ANIMATION_MANAGER);
+	GrAnimManager* animMan = (GrAnimManager*) root->getComponentByType(ComponentType::ANIMATION_MANAGER);
 	animMan->addAnimations(anims);
 
 }
 
-vector<GrAnimation*> Model::loadAnimations(const aiScene* scene)
+vector<GrAnimation*> ModelLoader::loadAnimations(const aiScene* scene)
 {
 	vector<GrAnimation*> animations;
 	for (int i = 0; i < scene->mNumAnimations; i++)
@@ -143,7 +147,7 @@ vector<GrAnimation*> Model::loadAnimations(const aiScene* scene)
 	return animations;
 }
 
-Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, bool isRoot)
+Object* ModelLoader::loadNode(aiNode * node, const aiScene * scene, GrSkeleton* skeleton, bool isRoot)
 {
 	Object* object = new Object();
 	object->name = node->mName.data;
@@ -163,24 +167,24 @@ Object* Model::loadNode(GameManager* gm, aiNode * node, const aiScene * scene, b
 	{
 		for (size_t i = 0; i < node->mNumMeshes; i++)
 		{
-			GrMesh* mesh = this->loadMesh(gm, node, scene->mMeshes[node->mMeshes[i]], scene);
+			GrMesh* mesh = this->loadMesh(node, scene->mMeshes[node->mMeshes[i]], scene);
 			//Load Bones
-			loadBones(scene, node, scene->mMeshes[node->mMeshes[i]], mesh->geometry);
+			loadBones(scene, node, scene->mMeshes[node->mMeshes[i]], skeleton, mesh->geometry);
 			mesh->geometry->initBuffers(); //Init buffers after loading bones
 			object->addComponent(mesh);
 		}
 	}
-
+	
 	for (size_t i = 0; i < node->mNumChildren; i++)
 	{
-		Object* child = this->loadNode(gm, node->mChildren[i], scene, false);
+		Object* child = this->loadNode(node->mChildren[i], scene, skeleton, false);
 		object->add(child);
 	}
 	
 	return object;
 }
 
-GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiScene * scene)
+GrMesh* ModelLoader::loadMesh(aiNode* node, aiMesh * mesh, const aiScene * scene)
 {
 
 	std::vector<Vertex> vertices;
@@ -203,8 +207,6 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 		{
 			vertex.IDs[j] = -1;
 			vertex.Weights[j] = 0;
-			vertex.ID2s[j] = -1;
-			vertex.Weights2[j] = 0;
 		}
 		vertices.push_back(vertex);
 	}
@@ -222,7 +224,7 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 	Geometry* geometry = new Geometry(vertices, indices, false);
 	GrMesh* grMesh;
 	if (mesh->mMaterialIndex >= 0) {
-		grMesh = new GrMesh(geometry, this->loadMaterial(gm, scene, mesh->mMaterialIndex), mesh->mName.data);
+		grMesh = new GrMesh(geometry, this->loadMaterial(scene, mesh->mMaterialIndex), mesh->mName.data);
 	}
 	else
 	{
@@ -230,13 +232,10 @@ GrMesh* Model::loadMesh(GameManager* gm, aiNode* node, aiMesh * mesh, const aiSc
 		grMesh = new GrMesh(geometry, mat, mesh->mName.data);
 	}
 
-	grMesh->material->gm = gm;
-
-
 	return grMesh;
 }
 
-void Model::loadMaterials(const aiScene * scene)
+void ModelLoader::loadMaterials(const aiScene * scene)
 {
 	int materialCount = scene->mNumMaterials;
 	for (size_t i = 0; i < materialCount; i++)
@@ -245,7 +244,7 @@ void Model::loadMaterials(const aiScene * scene)
 	}
 }
 
-Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned int materialIndex)
+Material* ModelLoader::loadMaterial(const aiScene * scene, unsigned int materialIndex)
 {
 	Material* gMaterial = new Material();
 	aiMaterial* material = scene->mMaterials[materialIndex];
@@ -272,11 +271,10 @@ Material* Model::loadMaterial(GameManager* gm, const aiScene * scene, unsigned i
 	loadTexture(material, gMaterial, aiTextureType_NORMALS, scene);
 	loadTexture(material, gMaterial, aiTextureType_SHININESS, scene);
 	
-	gMaterial->gm = gm;
 	return gMaterial;
 }
 
-void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textType, const aiScene* scene)
+void ModelLoader::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textType, const aiScene* scene)
 {
 
 	aiString path;
@@ -317,56 +315,37 @@ void Model::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType textT
 	}
 }
 
-void Model::loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry)
+void ModelLoader::loadBones(const aiScene *scene, aiNode *node, aiMesh *aiMesh, GrSkeleton *skeleton, Geometry *geometry)
 {
 	for (int i = 0; i < aiMesh->mNumBones; i++)
 	{
 		aiBone* ai_bone = aiMesh->mBones[i];
 		string boneName = ai_bone->mName.data;
-		GrBone* grBone = this->skeleton->getBoneByName(boneName);
-		//grBone->parentObject = parentObject;
-		//glm::mat4 nodeTransformation = Model::AiToGLMMat4(node->mTransformation);
-		//if (grBone == nullptr)  //This solved the issue where mesh was deformed, why?
-		//{
-		//	glm::mat4 boneMatrix = glm::transpose(Model::AiToGLMMat4(bone->mOffsetMatrix));
-		//	grBone = new GrBone(boneMatrix, this->skeleton->globalInverseTransform, boneName);
-		//	this->skeleton->addBone(boneName, grBone);
-		//}
-		
-		geometry->skeleton = this->skeleton;
-		geometry->bones.push_back(grBone);
-
+		GrBone* grBone = skeleton->getBoneByName(boneName);
+		int boneIndex = skeleton->getBoneIndex(boneName);
+		if(!boneName.compare("mixamorig:Hips"))
+		{
+			cout<<"At hips"<<endl;
+		}
 		for (int j = 0; j < ai_bone->mNumWeights; j++)
 		{
 			aiVertexWeight weight = ai_bone->mWeights[j];
-
 			for (int b = 0; b < 4; b++)
 			{
-				if (b < 4)
-				{
-					if (geometry->vertices.at(weight.mVertexId).IDs[b] == -1)
-					{
-						geometry->vertices.at(weight.mVertexId).IDs[b] = i;
-						//TODO: Why multiplying the weight works? (Also try multiplying with a very large number)
-						geometry->vertices.at(weight.mVertexId).Weights[b] = weight.mWeight*10; 
-						break;
-					}
-				}
-				else {  //Support for an additional 4 bones
-					if (geometry->vertices.at(weight.mVertexId).ID2s[b - 4] == -1)
-					{
-						geometry->vertices.at(weight.mVertexId).ID2s[b - 4] = i;
-						geometry->vertices.at(weight.mVertexId).Weights2[b - 4] = weight.mWeight;
-						break;
-					}
-				}
 
+				if (geometry->vertices.at(weight.mVertexId).IDs[b] == -1)
+				{
+					geometry->vertices.at(weight.mVertexId).IDs[b] = boneIndex;
+					//TODO: Why multiplying the weight works? (Also try multiplying with a very large number)
+					geometry->vertices.at(weight.mVertexId).Weights[b] = weight.mWeight;
+					break;
+				}
 			}
 		}
 	}
 }
 
-unsigned char * Model::loadEmbeddedTexture(const aiTexture *textureData, int *width, int *height, int *nrComponents)
+unsigned char * ModelLoader::loadEmbeddedTexture(const aiTexture *textureData, int *width, int *height, int *nrComponents)
 {
 	unsigned char* data = nullptr;
 	int desiredChannels;

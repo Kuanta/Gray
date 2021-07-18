@@ -12,14 +12,13 @@
 #include "Object.h"
 #include "Geometry.h"
 #include "Material.h"
-#include "GameManager.h"
 #include "stb_image.h"
 
-class Model
+class ModelLoader
 {
 public:
-	Model();
-	~Model();
+	ModelLoader();
+	~ModelLoader();
 
 	//Methods
 	static aiMatrix4x4 GLMMat4ToAi(glm::mat4 mat)
@@ -54,23 +53,21 @@ public:
 		tmp[3][3] = in_mat.d4;
 		return tmp;
 	}
-	Object* loadModel(GameManager* gm, const std::string& fileName);
+	Object* loadModel(const std::string& fileName);
 	Object* loadedModel = nullptr;
-	void importAnimations(const std::string &fileName, const char *animationName="");
+	void importAnimations(Object *root, const std::string &fileName, const char *animationName = "");
 	static vector<GrAnimation*> loadAnimations(const aiScene* scene);
 	void cleanup();
 private:
 	string directory;
-	Object* root;
-	GrSkeleton* skeleton;
 
 	//Methods
-	Object* loadNode(GameManager* gm, aiNode *node, const aiScene* scene, bool isRoot = false);
-	GrMesh* loadMesh(GameManager* gm, aiNode* node, aiMesh *mesh, const aiScene* scene);
+	Object *loadNode(aiNode *node, const aiScene *scene, GrSkeleton *skeleton, bool isRoot = false);
+	GrMesh* loadMesh(aiNode* node, aiMesh *mesh, const aiScene* scene);
 	void loadMaterials(const aiScene* scene);
-	Material* loadMaterial(GameManager* gm, const aiScene* scene, unsigned int materialIndex);
+	Material* loadMaterial(const aiScene* scene, unsigned int materialIndex);
 	void loadTexture(aiMaterial* aiMat, Material* gMat, aiTextureType textType, const aiScene* scene);
-	void loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, Geometry* geometry);
+	void loadBones(const aiScene* scene, aiNode* node, aiMesh* aiMesh, GrSkeleton* skeleton, Geometry* geometry);
 
 	unsigned char* loadEmbeddedTexture(const aiTexture * textureData, int *width, int *height, int *nrComponents);
 	//Assimp To Glm conversions
