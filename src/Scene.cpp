@@ -21,7 +21,7 @@ Scene::Scene(GameManager * gm)
 	this->frameBufferSizeCallback = nullptr;
 
 	//Init camera
-	this->camera = Camera(75, this->gm->windowWidth / this->gm->windowHeight, 0.1f, 100000.0f);
+	this->camera = Camera(75, this->gm->windowWidth / this->gm->windowHeight, 0.1f, 10000.0f);
 	this->camera.setPositionY(8);
 	this->camera.setTarget(glm::vec3(0.0f, 0.0f, -1.0f));
 
@@ -31,7 +31,7 @@ Scene::Scene(GameManager * gm)
 	this->deferredCanvas = new Object();
 	GrMesh *deferredCanvasMesh;
 	Plane *pg = new Plane(2.0f, 2.0f);
-	Material *mat = new Material(glm::vec3(1.0f, 1.0f, 1.0f), 1, true, 1);
+	Material *mat = new Material(glm::vec3(1.0f, 1.0f, 1.0f), 1, 1, 1);
 	deferredCanvasMesh = new GrMesh(pg, mat);
 	this->deferredCanvas->addComponent(deferredCanvasMesh);
 }
@@ -215,7 +215,7 @@ void Scene::initFbo()
 	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
 	glGenTextures(1, &fboTexture);
 	glBindTexture(GL_TEXTURE_2D, fboTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,1920,1080, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);  //TODO: Get width and height from gm
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB,this->gm->windowWidth,this->gm->windowHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);  //TODO: Get width and height from gm
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -226,7 +226,7 @@ void Scene::initFbo()
 	//Assign a render object to frame buffer for stencil and depth testing
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, 1920,1080);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, this->gm->windowWidth, this->gm->windowHeight);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 

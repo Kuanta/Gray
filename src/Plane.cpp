@@ -30,7 +30,7 @@ Plane::Plane(float width, float height, float uvScale)
 		1.0f, 0.0f, 0.0f
 	};
 	unsigned int indices[] = {
-		0, 1, 2, 1, 2, 3
+		0, 1, 2, 1, 3, 2
 	};
 	int vertexCount = 12;
 	int indexCount = 6;

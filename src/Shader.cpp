@@ -75,6 +75,23 @@ Shader::Shader(const char* vertexPath, const char* geometryPath, const char* fra
     glDeleteShader(geometry);
     glDeleteShader(fragment);
 }
+// Shader::Shader(const char *vertexPath, const char *geometryPath, const char *fragmentPath, const char *computePath)
+// {
+//     unsigned int vertex = this->loadShader(vertexPath, GL_VERTEX_SHADER);
+//     unsigned int geometry = this->loadShader(geometryPath, GL_GEOMETRY_SHADER);
+//     unsigned int fragment = this->loadShader(fragmentPath, GL_FRAGMENT_SHADER);
+//     unsigned int compute = this->loadShader(computePath, GL_COMPUTE_SHADER);
+//     ID = glCreateProgram();
+//     glAttachShader(ID, vertex);
+//     glAttachShader(ID, geometry);
+//     glAttachShader(ID, fragment);
+//     glAttachShader(ID, compute);
+//     glLinkProgram(ID);
+//     checkCompileErrors(ID, "PROGRAM");
+//     glDeleteShader(vertex);
+//     glDeleteShader(geometry);
+//     glDeleteShader(fragment);
+// }
 unsigned int Shader::loadShader(const char* shaderPath, unsigned int type)
 {
     /*

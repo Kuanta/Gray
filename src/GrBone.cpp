@@ -12,6 +12,10 @@ GrBone::GrBone(GrSkeleton* skeleton, glm::mat4 offsetMatrix, glm::mat4 rootMatri
 	this->scale = glm::vec3(1, 1, 1);
 	this->position = glm::vec3(0, 0, 0);
 	this->rotation = glm::quat(1, 0, 0, 0);
+	this->preTransitionScale = glm::vec3(1, 1, 1);
+	this->preTransitionPos = glm::vec3(0, 0, 0);
+	this->preTransitionRot = glm::quat(1, 0, 0, 0);
+
 	this->offsetMatrix = offsetMatrix;
 	this->rootMatrix = rootMatrix;
 	this->name = name;
@@ -32,11 +36,15 @@ void GrBone::setPosition(float x, float y, float z)
 	this->position.x = x;
 	this->position.y = y;
 	this->position.z = z;
+	this->preTransitionPos.x = x;
+	this->preTransitionPos.y = y;
+	this->preTransitionPos.z = z;
 }
 
 void GrBone::setRotation(glm::quat rotation)
 {
 	this->rotation = rotation;
+	this->preTransitionRot = rotation;
 }
 
 void GrBone::setScale(float x, float y, float z)
@@ -44,6 +52,9 @@ void GrBone::setScale(float x, float y, float z)
 	this->scale.x = x;
 	this->scale.y = y;
 	this->scale.z = z;
+	this->preTransitionScale.x = x;
+	this->preTransitionScale.y = y;
+	this->preTransitionScale.z = z;
 }
 
 void GrBone::setTargetPosition(float x, float y, float z)
@@ -106,9 +117,11 @@ void GrBone::updateLocalMatrix()
 	glm::mat4 mat= glm::mat4(1.0f);
 	if (this->transition && this->targetSet)
 	{
-		this->position = glm::mix(this->position, this->targetPos, this->transitionFactor);
-		this->rotation = glm::slerp(this->rotation, this->targetRot, this->transitionFactor);
-		this->scale = glm::mix(this->scale, this->targetScale, this->transitionFactor);
+		//During the transition, we have a transition factor. Pre transition values are the last transform values before starting to transiton
+		// (We update preTransition values whenever there is no transition)
+		this->position = glm::mix(this->preTransitionPos, this->targetPos, this->transitionFactor);
+		this->rotation = glm::slerp(this->preTransitionRot, this->targetRot, this->transitionFactor);
+		this->scale = glm::mix(this->preTransitionScale, this->targetScale, this->transitionFactor);
 	}
 
 	mat = glm::translate(mat, this->position);
@@ -190,25 +203,33 @@ void GrBone::addAnimationFrame(glm::vec3 posKey, glm::quat rotKey, glm::vec3 sca
 
 void GrBone::blendAnimationFrames()
 {
+	if(this->transition && this->targetSet)
+	{
+		//No need to do something, transition is still in progress
+		return;
+	}
 	glm::vec3 _targetPos(0.0f, 0.0f, 0.0f);
 	glm::vec3 _targetScale(0.0f, 0.0f, 0.0f);
-	glm::vec3 _targetRot(0.0f, 0.0f, 0.0f);
+	glm::quat _targetRotQuat(0.0f, 0.0f, 0.0f, 0.0f); //Summing quaternions for blending works much better than summing eulers
 	float totalWeights = 0.0f;
 	for (int i = 0; i < this->posQueue.size(); i++)
 	{
 		float weight = this->animWeights.at(i);
 		totalWeights += weight;
-		_targetPos += this->posQueue.at(i) * weight;
-		_targetScale += this->scaleQueue.at(i) * weight;
-		_targetRot += glm::eulerAngles(this->rotQueue.at(i)) * weight;
+
 
 	}
+
 	if (totalWeights > 0)
 	{
-		_targetPos = _targetPos / totalWeights;
-		_targetRot = _targetRot / totalWeights;
-		_targetScale = _targetScale / totalWeights;
-
+		for (int i = 0; i < this->posQueue.size(); i++)
+		{
+			float weight = this->animWeights.at(i) / totalWeights;
+			_targetPos += this->posQueue.at(i) * weight;
+			_targetScale += this->scaleQueue.at(i) * weight;
+			_targetRotQuat += this->rotQueue.at(i) * weight;
+		}
+		glm::vec3 _targetRot = glm::eulerAngles(_targetRotQuat);
 		if (this->transition)
 		{
 			this->setTargetPosition(_targetPos.x, _targetPos.y, _targetPos.z);
@@ -221,12 +242,18 @@ void GrBone::blendAnimationFrames()
 			this->setPosition(_targetPos.x, _targetPos.y, _targetPos.z);
 			this->setRotation(glm::quat(_targetRot));
 			this->setScale(_targetScale.x, _targetScale.y, _targetScale.z);
+			this->targetSet = false; //Set to false so that when transition starts the bone has a chance to update the targets
 		}
 		//this->updateLocalMatrix();
 	}
-	
-	this->clearQueues();  //There can still be frames in queues even if the weights are zero. For example an animation with zero weight affecting a bone. If this bone
-	//is not affected by the remaining animations, the queue for that bone my grow without end. 
+	if(!this->transition)
+	{
+		//There can still be frames in queues even if the weights are zero.
+		//For example an animation with zero weight affecting a bone. If this bone
+		//is not affected by the remaining animations, the queue for that bone my grow without end.
+		this->clearQueues(); 
+	}
+
 }
 
 GrBone* GrBone::clone()

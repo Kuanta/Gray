@@ -31,6 +31,15 @@ void LightManager::init()
 	this->depthCubeMapStatic = this->createCubeMap(this->depthMapFBOCubeStatic, this->depthCubeMapStatic);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	//Create shadowTexture
+	glBindFramebuffer(GL_FRAMEBUFFER, this->scene->fbo);
+	glGenTextures(1, &this->finalShadowTexture);
+	glBindTexture(GL_TEXTURE_2D, this->finalShadowTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, this->gm->windowWidth, this->gm->windowHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->finalShadowTexture, 0);
 }
 
 void LightManager::add(GrLight* light)
@@ -59,8 +68,10 @@ unsigned int LightManager::createDepthMap(unsigned int fbo, unsigned int depthMa
 	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	glTexParameterfv(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glDrawBuffer(GL_NONE);
@@ -77,9 +88,11 @@ unsigned int LightManager::createCubeMap(unsigned int fbo, unsigned int cubeMap)
 	glTexParameterf(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MIN_FILTER, GL_NEAREST); //linear
 	glTexParameterf(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_MAG_FILTER, GL_NEAREST); //linear
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
+	float borderColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	glTexParameterfv(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BORDER_COLOR, borderColor);
 	glTexParameterf(GL_TEXTURE_CUBE_MAP_ARRAY, GL_TEXTURE_BASE_LEVEL, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
@@ -113,6 +126,7 @@ void LightManager::draw()
 			this->lightStructs[counter].castShadow = light->castShadow;
 			this->lightStructs[counter].far_plane = light->farPlane;
 			this->lightStructs[counter].attenuationFactor = light->attenuationFactor;
+			this->lightStructs[counter].softnessFactor = light->softShadowFactor;
 
 			//Create Shadow Map if light casts shadow
 			if(light->castShadow)
@@ -166,14 +180,13 @@ void LightManager::draw()
 		}
 	}
 	this->lightsBuffer->bindBuffer();
-	glBufferSubData(GL_UNIFORM_BUFFER, 0, 100*144, this->lightStructs);
-	glBufferSubData(GL_UNIFORM_BUFFER, 100*144, 4, &this->numberOfLights); //Send the number of lights
+	glBufferSubData(GL_UNIFORM_BUFFER, 0, 100*160, this->lightStructs);
+	glBufferSubData(GL_UNIFORM_BUFFER, 100*160, 4, &this->numberOfLights); //Send the number of lights
 	glBindBuffer(GL_UNIFORM_BUFFER, 0); //Unbind,
 
 	//Activate the texture for shadowmaps
 	glViewport(0, 0, this->gm->windowWidth, this->gm->windowHeight);
 	this->scene->activateFbo();
-
 }
 void LightManager::prepareDrawing(GrLight *light, unsigned int fbo, bool isStatic, int index)
 {

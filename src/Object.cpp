@@ -290,7 +290,19 @@ glm::vec3 Object::getScale()
 {
 	return this->scale;
 }
-
+glm::vec3 Object::getForward()
+{
+	glm::vec3 eulerAngles = this->rotation;
+	glm::vec3 forward;
+	forward.x = cos(glm::radians(eulerAngles.x)) * cos(glm::radians(-1*eulerAngles.y));
+	forward.y = sin(glm::radians(eulerAngles.x));
+	forward.z = cos(glm::radians(eulerAngles.x)) * sin(glm::radians(-1*eulerAngles.y));
+	return glm::normalize(forward);
+}
+glm::vec3 Object::getRight()
+{
+	return glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), this->getForward()));
+}
 Component* Object::getComponentByType(ComponentType type)
 {
 	for (int i = 0; i < this->components.size(); i++)
@@ -369,7 +381,10 @@ glm::mat4 Object::getLocalMatrix()
 
 void Object::updateModel()
 {
-	//Get parents
+	/*
+		Updates the model matrix. And recursively updates the childs by re-using already calculated matrices
+	*/
+
 	glm::mat4 model = glm::mat4(1.0f);
 	Object* parent = this->parent;
 	while (parent != nullptr) {
@@ -379,4 +394,17 @@ void Object::updateModel()
 
 	model *= this->getLocalMatrix();
 	this->model = model;
+	this->updateChildModels(model);
+}
+void Object::updateChildModels(glm::mat4 parentModel)
+{
+	for (vector<Object *>::iterator it = this->children.elements.begin(); it != this->children.elements.end(); it++)
+	{
+		if ((*it) != nullptr)
+		{
+			glm::mat4 childModel = parentModel * (*it)-> getLocalMatrix();
+			(*it)->model = childModel;
+			(*it)->updateChildModels(childModel); 
+		}
+	}
 }

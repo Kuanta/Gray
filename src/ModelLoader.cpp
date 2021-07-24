@@ -249,18 +249,27 @@ Material* ModelLoader::loadMaterial(const aiScene * scene, unsigned int material
 	Material* gMaterial = new Material();
 	aiMaterial* material = scene->mMaterials[materialIndex];
 	aiColor3D diffuseColor, specularColor, ambientColor;
-	float shininess;
+	ai_real roughness, metalness, shininess;
 	material->Get(AI_MATKEY_COLOR_DIFFUSE, diffuseColor);
 	material->Get(AI_MATKEY_COLOR_SPECULAR, specularColor);
 	material->Get(AI_MATKEY_COLOR_AMBIENT, ambientColor);
-	material->Get(AI_MATKEY_SHININESS, shininess);
-	
+	int result;	 //Get function returns -1 if it can't find the desired property
+	result = material->Get(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR, metalness);
+	if(result == -1)
+	{
+		metalness = 0.5f;
+	}
+	result = material->Get(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_ROUGHNESS_FACTOR, roughness);
+	if (result == -1)
+	{
+		roughness = 0.5f;
+	}
+
 	gMaterial->diffuse = this->aiColorToGlm(diffuseColor);
 	gMaterial->specular = this->aiColorToGlm(specularColor);
 	gMaterial->ambient = this->aiColorToGlm(ambientColor);
-	gMaterial->rougness = 0.2f;
-	gMaterial->shininess = shininess;
-	gMaterial->metalness = false;
+	gMaterial->rougness = roughness;
+	gMaterial->metalness = metalness;
 
 	//Check Textures
 	//TODO: Check for other texture types
@@ -269,7 +278,8 @@ Material* ModelLoader::loadMaterial(const aiScene * scene, unsigned int material
 	//Diffuse Textures
 	loadTexture(material, gMaterial, aiTextureType_DIFFUSE, scene);
 	loadTexture(material, gMaterial, aiTextureType_NORMALS, scene);
-	loadTexture(material, gMaterial, aiTextureType_SHININESS, scene);
+	loadTexture(material, gMaterial, aiTextureType_UNKNOWN, scene);
+	//loadTexture(material, gMaterial, aiTextureType_ROUGHNESS, scene);
 	
 	return gMaterial;
 }
@@ -288,13 +298,17 @@ void ModelLoader::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType
 		gTextType = NORMAL_TEXTURE;
 		break;
 	case aiTextureType_SHININESS:
-		gTextType = ROUGHNESS_TEXTURE;
+		//gTextType = ROUGHNESS_TEXTURE;
+		break;
+	case aiTextureType_UNKNOWN:
+		gTextType = PBR_TEXTURE;
 		break;
 	default:
-		gTextType = DIFFUSE_TEXTURE;
+		return;
 		break;
 	}
 	if (aiMat->GetTexture(textType, 0, &path) == AI_SUCCESS) {
+		cout<<"Loading "<<path.data<<endl;
 		grTexture* texture = new grTexture();
 		if (const aiTexture* textureData = scene->GetEmbeddedTexture(path.C_Str()))
 		{
@@ -312,21 +326,25 @@ void ModelLoader::loadTexture(aiMaterial * aiMat, Material * gMat, aiTextureType
 			texture->loadTexture(filename.c_str());
 		}
 		gMat->setTexture(texture, gTextType);
+	}else{
+		
 	}
 }
 
 void ModelLoader::loadBones(const aiScene *scene, aiNode *node, aiMesh *aiMesh, GrSkeleton *skeleton, Geometry *geometry)
 {
+	if(aiMesh->mNumBones == 0)
+	{
+		geometry->hasBones=false;
+		return;
+	}
+	geometry->hasBones = true;
 	for (int i = 0; i < aiMesh->mNumBones; i++)
 	{
 		aiBone* ai_bone = aiMesh->mBones[i];
 		string boneName = ai_bone->mName.data;
 		GrBone* grBone = skeleton->getBoneByName(boneName);
 		int boneIndex = skeleton->getBoneIndex(boneName);
-		if(!boneName.compare("mixamorig:Hips"))
-		{
-			cout<<"At hips"<<endl;
-		}
 		for (int j = 0; j < ai_bone->mNumWeights; j++)
 		{
 			aiVertexWeight weight = ai_bone->mWeights[j];

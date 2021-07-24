@@ -67,26 +67,27 @@ vector<glm::mat4> GrLight::getTransformMat(int width, int height)
 	vector<glm::mat4> matrices;
 	if(this->type == LIGHT_TYPES::DIRECTIONAL)
 	{
-		glm::vec3 targetVec = this->position + this->direction*1.0f;
+		glm::vec3 targetVec = this->position + this->direction;
 		glm::mat4 lightViewMatrix = glm::lookAt(this->position, targetVec,glm::vec3(0.0f,1.0f,0.0f));
-		glm::mat4 lightProjMatrix = glm::ortho(-40.0f,40.0f,-40.0f,40.0f,1.0f, 200.0f);
+		glm::mat4 lightProjMatrix = glm::ortho(-40.0f,40.0f,-40.0f,40.0f,1.0f, this->farPlane);
 		matrices.push_back(lightProjMatrix*lightViewMatrix);
 	}else
 	{
 		float aspect = (float)width / (float)height;
 		glm::vec3 lightPos = this->position;
-		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, 0.001f, this->farPlane);
-		matrices.push_back(shadowProj * glm::lookAt(lightPos, lightPos + glm::vec3( 1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
-matrices.push_back(shadowProj * 
-                 glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
-matrices.push_back(shadowProj * 
-                 glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
-matrices.push_back(shadowProj * 
-                 glm::lookAt(lightPos, lightPos + glm::vec3( 0.0,-1.0, 0.0), glm::vec3(0.0, 0.0,-1.0)));
-matrices.push_back(shadowProj * 
-                 glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0, 1.0), glm::vec3(0.0,-1.0, 0.0)));
-matrices.push_back(shadowProj * 
-                 glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0,-1.0), glm::vec3(0.0,-1.0, 0.0)));
+		glm::mat4 shadowProj = glm::perspective(glm::radians(90.0f), aspect, 0.1f, this->farPlane);
+		matrices.push_back(shadowProj * 
+						glm::lookAt(lightPos, lightPos + glm::vec3( 1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
+		matrices.push_back(shadowProj * 
+						glm::lookAt(lightPos, lightPos + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0,-1.0, 0.0)));
+		matrices.push_back(shadowProj * 
+						glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+		matrices.push_back(shadowProj * 
+						glm::lookAt(lightPos, lightPos + glm::vec3( 0.0,-1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+		matrices.push_back(shadowProj * 
+						glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0, 1.0), glm::vec3(0.0,-1.0, 0.0)));
+		matrices.push_back(shadowProj * 
+						glm::lookAt(lightPos, lightPos + glm::vec3( 0.0, 0.0,-1.0), glm::vec3(0.0,-1.0, 0.0)));
 	}
 	return matrices;
 }

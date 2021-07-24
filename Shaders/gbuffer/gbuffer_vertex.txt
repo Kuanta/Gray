@@ -12,7 +12,6 @@ out vec3 FragPos;
 out vec2 TexCoords;
 out vec3 Color;
 out mat3 TBN;
-out flat float debug;
 
 layout (std140, binding=0) uniform Matrices
 {
@@ -31,46 +30,55 @@ uniform mat4 gBones[MAX_BONES];
 
 void main()
 {
-	
-	mat4 boneMatrix=mat4(0.0);
-	boneMatrix[3][3] = 1.0;
-	
-	float weights = 0;
-	float totalWeights = 0;
-
-	for(int i=0;i<NUM_BONES_PER_VERTEX;i++)
+	vec3 tangent;
+	if(hasBones == 1)
 	{
-		if(boneIDs[i] >= 0)
+		mat4 boneMatrix=mat4(0.0);
+		boneMatrix[3][3] = 1.0;
+		
+		float weights = 0;
+		float totalWeights = 0;
+
+		for(int i=0;i<NUM_BONES_PER_VERTEX;i++)
 		{
-			totalWeights += boneWeights[i];
+			if(boneIDs[i] >= 0)
+			{
+				totalWeights += boneWeights[i];
+			}
 		}
-	}
-	for(int i=0;i<NUM_BONES_PER_VERTEX;i++)
-	{
-		if(boneIDs[i] >= 0)
+		if(totalWeights > 0)
 		{
-			boneMatrix += gBones[boneIDs[i]]*boneWeights[i] / totalWeights;
-		}else{
-			break;
+			for(int i=0;i<NUM_BONES_PER_VERTEX;i++)
+			{
+				if(boneIDs[i] >= 0)
+				{
+					boneMatrix += gBones[boneIDs[i]]*boneWeights[i] / totalWeights;
+				}else{
+					break;
+				}
+			}
 		}
+		
+		
+		boneMatrix = boneMatrix / boneMatrix[3][3];
+		gl_Position = projection * view * model * boneMatrix * vec4(aPos, 1.0);
+		Normal = normalize(vec3(model  * boneMatrix * vec4(aNormal, 0.0)));
+		FragPos = (model * boneMatrix * vec4(aPos, 1.0)).xyz;
+		tangent = normalize(vec3(model * boneMatrix * vec4(aTangent, 0.0)));
+	}else{
+		gl_Position = projection * view * model * vec4(aPos, 1.0);
+		Normal = normalize(vec3(model  *  vec4(aNormal,    0.0)));
+		FragPos = (model * vec4(aPos, 1.0)).xyz;
+		tangent = normalize(vec3(model * vec4(aTangent,   0.0)));
 	}
 	
-
-	gl_Position = projection * view * model * boneMatrix * vec4(aPos, 1.0);
-	vec3 tangent = normalize(vec3(model * vec4(aTangent,   0.0)));
-	Normal = normalize(vec3(model  * vec4(aNormal,    0.0)));
+	tangent = normalize(vec3(model * vec4(aTangent,   0.0)));
+	
 	
 	tangent = normalize(tangent-dot(tangent,Normal)*Normal);
 	vec3 bitangent = cross(Normal, tangent);
 	TBN = mat3(tangent, bitangent, Normal);
-	FragPos=vec3(model*vec4(aPos,1.0));
+	
 	TexCoords = aUvs;
 	Color = aColor;
-
-	if(totalWeights <= 0.0f)
-	{
-		debug = 1.0f;
-	}else{
-		debug = 0.0f;
-	}
 }

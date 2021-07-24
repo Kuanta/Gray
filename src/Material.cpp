@@ -5,12 +5,12 @@ Material::Material()
 	//glm variables initiates themselves
 	this->diffuse = glm::vec3(0);
 	this->shininess = 0;
-	this->metalness = false;
+	this->metalness = 0.0f;
 	this->rougness = 0.15f;
 	this->initTextures();
 }
 
-Material::Material(glm::vec3 color, float shininess, bool metalness, float rougness)
+Material::Material(glm::vec3 color, float shininess, float metalness, float rougness)
 {
 	this->diffuse = color;
 	this->shininess = shininess;
@@ -29,8 +29,7 @@ void Material::initTextures()
 {
 	this->diffuseMap = nullptr;
 	this->normalMap = nullptr;
-	this->roughnessMap = nullptr;
-	this->metalMap = nullptr;
+	this->pbrMap = nullptr;
 	this->dispMap = nullptr;
 }
 void Material::setTexture(const char * filename, TextureTypes textureType)
@@ -81,13 +80,13 @@ void Material::setTexture(grTexture * texture, TextureTypes textureType)
 			}
 			this->normalMap = texture;
 			break;
-		case ROUGHNESS_TEXTURE:
-			if (this->roughnessMap != nullptr)
+		case PBR_TEXTURE:
+			if (this->pbrMap != nullptr)
 			{
-				this->roughnessMap->clearTexture();
-				delete this->roughnessMap;
+				this->pbrMap->clearTexture();
+				delete this->pbrMap;
 			}
-			this->roughnessMap = texture;
+			this->pbrMap = texture;
 			break;
 		default:
 			break;
@@ -104,6 +103,8 @@ grTexture * Material::getTexture(TextureTypes textureType)
 	case NORMAL_TEXTURE:
 		return this->normalMap;
 		break;
+	case PBR_TEXTURE:
+	return this->pbrMap;
 	default:
 		break;
 	}
@@ -117,8 +118,8 @@ void Material::draw(Shader* shader)
 	
 	if (this->diffuseMap != nullptr && this->diffuseMap->textureExists()) {
 		//Diffuse (Using first 5 maps for shadows)
-		glActiveTexture(GL_TEXTURE0 );
-		glBindTexture(GL_TEXTURE_2D_ARRAY, this->diffuseMap->getTextureID());
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, this->diffuseMap->getTextureID());
 		shader->setInt("diffuseMap", 0);
 		shader->setBool("containsTexture", 1);
 		this->diffuseMap->useTexture(0);
@@ -131,7 +132,7 @@ void Material::draw(Shader* shader)
 	if (this->normalMap != nullptr && this->normalMap->textureExists())
 	{
 		glActiveTexture(GL_TEXTURE0 + 1);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, this->normalMap->getTextureID());
+		glBindTexture(GL_TEXTURE_2D, this->normalMap->getTextureID());
 		shader->setInt("normalMap", 1);
 		shader->setBool("containsNormalTexture", 1);
 		this->normalMap->useTexture(1);
@@ -142,19 +143,19 @@ void Material::draw(Shader* shader)
 	}
 
 	//Roughness
-	if(this->roughnessMap != nullptr && this->roughnessMap->textureExists())
+	if(this->pbrMap != nullptr && this->pbrMap->textureExists())
 	{
 		glActiveTexture(GL_TEXTURE0+3);
-		glBindTexture(GL_TEXTURE_2D_ARRAY, this->roughnessMap->getTextureID());
-		shader->setInt("roughnessMap", 3);
-		shader->setBool("containsRoughnessTexture", 1);
+		glBindTexture(GL_TEXTURE_2D, this->pbrMap->getTextureID());
+		shader->setInt("pbrMap", 3);
+		shader->setBool("containsPbrTexture", 1);
 	}else{
-		shader->setBool("containsRoughnessTexture", 0);
+		shader->setBool("containsPbrTexture", 0);
 	}
 	//Set uniforms
 	shader->setVec3("material.color", this->diffuse);
 	shader->setFloat("material.shininess", this->shininess);
-	shader->setBool("material.metal", this->metalness);
+	shader->setFloat("material.metal", this->metalness);
 	shader->setFloat("material.roughness", this->rougness);
 }
 

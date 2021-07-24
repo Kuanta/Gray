@@ -14,6 +14,7 @@ struct GrAnimFrame
 	glm::vec3* scaleKey;
 	glm::quat* rotKey;
 };
+
 class GrAnimationNode
 {
 public:
@@ -24,7 +25,7 @@ public:
 	string name;
 	int keyNum;
 	vector<float> times;
-	GrAnimFrame getAnimFrame(float relTime, float ticksPerSecond, int direction);
+	GrAnimFrame getAnimFrame(float relTime, float duration, int direction);
 	glm::vec3 currPos;
 	glm::vec3 currRot;
 	glm::vec3 currScale;
@@ -37,10 +38,10 @@ public:
 	GrAnimation(string name, double duration, double ticksPerSecond);
 	~GrAnimation();
 
-	void update(float deltaTime, GrSkeleton* skeleton, bool transition, float transitionFactor = 0.0f);
+	virtual void update(float deltaTime, GrSkeleton* skeleton, bool transition, float transitionFactor = 0.0f);
 	void fadeTo(float targetWeight, float speed);
 	void transition(float transitionFactor, GrSkeleton* skeleton);
-	void resetAnimation();
+	virtual void resetAnimation();
 	string name;
 	GrSkeleton* skeleton;
 	GrAnimManager* animManager;
@@ -59,7 +60,7 @@ public:
 	bool fading = false;
 	bool loop = true; //If loop, will continue after completing a cycle
 	
-private:
+protected:
 	float animTime = 0.0f;
 	float targetWeight;
 	float fadeSpeed;

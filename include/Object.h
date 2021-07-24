@@ -53,6 +53,8 @@ public:
 	glm::vec3 getPosition();
 	glm::vec3 getRotation();
 	glm::vec3 getScale();
+	glm::vec3 getForward();
+	glm::vec3 getRight();
 
 	Object* getRootObject(); //Returns the greatest grandparent
 	Object* clone(Object* parent=nullptr);
@@ -79,6 +81,7 @@ public:
 		this->gm = parent->gm;
 	}
 	void updateModel();
+	void updateChildModels(glm::mat4 parentModel); //A recursice function to update child nodes
 	bool requireModelUpdate = false;
 	Shader *shader = nullptr;
 	bool castShadow = true;

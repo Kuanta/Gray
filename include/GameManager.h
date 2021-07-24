@@ -52,7 +52,6 @@ public:
 	GameManager();
 	~GameManager();
 
-private:
 	double currentFrame;
 	double lastFrame = 0;
 	double deltaTime;

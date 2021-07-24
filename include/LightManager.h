@@ -27,17 +27,21 @@ struct GpuLight {
 	// bool castShadow;
 	// float dummmy1;
 	glm::mat4 transformMat; //4*16
-	glm::vec4 color;
-	glm::vec4 position;
-	glm::vec4 direction;
-	int type;
-	float intensity;
-	float constant;
-	float linear;
+	glm::vec4 color; //16
+	glm::vec4 position; // 16
+	glm::vec4 direction; //16
+	int type; //4
+	float intensity; //4
+	float constant; //4
+	float linear; //4
 	float quadratic;
 	int castShadow;
 	float far_plane;
 	float attenuationFactor;
+	int softnessFactor;
+	float dummy1;
+	float dummy2;
+	float dummy3;
 };
 
 class LightManager
@@ -79,6 +83,7 @@ public:
 	unsigned int depthMapFBOStatic; //Framebuffer for dynamicdirectionals
 	unsigned int depthMapFBOCubeStatic;
 
+	unsigned int finalShadowTexture; //Draw all the shadows here
 	unsigned int createDepthMap(unsigned int fbo, unsigned int depthMap);
 	unsigned int createCubeMap(unsigned int fbo, unsigned int cubeMap);
 	void prepareDrawing(GrLight *light, unsigned int fbo, bool isStatic, int index); //Use before drawing elements

@@ -94,6 +94,12 @@ void Geometry::initBuffers()
 void Geometry::draw(Shader* shader)
 {
 	shader->use();
+	if(this->hasBones)
+	{
+		shader->setInt("hasBones", 1);
+	}else{
+		shader->setInt("hasBones", 0);
+	}
 	glBindVertexArray(this->VAO);
 	if (this->indexed)
 	{

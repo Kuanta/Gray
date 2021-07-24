@@ -31,14 +31,12 @@ public:
 	void addToActive(GrAnimation* anim, float weight, bool loop=false, void* (*callback)() = nullptr);
 	void static clearAnimCallback(GrAnimation* anim);
 	
-
-private:
-	GrAnimation* currentAnimation = nullptr;
-	GrAnimation* secondaryAnimation = nullptr;
+	GrAnimation* activeAnimation = nullptr;
 	linked::LinkedList<GrAnimation*> activeAnimations;
 	float animationFactor = 1.0f; //Used in blending
 	//Transition variables
 	bool transitioning=false;
+	float transitionClock = 0.0f; //Holds the time for transition
 	GrAnimation* targetAnimation = nullptr;
 	float transitionTime = 0.0f;
 	float totalWeights = 0;

@@ -66,7 +66,7 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 		shader = new Shader("Shaders/simple_vertex.txt", "Shaders/outline_fragment.txt");
 		break;
 	case SHADER_TYPE::FBO_SHADER:
-		shader = new Shader("Shaders/fbo_vertex.txt", "Shaders/fbo_fragment.txt");
+		shader = new Shader("Shaders/fbo_vertex.glsl", "Shaders/fbo_fragment.txt");
 		break;
 	case SHADER_TYPE::SKYBOX_SHADER:
 		shader = new Shader("Shaders/skybox_vertex.txt", "Shaders/skybox_fragment.txt");
@@ -85,7 +85,7 @@ Shader* ShaderManager::createShader(SHADER_TYPE shaderType)
 		shader = new Shader("Shaders/gbuffer/gbuffer_skybox_vertex.txt", "Shaders/gbuffer/gbuffer_skybox_fragment.txt");
 		break;
 	case SHADER_TYPE::DEFERRED_SHADER:
-		shader = new Shader("Shaders/fbo_vertex.txt", "Shaders/deferred_fragment.txt");
+		shader = new Shader("Shaders/fbo_vertex.glsl", "Shaders/deferred_fragment.glsl");
 		break;
 	default:
 		break;

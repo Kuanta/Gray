@@ -24,9 +24,10 @@ bool GameManager::init(int width, int height)
 	glfwWindowHint(GLFW_ALPHA_BITS, 16);
 	glfwWindowHint(GLFW_STENCIL_BITS, 16);
 	glfwWindowHint(GLFW_DEPTH_BITS, 24);
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	this->window = glfwCreateWindow(width, height, "Gray", NULL, NULL);
+	this->window = glfwCreateWindow(width, height, "Gray", 0, NULL);
 	this->windowWidth = width; this->windowHeight = height;
 	if (window == NULL)
 	{
@@ -67,11 +68,11 @@ bool GameManager::init(int width, int height)
 
 	//Initialize Buffers
 	this->matricesBuffer = new UniformBuffer(16*9, "Matrices", 0);
-	this->lightsBuffer = new UniformBuffer(MAX_NUM_LIGHTS*144 + 4, "Lights", 1);
+	this->lightsBuffer = new UniformBuffer(MAX_NUM_LIGHTS*160 + 4, "Lights", 1);
 
 	//OPENGL
 	glEnable(GL_DEPTH_TEST);  //Enable depth testing
-	glDepthFunc(GL_LESS);  //Type of depth chechking
+	glEnable(GL_CULL_FACE);
 
 	return true;
 }

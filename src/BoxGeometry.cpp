@@ -110,6 +110,7 @@ BoxGeometry::BoxGeometry(float width, float height, float depth)
 	this->setIndices(_indices, indexCount);
 
 	this->initBuffers();
+	this->hasBones = false;
 }
 
 BoxGeometry::~BoxGeometry()

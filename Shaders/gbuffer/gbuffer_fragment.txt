@@ -10,24 +10,24 @@ in vec3 FragPos;
 in vec3 Normal;
 in vec3 Color;
 in mat3 TBN;
-in flat float debug;
 
 struct Material
 {
 	vec3 color;
 	float shininess;
-	bool metal;
+	float metal;
 	float roughness;
 };
 
-layout(binding=0) uniform sampler2D diffuseMap;
+layout (binding=0) uniform sampler2D diffuseMap;
 layout (binding=1) uniform sampler2D normalMap;
 layout (binding=2) uniform sampler2D bumpMap;
-layout (binding=3) uniform sampler2D rougnessMap;
+layout (binding=3) uniform sampler2D pbrMap;
+
 uniform Material material;
 uniform int containsTexture;
 uniform int containsNormalTexture;
-uniform int containsRoughnessTexture;
+uniform int containsPbrTexture;
 
 void main()
 {
@@ -38,12 +38,6 @@ void main()
     }else{
         gColors.rgb = material.color;
     }
-
-    if(debug == 1.0f)
-    {
-        gColors.rgb = Color;
-    }
-
     gColors.a = 1; //TODO: Implement rougness and metalicness in here, or in an additional texture
     
     vec3 normal;
@@ -56,11 +50,14 @@ void main()
         normal = normalize(Normal);  //Get the normal from the geometry
     }
     gPbr = vec3(0);
-    if(containsRoughnessTexture == 1)
+    if(containsPbrTexture == 1)
     {
-        gPbr.r = texture(rougnessMap, TexCoords).r;
+        vec3 pbrProps = texture(pbrMap, TexCoords).rgb;
+        gPbr.r = pbrProps.g; //Green channel is roughness in gltf 
+        gPbr.g = 1 - pbrProps.r;
     }else{
-        gPbr.r = material.roughness;
+        gPbr.r = clamp(material.roughness, 0.0f, 1.0f);
+        gPbr.g = clamp(material.metal, 0.0f, 1.0f);
     }
     gNormal = normalize(normal);
 

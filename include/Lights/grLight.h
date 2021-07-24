@@ -29,6 +29,7 @@ public:
 	float linear;
 	float quadratic;
 	bool castShadow=false;
+	int softShadowFactor = 0; // 0 means hard shadow
 	unsigned int depthMap;
 	float farPlane = 1.0f; //For shadow maps
 	bool staticLight = false; //Static lights won't update their shadowmaps no matter what

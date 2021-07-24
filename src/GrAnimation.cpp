@@ -10,8 +10,8 @@ GrAnimation::GrAnimation()
 GrAnimation::GrAnimation(string name, double duration, double ticksPerSecond)
 {
 	this->name = name;
-	this->duration = duration/ticksPerSecond;
 	this->ticksPerSecond = ticksPerSecond;
+	this->duration = duration/ticksPerSecond;
 }
 
 GrAnimation::~GrAnimation()
@@ -33,7 +33,6 @@ void GrAnimation::update(float deltaTime, GrSkeleton* skeleton, bool transition,
 		}
 		this->animTime -= this->duration;
 	}
-	
 	if (skeleton != nullptr)  //Can't animate something without bones
 	{
 		map<string, GrAnimationNode*>::iterator iter;
@@ -43,26 +42,32 @@ void GrAnimation::update(float deltaTime, GrSkeleton* skeleton, bool transition,
 			GrBone* bone = skeleton->getBoneByName(animNode->name);
 			if (bone != nullptr)
 			{
-				GrAnimFrame f = animNode->getAnimFrame(animTime / duration, this->ticksPerSecond, this->direction);
-				if (animNode->keyNum > 1)
-				{
-					GrAnimFrame f = animNode->getAnimFrame(animTime / duration, this->ticksPerSecond, this->direction);
-					bone->addAnimationFrame(*f.posKey, *f.rotKey, *f.scaleKey, this->weight);
+				if(!transition || (transition && !bone->targetSet)){
+					//During the transition, animTime doesn't progress so no need to find the same nodes again during transition
+					//But to set the target, we check bone->setTarget so that just for a single udpate, we can set the target
+					GrAnimFrame f = animNode->getAnimFrame(animTime, duration, this->direction);
+					if (animNode->keyNum > 1)
+					{
+						GrAnimFrame f = animNode->getAnimFrame(animTime, duration, this->direction);
+						bone->addAnimationFrame(*f.posKey, *f.rotKey, *f.scaleKey, this->weight);
+					}
+					else
+					{
+						bone->addAnimationFrame(animNode->posKeys[0], animNode->rotKeys[0], animNode->scaleKeys[0], this->weight);
+					}
+					
 				}
-				else
+				if(transition)
 				{
-					bone->addAnimationFrame(animNode->posKeys[0], animNode->rotKeys[0], animNode->scaleKeys[0], this->weight);
-				}
-				if (transition)
-				{
-					bone->transitionFactor = transitionFactor;
 					bone->transition = true;
+					bone->transitionFactor = transitionFactor;
+				}else{
+					bone->transition = false;
 				}
 				bone->updateLocalMatrix();
 				bone->markForUpdate();				
 			}
 		}
-		//Set the transition factor
 	}
 	if (!transition)
 	{
@@ -98,17 +103,8 @@ void GrAnimation::transition(float transitionFactor, GrSkeleton* skeleton)
 			GrBone* bone = skeleton->getBoneByName(animNode->name);
 			if (bone != nullptr)
 			{
-				/*glm::vec3 p1(bone->position.x, bone->position.y, bone->position.z);
-				glm::vec3 p2(animNode->posKeys[0].x, animNode->posKeys[0].y, animNode->posKeys[0].z);
-				glm::vec3 p = glm::mix(p1, p2, transitionFactor);
-				bone->setPosition(p.x, p.y, p.z);
-				glm::quat r1 = glm::quat(bone->rotation);
-				glm::quat r2(animNode->rotKeys[0].w, animNode->rotKeys[0].x, animNode->rotKeys[0].y, animNode->rotKeys[0].z);
-				bone->setRotation(glm::slerp(r1, r2, transitionFactor));*/
 				bone->transitionFactor = transitionFactor;
 				bone->transition = true;
-				//bone->updateLocalMatrix();
-				//bone->markForUpdate();
 			}else{
 				cout<<"Empty "<<animNode->name<<endl;
 			}
@@ -143,22 +139,25 @@ GrAnimationNode::GrAnimationNode(aiNodeAnim * node)
 }
 
 
-GrAnimFrame GrAnimationNode::getAnimFrame(float relTime, float ticksPerSecond, int direction)
+GrAnimFrame GrAnimationNode::getAnimFrame(float relTime, float duration, int direction)
 {
 	GrAnimFrame frame;
-	int currentTick, nextTick;
+	float currentTick, nextTick;
 	float factor;
-	float temp = this->keyNum * relTime;
+	float stepTime = duration / ((float)this->keyNum -1.0f);  
+	float temp = relTime / stepTime;
+	float remainder = relTime - (float)floor(temp) * stepTime;
+	factor = remainder / stepTime;
 	if (direction == 1) // Forward
 	{
-		currentTick = floor(temp);
+		currentTick = (float)floor(temp);
 		nextTick = currentTick + 1;
-		factor = (temp - currentTick)/ticksPerSecond;
+		//factor = (temp - currentTick)/(float)ticksPerSecond;
 	}
 	else {
-		currentTick = ceil(temp);
+		currentTick = (float)ceil(temp);
 		nextTick = currentTick - 1;
-		factor = (currentTick - temp)/ticksPerSecond;
+		//factor = (currentTick - temp)/(float)ticksPerSecond;
 	}
 	
 	if (currentTick >= this->keyNum)
@@ -178,9 +177,7 @@ GrAnimFrame GrAnimationNode::getAnimFrame(float relTime, float ticksPerSecond, i
 	{
 		nextTick = this->keyNum-1;
 	}
-
 	glm::vec3 p = glm::mix(this->posKeys[currentTick], this->posKeys[nextTick], factor);
-	//bone->setPosition(p.x, p.y, p.z);
 	glm::quat r = glm::slerp(this->rotKeys[currentTick], this->rotKeys[nextTick], factor);
 	glm::vec3 s = glm::mix(this->scaleKeys[currentTick], this->scaleKeys[nextTick], factor);
 

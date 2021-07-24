@@ -31,9 +31,12 @@ static GrAnimManager *animMan;
 static GrAnimation *idle;
 static GrAnimation *walk;
 static GrAnimation *walkBack;
+static GrAnimation *leftStrafe;
+static GrAnimation *rightStrafe;
 
 //Controls
 static int turnRate = 0;
+static int strafeRate = 0;
 static int moveRate = 0;
 
 void run();

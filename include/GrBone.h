@@ -26,6 +26,9 @@ public:
 	glm::vec3 position;
 	glm::quat rotation;
 	glm::vec3 scale;
+	glm::vec3 preTransitionPos;
+	glm::quat preTransitionRot;
+	glm::vec3 preTransitionScale;
 	glm::mat4 offsetMatrix;
 	glm::mat4 nodeTransformation;
 	bool requiresUpdate = false;
@@ -49,9 +52,9 @@ public:
 	void clearQueues();
 	bool transition = false;
 	float transitionFactor = 1.0f; //Current p-r-s will be determined by : interpolate(current, target, targetScale)
+	bool targetSet = false;
 
 private:
-	bool targetSet = false;
 	vector<glm::vec3> posQueue;
 	vector<glm::quat> rotQueue;
 	vector<glm::vec3> scaleQueue;

@@ -3,6 +3,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/pbrmaterial.h>
 #include <glm/gtx/matrix_decompose.hpp>
 #include "grMesh.h"
 #include "grTexture.h"

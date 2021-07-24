@@ -27,9 +27,8 @@ public:
 	Geometry(vector<Vertex> vertices, unsigned int indices[], bool initBuffers = true);
 	Geometry(vector<Vertex> vertices, bool initBuffers = true); // For non indexed geometries
 	~Geometry();
-	GrSkeleton* skeleton = NULL;
+	bool hasBones = false;
 	vector<Vertex> vertices;
-	vector<GrBone*> bones;
 	unsigned int VAO, VBO, EBO;
 	void setIndices(unsigned int indices[], int indicesSize);
 	void initBuffers();

@@ -17,13 +17,13 @@ struct Texture {
 	aiString path;
 };
 
-enum TextureTypes { DIFFUSE_TEXTURE, SPECULAR_TEXTURE, NORMAL_TEXTURE, HEIGHT_TEXTURE, ROUGHNESS_TEXTURE, METALNESS_TEXTURE, DISP_TEXTURE };
+enum TextureTypes { DIFFUSE_TEXTURE, SPECULAR_TEXTURE, NORMAL_TEXTURE, HEIGHT_TEXTURE, PBR_TEXTURE, DISP_TEXTURE };
 
 class Material
 {
 public:
 	Material();
-	Material(glm::vec3 color, float shininess, bool metalness, float rougness);
+	Material(glm::vec3 color, float shininess, float metalness, float rougness);
 	~Material();
 	
 
@@ -41,7 +41,7 @@ public:
 	float shininess = 32;
 
 	//PBR
-	bool metalness;
+	float metalness;
 	float rougness;
 
 	//General Properties
@@ -54,8 +54,7 @@ private:
 	grTexture* diffuseMap;
 	grTexture* normalMap;
 	
-	grTexture* roughnessMap;
-	grTexture* metalMap;
+	grTexture* pbrMap; //Roughness and metalness combined
 	grTexture* dispMap;
 };
 
