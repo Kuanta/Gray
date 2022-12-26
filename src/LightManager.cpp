@@ -30,16 +30,8 @@ void LightManager::init()
 	this->depthCubeMap = this->createCubeMap(this->depthMapFBOCube, this->depthCubeMap);
 	this->depthCubeMapStatic = this->createCubeMap(this->depthMapFBOCubeStatic, this->depthCubeMapStatic);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//Create shadowTexture
-	glBindFramebuffer(GL_FRAMEBUFFER, this->scene->fbo);
-	glGenTextures(1, &this->finalShadowTexture);
-	glBindTexture(GL_TEXTURE_2D, this->finalShadowTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, this->gm->windowWidth, this->gm->windowHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->finalShadowTexture, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void LightManager::add(GrLight* light)
@@ -157,7 +149,7 @@ void LightManager::draw()
 				if(light->requiresUpdate)
 				{
 					this->prepareDrawing(light, staticFbo, true, index);
-					this->scene->drawStaticElements(depthShader);
+					this->scene->drawStaticElements(light, depthShader);
 					light->requiresUpdate = false;
 				}
 
@@ -166,7 +158,7 @@ void LightManager::draw()
 				{
 					//Static lights won't update their maps even for dynamic objects
 					this->prepareDrawing(light, dynamicFbo, false, index);
-					this->scene->drawDynamicElements(depthShader);
+					this->scene->drawDynamicElements(light, depthShader);
 				}
 			}
 			if(light->type == LIGHT_TYPES::DIRECTIONAL)

@@ -62,10 +62,8 @@ public:
 
 	void activateFbo(); //If post processing effects are activated, the canvas fbo will be activated
 	void drawElements(Shader* shader=nullptr);
-	void drawStaticElements(Shader* shader=nullptr, bool lightFilter=true);
-	void drawDynamicElements(Shader* shader=nullptr, bool lightFilter=true);
-
-protected:
+	void drawStaticElements(GrLight *light, Shader *shader = nullptr);
+	void drawDynamicElements(GrLight *light, Shader *shader = nullptr);
 
 	//Post Processing
 	unsigned int fbo;

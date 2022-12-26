@@ -1,4 +1,4 @@
-#include "GrAnimation.h"
+#include "Animation/GrAnimation.h"
 
 class GrAnimationGroup : public GrAnimation
 {

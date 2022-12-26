@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include "Components/Component.h"
-#include "GrAnimation.h"
+#include "Animation/GrAnimation.h"
 #include "containers.h"
 
 class GrAnimManager : public Component

@@ -1,9 +1,9 @@
 #include "demoScene.h"
-#include "GrAnimGroup.h"
+#include "Animation/GrAnimGroup.h"
 
 void run()
 {
-    GameManager *gm = new GameManager(1920, 1080);
+    GameManager *gm = new GameManager(2560, 1440);
     scene = new Scene(gm);
     scene->keyInputCallback = keyInput;
     scene->cursorEnterCallback = cursor_enter_callback;
@@ -12,7 +12,7 @@ void run()
     scene->scrollCallback = scroll_callback;
     gm->changeScene(scene);
     GrLight *ambient = createAmbientLight(glm::vec3(0.9, 0.9, 0.9), 0.1);
-    GrLight *directional = createDirectionalLight(glm::vec3(0.6, 0.6, 0.8), 2.0f, glm::vec3(-0.5f, -1.0f, -1.0f));
+    GrLight *directional = createDirectionalLight(glm::vec3(94.5/255.0, 85.5/255.0, 64.3/255.0), 2.0f, glm::vec3(-0.5f, -1.0f, -1.0f));
     directional->setPosition(10, 100, 25.0);
     glm::vec3 direction = glm::vec3(-5.0f, 0, -5.0f) - directional->getPosition();
     direction = glm::normalize(direction);
@@ -38,12 +38,12 @@ void run()
 
     for(int i=0;i<lightPositions.size();++i)
     {
-        GrLight *point = createPointLight(glm::vec3(0.9, 0.9, 0.9), 10.0f, lightPositions.at(i), 0,0,0);
-        point->attenuationFactor = 10.0f;
-        point->farPlane = 50.0f;
+        GrLight *point = createPointLight(glm::vec3(94.5 / 255.0, 85.5 / 255.0, 64.3 / 255.0), 10.0f, lightPositions.at(i), 0, 0, 0);
+        point->attenuationFactor = 20.0f;
+        point->farPlane = 200.0f;
         point->castShadow = true;
         point->staticLight = false;
-        point->softShadowFactor = 2;
+        point->softShadowFactor = 0;
         scene->add(point);
     }
     
@@ -61,7 +61,7 @@ void run()
     ybot = new Object();
     ybot->add(_ybot);
     //ybot = gm->assetMan.cloneAsset("Ybot");
-    ybot->setPosition(glm::vec3(0,0,-20));
+    ybot->setPosition(glm::vec3(-122.96,0, 1.02));
     ybot->setScale(glm::vec3(0.1, 0.1, 0.1));
     // ybot->setShader(gm->getShader(SHADER_TYPE::GBUFFER_SHADER));
     ybot->name = "YbotRoot";
@@ -95,15 +95,16 @@ void run()
     //Box
     Object *box = new Object();
     box->name = "box";
-    BoxGeometry* bg = new BoxGeometry(3,3,3);
+    BoxGeometry* bg = new BoxGeometry(1,1,1);
     Material* boxMat = new Material();
-    boxMat->diffuse = glm::vec3(0.8, 0.3, 0.6);
+    boxMat->diffuse = glm::vec3(1, 1, 1);
     GrMesh* boxMesh = new GrMesh(bg, boxMat);
     box->addComponent(boxMesh);
     scene->add(box);
     box->setShader(gm->getShader(SHADER_TYPE::GBUFFER_SHADER));
     box->setPosition(5, 1.5, 10);
     box->isStatic = true;
+    box->castShadow = false;
     //Skybox
     Object *skybox = new Object();
     //back, bottom, front, left, right
@@ -122,10 +123,20 @@ void run()
     scene->camera.controls = oc;
     scene->camera.setTarget(glm::vec3(0, 0, -10));
 
+    //Dynamic Light
+    GrLight *dynamicPoint = createPointLight(glm::vec3(0.5, 0.5, 0.6), 10.0f, glm::vec3(0,0,0), 0, 0, 0);
+    dynamicPoint->farPlane = 100.0f;
+    dynamicPoint->attenuationFactor = 10.0f;
+    dynamicPoint->castShadow = true;
+    dynamicPoint->softShadowFactor = 1;
+    ybot->add(dynamicPoint);
+    scene->add(dynamicPoint);
+
     //Walk dynamics
     while (!glfwWindowShouldClose(gm->window))
     {
         float denum = sqrt(moveRate * moveRate + strafeRate*strafeRate);
+        glm::vec3 ybotPos = ybot->getPosition();
         if(denum > 0)
         {
             float _moveRate = moveRate / denum;
@@ -134,7 +145,7 @@ void run()
             glm::vec3 right = ybot->getRight();
             float moveLength = (_moveRate * gm->deltaTime * 5.0f);
             float strafeLength = (_strafeRate * gm->deltaTime * 5.0f);
-            ybot->setPosition(ybot->getPosition() + forward * moveLength + right * strafeLength);
+            ybot->setPosition(ybotPos + forward * moveLength + right * strafeLength);
         }
         if(turnRate != 0)
         {
@@ -142,6 +153,10 @@ void run()
             currRot.y = currRot.y + gm->deltaTime * 50.0f * turnRate;
             ybot->setRotation(currRot);
         }
+        glm::vec3 position = glm::vec3(ybotPos.x + 4 * cos(glfwGetTime() * 2.5f), ybotPos.y + 13.0f, ybotPos.z + 4 * sin(glfwGetTime() * 2.5f));
+        dynamicPoint->setPosition(position);
+        box->setPosition(position);
+        dynamicPoint->requiresUpdate = true;
         gm->update();
     }
 }

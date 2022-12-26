@@ -14,7 +14,7 @@
 #include "Lights/grLight.h"
 #include "Components/Skybox.h"
 #include "Object.h"
-#include "GrAnimManager.h"
+#include "Animation/GrAnimManager.h"
 
 using namespace std;
 

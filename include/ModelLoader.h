@@ -7,8 +7,8 @@
 #include <glm/gtx/matrix_decompose.hpp>
 #include "grMesh.h"
 #include "grTexture.h"
-#include "GrAnimation.h"
-#include "GrAnimManager.h"
+#include "Animation/GrAnimation.h"
+#include "Animation/GrAnimManager.h"
 #include "GrSkeleton.h"
 #include "Object.h"
 #include "Geometry.h"

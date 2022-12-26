@@ -3,6 +3,7 @@ out vec4 FragColor;
   
 in vec2 TexCoords;
 layout(binding=0) uniform sampler2D screenTexture;
+layout(binding=1) uniform sampler2D shadowValues;
 
 uniform float postProcessFactor;
 
@@ -25,13 +26,8 @@ void main()
 
     vec3 col = vec3(0.0);
 
-
     
-    col = vec3(texture(screenTexture, TexCoords.st));
-    FragColor = vec4(col,1);
-
-    //For debugging depth map
-    /*float color = texture(screenTexture, TexCoords.st).r;
-    FragColor = vec4(color,0,0,1);*/
+    vec3 color = texture(screenTexture, TexCoords.st).rgb;
+    FragColor = vec4(color , 1);
    
 } 

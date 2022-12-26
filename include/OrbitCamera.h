@@ -13,7 +13,6 @@ public:
 
 	Camera* camera;
 
-	// Controls aracýlýðýyla devralýndý
 	virtual void update(float deltaTime) override;
 	virtual void keyInput(int key, int scancode, int action, int mods) override;
 	virtual void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) override;

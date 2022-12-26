@@ -157,7 +157,7 @@ void Scene::drawElements(Shader* shader)
 
 	}
 }
-void Scene::drawStaticElements(Shader* shader, bool lightFilter)
+void Scene::drawStaticElements(GrLight *light, Shader *shader)
 {
 	//Draw each element
 	for (vector<Object *>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
@@ -183,7 +183,7 @@ void Scene::drawStaticElements(Shader* shader, bool lightFilter)
 	}
 }
 
-void Scene::drawDynamicElements(Shader* shader, bool lightFilter)
+void Scene::drawDynamicElements( GrLight *light, Shader *shader)
 {
 	//Draw each element
 	for (vector<Object *>::iterator it = this->em.elements.begin(); it != this->em.elements.end(); it++)
@@ -193,6 +193,7 @@ void Scene::drawDynamicElements(Shader* shader, bool lightFilter)
 		// 	//Don't show it in the depth buffer
 		// 	continue;
 		//}
+
 		if ((*it) != nullptr && !(*it)->isStatic)
 		{
 			if (shader != nullptr)
@@ -223,6 +224,19 @@ void Scene::initFbo()
 	//Bind the texture to the frame buffer
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->fboTexture, 0);
 
+	//Create shadowTexture
+	glBindFramebuffer(GL_FRAMEBUFFER, this->fbo);
+	glGenTextures(1, &this->lm.finalShadowTexture);
+	glBindTexture(GL_TEXTURE_2D, this->lm.finalShadowTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, this->gm->windowWidth, this->gm->windowHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, this->lm.finalShadowTexture, 0);
+	//First color channel is the actual color and secodn is used for the shadow
+
+	unsigned int channels[2] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1};
+	glDrawBuffers(2, channels);
+
 	//Assign a render object to frame buffer for stencil and depth testing
 	glGenRenderbuffers(1, &rbo);
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
@@ -234,6 +248,7 @@ void Scene::initFbo()
 	{
 		cout << "ERROR: Framebuffer is not complete" << endl;
 	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	this->fboCanvas = new Object();
@@ -257,6 +272,8 @@ void Scene::drawFbo()
 	glDisable(GL_DEPTH_TEST);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, this->fboTexture);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, this->lm.finalShadowTexture);
 
 	this->fboCanvas->draw(shader);
 }

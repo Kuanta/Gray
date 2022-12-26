@@ -27,7 +27,7 @@ bool GameManager::init(int width, int height)
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-	this->window = glfwCreateWindow(width, height, "Gray", 0, NULL);
+	this->window = glfwCreateWindow(width, height, "Gray", glfwGetPrimaryMonitor(), NULL);
 	this->windowWidth = width; this->windowHeight = height;
 	if (window == NULL)
 	{
@@ -72,7 +72,6 @@ bool GameManager::init(int width, int height)
 
 	//OPENGL
 	glEnable(GL_DEPTH_TEST);  //Enable depth testing
-	glEnable(GL_CULL_FACE);
 
 	return true;
 }

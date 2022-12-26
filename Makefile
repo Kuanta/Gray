@@ -29,6 +29,11 @@ vpath %.cpp examples
 vpath %.o build
 
 all: main
+
+run:
+	make all
+	./build/main.exe
+
 compileall:
 	make clean
 	make all
